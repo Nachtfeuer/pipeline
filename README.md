@@ -29,3 +29,6 @@ basing on pure Python data (dict, list, str and so on).
 python -c "import yaml;print(yaml.load(open('example.yaml').read()))"
 ```
 
+# Links
+ - http://pykwalify.readthedocs.io/en/unstable/
+ - http://pykwalify.readthedocs.io/en/unstable/partial-schemas.html

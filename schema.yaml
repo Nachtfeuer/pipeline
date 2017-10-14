@@ -1,3 +1,13 @@
+schema;env_map:
+  type: map
+  mapping:
+    env:
+      type: map
+      matching-rule: all
+      mapping:
+        regex;(.+):
+            type: str
+
 type: map
 mapping:
 
@@ -14,44 +24,19 @@ mapping:
     required: yes
     type: seq
     sequence:
-      - type: map
-        mapping:
-          env:
-            type: map
-            matching-rule: all
-            mapping:
-              regex;(.+):
-                  type: str
-                  unique: yes
-
+      - include: env_map
       - type: map
         mapping:
           regex;(stage\(.+\)):
             type: seq
             sequence:
-              - type: map
-                mapping:
-                  env:
-                    type: map
-                    matching-rule: all
-                    mapping:
-                      regex;(.+):
-                          type: str
-
+              - include: env_map
               - type: map
                 mapping:
                   tasks:
                     type: seq
                     sequence:
-                      - type: map
-                        mapping:
-                          env:
-                            type: map
-                            matching-rule: all
-                            mapping:
-                              regex;(.+):
-                                  type: str
-
+                      - include: env_map
                       - type: map
                         mapping:
                           shell:

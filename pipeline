@@ -19,11 +19,14 @@ class PipelineData(object):
 
 
 class Stage(object):
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, title):
         """Initializing with referenz to pipeline main object."""
         self.pipeline = pipeline
+        self.title = title
 
     def process(self, stage):
+        """Processing one stage."""
+        logging.info("Processing pipeline stage '%s'", self.title)
         for entry in stage:
             key = entry.keys()[0]
             if key == "env":
@@ -50,7 +53,7 @@ class Pipeline(object):
                 continue
 
             if key.startswith("stage"):
-                stage = Stage(self)
+                stage = Stage(self, re.match("stage\((?P<title>.*)\)", key).group("title"))
                 stage.process(entry[key])
 
 def setup_logging():

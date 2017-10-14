@@ -1,0 +1,18 @@
+matrix:
+  - foobar: "hello world 1!"
+  - foobar: "hello world 2!"
+
+pipeline:
+  - env:
+      foo: foo at pipeline level
+      bar: bar at pipeline level
+
+  - stage:
+    - env:
+        foo: foo at stage level
+        bar: bar at stage level
+
+    - tasks:
+      - env:
+          foo: foo at task level
+          bar: bar at task level

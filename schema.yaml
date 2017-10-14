@@ -1,0 +1,53 @@
+type: map
+mapping:
+
+  matrix:
+    type: seq
+    sequence:
+      - type: map
+        matching-rule: all
+        mapping:
+          regex;(.+):
+              type: str
+
+  pipeline:
+    required: yes
+    type: seq
+    sequence:
+      - type: map
+        mapping:
+          env:
+            type: map
+            matching-rule: all
+            mapping:
+              regex;(.+):
+                  type: str
+                  unique: yes
+
+      - type: map
+        mapping:
+          stage:
+            type: seq
+            sequence:
+              - type: map
+                mapping:
+                  env:
+                    type: map
+                    matching-rule: all
+                    mapping:
+                      regex;(.+):
+                          type: str
+
+              - type: map
+                mapping:
+                  tasks:
+                    type: seq
+                    sequence:
+                      - type: map
+                        mapping:
+                          env:
+                            type: map
+                            matching-rule: all
+                            mapping:
+                              regex;(.+):
+                                  type: str

@@ -1,0 +1,46 @@
+#!/usr/bin/python
+import sys
+import platform
+import logging
+import re
+import click
+import yaml
+
+class Pipeline(object):
+    def __init__(self, pipeline):
+        self.pipeline = pipeline
+        self.env_list = [{}, {}, {}]
+
+    def run(self):
+        """Processing the whole pipeline definition."""
+        for entry in self.pipeline:
+            key = entry.keys()[0]
+            if key == "env":
+                self.env_list[0] = entry[key]
+                logging.debug("Updating environment at level 0 with %s", self.env_list[0])
+                continue
+            if key.startswith("stage"):
+                pass
+
+
+def setup_logging():
+    """Setup of application logging."""
+    FORMAT="%(asctime)-15s %(message)s"
+    logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+
+
+@click.command()
+@click.option('--definition', help="Pipeline definition in yaml format")
+def main(definition):
+    """Pipeline tool."""
+    setup_logging()
+    logging.info("Running with Python %s", sys.version.replace("\n", ""))
+    logging.info("Running on platform %s", platform.platform())
+    logging.info("Processing pipeline definition '%s'", definition)
+
+    document = yaml.load(open(definition).read())
+    pipeline = Pipeline(document['pipeline'])
+    pipeline.run()
+
+if __name__ == "__main__":
+    main()

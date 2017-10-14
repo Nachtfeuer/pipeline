@@ -1,13 +1,13 @@
 matrix:
-  - foobar: "hello world 1!"
-  - foobar: "hello world 2!"
+  - mode: one
+  - mode: two
 
 pipeline:
   - env:
       foo: foo at pipeline level
       bar: bar at pipeline level
 
-  - stage:
+  - stage(build):
     - env:
         foo: foo at stage level
         bar: bar at stage level
@@ -16,3 +16,8 @@ pipeline:
       - env:
           foo: foo at task level
           bar: bar at task level
+
+      - shell: echo "hello world! (mode=$mode)"
+      - shell: |
+          echo "$foo"
+          echo "$bar"

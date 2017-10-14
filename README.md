@@ -7,7 +7,7 @@
 Following dependencies are required:
 
 ```
-pip install pyaml pykwalify
+pip install click pyaml pykwalify
 ```
 
 Main focus for a quick start is developing on this

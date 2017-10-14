@@ -1,4 +1,7 @@
 #!/usr/bin/python
+"""
+Pipeline tool.
+"""
 import sys
 import platform
 import logging
@@ -6,32 +9,59 @@ import re
 import click
 import yaml
 
-class Pipeline(object):
+
+class PipelineData(object):
+    """Class for keeping pipeline data."""
     def __init__(self, pipeline):
+        """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pipeline = pipeline
         self.env_list = [{}, {}, {}]
 
-    def run(self):
-        """Processing the whole pipeline definition."""
-        for entry in self.pipeline:
+
+class Stage(object):
+    def __init__(self, pipeline):
+        """Initializing with referenz to pipeline main object."""
+        self.pipeline = pipeline
+
+    def process(self, stage):
+        for entry in stage:
             key = entry.keys()[0]
             if key == "env":
-                self.env_list[0] = entry[key]
-                logging.debug("Updating environment at level 0 with %s", self.env_list[0])
+                self.pipeline.data.env_list[1].update(entry[key])
+                logging.debug("Updating environment at level 1 with %s",
+                              self.pipeline.data.env_list[1])
                 continue
-            if key.startswith("stage"):
-                pass
 
+
+class Pipeline(object):
+    """Class for processing a pipeline definition."""
+    def __init__(self, pipeline):
+        """Initializing pipeline with definition (loaded from a yaml file)."""
+        self.data = PipelineData(pipeline)
+
+    def run(self):
+        """Processing the whole pipeline definition."""
+        for entry in self.data.pipeline:
+            key = entry.keys()[0]
+            if key == "env":
+                self.data.env_list[0].update(entry[key])
+                logging.debug("Updating environment at level 0 with %s",
+                              self.data.env_list[0])
+                continue
+
+            if key.startswith("stage"):
+                stage = Stage(self)
+                stage.process(entry[key])
 
 def setup_logging():
     """Setup of application logging."""
-    FORMAT="%(asctime)-15s %(message)s"
-    logging.basicConfig(format=FORMAT, level=logging.DEBUG)
+    logging_format = "%(asctime)-15s %(message)s"
+    logging.basicConfig(format=logging_format, level=logging.DEBUG)
 
 
 @click.command()
 @click.option('--definition', help="Pipeline definition in yaml format")
-def main(definition):
+def main(definition=""):
     """Pipeline tool."""
     setup_logging()
     logging.info("Running with Python %s", sys.version.replace("\n", ""))

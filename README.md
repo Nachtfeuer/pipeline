@@ -32,3 +32,4 @@ python -c "import yaml;print(yaml.load(open('example.yaml').read()))"
 # Links
  - http://pykwalify.readthedocs.io/en/unstable/
  - http://pykwalify.readthedocs.io/en/unstable/partial-schemas.html
+ - https://github.com/amoffat/sh

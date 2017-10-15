@@ -3,22 +3,83 @@
 Pipeline tool.
 """
 import sys
+import os
 import platform
 import logging
 import re
+import shlex
+import subprocess
 import click
 import yaml
 
 
+class Bash(object):
+    """Wrapper for Bash execution."""
+
+    def __init__(self, script, env={}):
+        """Initialize with Bash code and optional environment variables."""
+        self.args = shlex.split("bash -c \"%s\"" % script)
+        self.stdout = subprocess.PIPE
+        self.stderr = subprocess.STDOUT
+        self.shell = False
+        self.env = os.environ.copy()
+        self.env.update(env)
+
+    def process(self):
+        """Running the Bash code."""
+        try:
+            process = subprocess.Popen(
+                self.args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
+            out, _ = process.communicate()
+            for line in out.split("\n"):
+                yield line
+        except OSError as exception:
+            yield str(exception)
+
+
 class PipelineData(object):
     """Class for keeping pipeline data."""
+
     def __init__(self, pipeline):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pipeline = pipeline
         self.env_list = [{}, {}, {}]
 
 
+class Tasks(object):
+    """Class for procressing a list of tasks."""
+
+    def __init__(self, pipeline):
+        """Initializing with referenz to pipeline main object."""
+        self.pipeline = pipeline
+
+    def process(self, tasks):
+        """Processing a group of tasks."""
+        logging.info("Processing group of tasks")
+        for entry in tasks:
+            key = entry.keys()[0]
+            if key == "env":
+                self.pipeline.data.env_list[2].update(entry[key])
+                logging.debug("Updating environment at level 2 with %s",
+                              self.pipeline.data.env_list[2])
+                continue
+
+            if key == "shell":
+                env = self.pipeline.data.env_list[0].copy()
+                env.update(self.pipeline.data.env_list[1].copy())
+                env.update(self.pipeline.data.env_list[2].copy())
+
+                logging.info("Processing Bash code: start")
+                shell = Bash(entry[key], env)
+                for line in shell.process():
+                    logging.info(" | %s", line)
+                logging.info("Processing Bash code: finished")
+                continue
+
+
 class Stage(object):
+    """Class for representing a name group (title)."""
+
     def __init__(self, pipeline, title):
         """Initializing with referenz to pipeline main object."""
         self.pipeline = pipeline
@@ -35,9 +96,15 @@ class Stage(object):
                               self.pipeline.data.env_list[1])
                 continue
 
+            if key == "tasks":
+                tasks = Tasks(self.pipeline)
+                tasks.process(entry[key])
+                continue
+
 
 class Pipeline(object):
     """Class for processing a pipeline definition."""
+
     def __init__(self, pipeline):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.data = PipelineData(pipeline)
@@ -53,8 +120,9 @@ class Pipeline(object):
                 continue
 
             if key.startswith("stage"):
-                stage = Stage(self, re.match("stage\((?P<title>.*)\)", key).group("title"))
+                stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
                 stage.process(entry[key])
+
 
 def setup_logging():
     """Setup of application logging."""

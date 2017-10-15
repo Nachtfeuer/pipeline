@@ -22,7 +22,8 @@ class Bash(object):
         self.temp = tempfile.NamedTemporaryFile(
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
         if os.path.isfile(script):
-            self.temp.writeLines(open(script).read().split("\n"))
+            content = str(open(script).read())
+            self.temp.writelines(content)
         else:
             self.temp.writelines("#!/bin/bash\n" + script)
         self.temp.close()

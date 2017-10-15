@@ -18,6 +18,7 @@ be another section.
 git clone https://github.com/Nachtfeuer/pipeline.git
 cd pipeline
 ./validate.sh
+./unittests.sh
 ```
 
 # Some hints
@@ -32,4 +33,4 @@ python -c "import yaml;print(yaml.load(open('example.yaml').read()))"
 # Links
  - http://pykwalify.readthedocs.io/en/unstable/
  - http://pykwalify.readthedocs.io/en/unstable/partial-schemas.html
- - https://github.com/amoffat/sh
+ - https://github.com/bats-core/bats-core

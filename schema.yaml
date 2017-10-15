@@ -15,10 +15,15 @@ mapping:
     type: seq
     sequence:
       - type: map
-        matching-rule: all
         mapping:
-          regex;(.+):
-              type: str
+          name:
+            type: str
+          env:
+            type: map
+            matching-rule: all
+            mapping:
+              regex;(.+):
+                  type: str
 
   pipeline:
     required: yes

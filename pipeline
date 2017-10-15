@@ -88,6 +88,7 @@ class Tasks(object):
                 continue
 
             if key == "shell":
+                # copying and merging environment variables
                 env = self.pipeline.data.env_list[0].copy()
                 env.update(self.pipeline.data.env_list[1].copy())
                 env.update(self.pipeline.data.env_list[2].copy())
@@ -128,9 +129,10 @@ class Stage(object):
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, env={}):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.data = PipelineData(pipeline)
+        self.data.env_list[0].update(env)
 
     def run(self):
         """Processing the whole pipeline definition."""
@@ -163,8 +165,17 @@ def main(definition=""):
     logging.info("Processing pipeline definition '%s'", definition)
 
     document = yaml.load(open(definition).read())
-    pipeline = Pipeline(document['pipeline'])
-    pipeline.run()
+
+    if 'matrix' in document:
+        matrix = document['matrix']
+        for entry in matrix:
+            logging.info("Processing pipeline for matrix entry '%s'", entry['name'])
+            pipeline = Pipeline(document['pipeline'], entry['env'])
+            pipeline.run()
+    else:
+        pipeline = Pipeline(document['pipeline'])
+        pipeline.run()
+
 
 if __name__ == "__main__":
     main()

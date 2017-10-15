@@ -1,0 +1,13 @@
+matrix:
+  - name: first
+    env:
+      matrix_message: first hello world on matrix level
+
+  - name: second
+    env:
+      matrix_message: second hello world on matrix level
+
+pipeline:
+  - stage(test):
+    - tasks:
+      - shell: echo $matrix_message

@@ -1,6 +1,10 @@
 matrix:
-  - mode: one
-  - mode: two
+  - name: one
+    env:
+        mode: one
+  - name: two
+    env:
+        mode: two
 
 pipeline:
   - env:

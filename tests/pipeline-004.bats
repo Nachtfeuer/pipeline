@@ -1,4 +1,4 @@
-SCRIPT=${WORKSPACE}/pipeline
+SCRIPT="python ${WORKSPACE}/pipeline"
 
 # From the root of the repository you also can test this
 # with following command. ./pipeline --definition=tests/pipeline-004.yaml

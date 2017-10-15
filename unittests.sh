@@ -7,7 +7,7 @@ WORKSPACE=$PWD
 export WORKSPACE
 
 # one simple run
-${WORKSPACE}/pipeline --definition=tests/pipeline-001.yaml
+python ${WORKSPACE}/pipeline --definition=tests/pipeline-001.yaml
 
 # running all tests
 bats-core/bin/bats tests

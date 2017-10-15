@@ -21,6 +21,7 @@ before_install:
 install:
     - pip install pip --upgrade
     - pip install click pyaml pykwalify
+    - which python
     - python -V
     - pip -V
 

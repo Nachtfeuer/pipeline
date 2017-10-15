@@ -1,0 +1,6 @@
+pipeline:
+  - stage(test):
+    - tasks:
+      - shell: |
+          echo "hello world!"
+          exit 1

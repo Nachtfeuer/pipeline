@@ -1,0 +1,18 @@
+pipeline:
+  - env:
+      pipeline_message: hello world at pipeline level!
+      stage_message: this message should be overwritten!
+
+  - stage(test):
+    - env:
+        stage_message: hello world at stage level!
+        tasks_message: this mesage should be overwritten!
+
+    - tasks:
+      - env:
+          tasks_message: hello world at tasks level!
+
+      - shell: |
+          echo "$pipeline_message"
+          echo "$stage_message"
+          echo "$tasks_message"

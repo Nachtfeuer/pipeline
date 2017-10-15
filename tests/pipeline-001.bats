@@ -1,5 +1,7 @@
 SCRIPT=${WORKSPACE}/pipeline
 
+# From the root of the repository you also can test this
+# with following command. ./pipeline --definition=tests/pipeline-001.yaml
 @test "$BATS_TEST_FILENAME :: Testing valid inline bash code" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-001.yaml
     # verifying exit code

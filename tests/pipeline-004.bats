@@ -1,5 +1,7 @@
 SCRIPT=${WORKSPACE}/pipeline
 
+# From the root of the repository you also can test this
+# with following command. ./pipeline --definition=tests/pipeline-004.yaml
 @test "$BATS_TEST_FILENAME :: Testing use of environment variables (stage level, merging)" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-004.yaml
     # verifying exit code

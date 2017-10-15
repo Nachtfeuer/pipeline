@@ -20,13 +20,13 @@ before_install:
 
 install:
     - pip install pip --upgrade
-    - pip install coveralls
+    - pip install click pyaml pykwalify
     - python -V
     - pip -V
 
 script:
-    - validate.sh
-    - unitests.sh
+    - ./validate.sh
+    - ./unitests.sh
 
 notifications:
     email:

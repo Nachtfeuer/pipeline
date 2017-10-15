@@ -9,6 +9,7 @@ import logging
 import re
 import shlex
 import subprocess
+import tempfile
 import click
 import yaml
 
@@ -18,7 +19,19 @@ class Bash(object):
 
     def __init__(self, script, env={}):
         """Initialize with Bash code and optional environment variables."""
-        self.args = shlex.split("bash -c \"%s\"" % script)
+        self.temp = tempfile.NamedTemporaryFile(
+            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
+        if os.path.isfile(script):
+            self.temp.writeLines(open(script).read().split("\n"))
+        else:
+            self.temp.writelines("#!/bin/bash\n" + script)
+        self.temp.close()
+        # make Bash script executable
+        os.chmod(self.temp.name, 0777)
+
+        logging.info("Running script %s", self.temp.name)
+
+        self.args = shlex.split("bash %s" % self.temp.name)
         self.stdout = subprocess.PIPE
         self.stderr = subprocess.STDOUT
         self.shell = False
@@ -27,14 +40,23 @@ class Bash(object):
 
     def process(self):
         """Running the Bash code."""
+        success = False
         try:
             process = subprocess.Popen(
                 self.args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
             out, _ = process.communicate()
             for line in out.split("\n"):
                 yield line
+            logging.info("Exit code has been %d", process.returncode)
+            success = True if process.returncode == 0 else False
         except OSError as exception:
             yield str(exception)
+
+        # removing script
+        os.remove(self.temp.name)
+        if not success:
+            logging.error("Pipeline has failed: immediately leaving!")
+            sys.exit(1)
 
 
 class PipelineData(object):

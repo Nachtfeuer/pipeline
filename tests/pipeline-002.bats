@@ -1,6 +1,6 @@
 SCRIPT=${WORKSPACE}/pipeline
 
-@test "Testing failing inline bash code" {
+@test "$BATS_TEST_FILENAME :: Testing failing inline bash code" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-002.yaml
     # verifying exit code
     [ ${status} -eq 1 ]

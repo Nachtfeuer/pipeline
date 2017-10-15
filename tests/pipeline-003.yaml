@@ -1,0 +1,7 @@
+pipeline:
+  - env:
+      message: hello world at pipeline level!
+
+  - stage(test):
+    - tasks:
+      - shell: echo "$message"

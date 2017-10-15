@@ -63,10 +63,11 @@ class Bash(object):
 class PipelineData(object):
     """Class for keeping pipeline data."""
 
-    def __init__(self, pipeline):
+    def __init__(self, pipeline, tags=[]):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pipeline = pipeline
         self.env_list = [{}, {}, {}]
+        self.tags = tags
 
 
 class Tasks(object):
@@ -88,13 +89,23 @@ class Tasks(object):
                 continue
 
             if key == "shell":
+                if len(self.pipeline.data.tags) > 0:
+                    count = 0
+                    if 'tags' in entry[key]:
+                        for tag in self.pipeline.data.tags:
+                            if tag in entry[key]['tags']:
+                                count += 1
+
+                    if count == 0:
+                        continue
+
                 # copying and merging environment variables
                 env = self.pipeline.data.env_list[0].copy()
                 env.update(self.pipeline.data.env_list[1].copy())
                 env.update(self.pipeline.data.env_list[2].copy())
 
                 logging.info("Processing Bash code: start")
-                shell = Bash(entry[key], env)
+                shell = Bash(entry[key]['script'], env)
                 for line in shell.process():
                     logging.info(" | %s", line)
                 logging.info("Processing Bash code: finished")
@@ -129,11 +140,13 @@ class Stage(object):
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, pipeline, env={}):
+    def __init__(self, pipeline, env={}, tags=[]):
         """Initializing pipeline with definition (loaded from a yaml file)."""
-        self.data = PipelineData(pipeline)
+        self.data = PipelineData(pipeline, tags)
         self.data.env_list[0].update(env)
 
+    def run(self):
+        """Processing the whole pipeline definition."""
     def run(self):
         """Processing the whole pipeline definition."""
         for entry in self.data.pipeline:
@@ -157,7 +170,8 @@ def setup_logging():
 
 @click.command()
 @click.option('--definition', help="Pipeline definition in yaml format")
-def main(definition=""):
+@click.option('--tags', default='', help="Comma separated list of tags")
+def main(definition="", tags=""):
     """Pipeline tool."""
     setup_logging()
     logging.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -165,15 +179,16 @@ def main(definition=""):
     logging.info("Processing pipeline definition '%s'", definition)
 
     document = yaml.load(open(definition).read())
+    tag_list = [] if  len(tags) == 0 else tags.split(",")
 
     if 'matrix' in document:
         matrix = document['matrix']
         for entry in matrix:
             logging.info("Processing pipeline for matrix entry '%s'", entry['name'])
-            pipeline = Pipeline(document['pipeline'], entry['env'])
+            pipeline = Pipeline(document['pipeline'], env=entry['env'], tags=tag_list)
             pipeline.run()
     else:
-        pipeline = Pipeline(document['pipeline'])
+        pipeline = Pipeline(document['pipeline'], tags=tag_list)
         pipeline.run()
 
 

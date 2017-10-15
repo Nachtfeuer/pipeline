@@ -1,0 +1,12 @@
+pipeline:
+  - stage(test):
+    - tasks:
+      - shell:
+          script: echo "hello world one!"
+          tags:
+            - one
+
+      - shell:
+          script: echo "hello world two!"
+          tags:
+            - two

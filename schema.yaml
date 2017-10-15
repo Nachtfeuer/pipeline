@@ -45,4 +45,11 @@ mapping:
                       - type: map
                         mapping:
                           shell:
-                            type: str
+                            type: map
+                            mapping:
+                              script:
+                                type: str
+                              tags:
+                                type: seq
+                                sequence:
+                                  - type: str

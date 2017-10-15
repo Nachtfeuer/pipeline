@@ -1,4 +1,5 @@
 pipeline:
   - stage(test):
     - tasks:
-      - shell: echo "hello world!"
+      - shell:
+          script: echo "hello world!"

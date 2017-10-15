@@ -12,7 +12,9 @@ refer to installed Jenkins plugins. Similar is also valid for a  .travis.yml.
 
 However it would be great when I could define a pipeline
 that is capable of running locally. Of course I would like to have some well
-known features of the existing pipelines and some that do not exist:
+known features of the existing pipelines and some that do not exist. Following
+features will be considered for now:
+
  - matrix based pipeline (done)
  - pipeline stages (done)
  - shell scrip execution: inline and file (done)
@@ -21,14 +23,14 @@ known features of the existing pipelines and some that do not exist:
  - execution time on each level: pipeline, stage, tasks and shell (todo)
  - automatic schema validation for yaml file (schema is there but validation is still manual)
  - cleanup hooks (todo)
- - filtered execution via tags (todo)
+ - filtered execution via tags (done)
  - one report (todo):
     - one html only
     - simple
     - nice
     - compact
 
-It can be used byy Jenkinsfile as well as by .travis.yml (or other pipelines).
+It can be used by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
 
 # Quick start
 

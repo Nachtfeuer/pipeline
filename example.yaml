@@ -21,7 +21,11 @@ pipeline:
           foo: foo at task group level
           bar: bar at task group level
 
-      - shell: echo "hello world! (mode=$mode)"
-      - shell: |
-          echo "foo=$foo"
-          echo "bar=$bar"
+      - shell:
+            script: echo "hello world! (mode=$mode)"
+            tags:
+                - demo
+      - shell:
+            script: |
+                echo "foo=$foo"
+                echo "bar=$bar"

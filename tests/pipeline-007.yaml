@@ -10,4 +10,5 @@ matrix:
 pipeline:
   - stage(test):
     - tasks:
-      - shell: echo $matrix_message
+      - shell:
+          script: echo $matrix_message

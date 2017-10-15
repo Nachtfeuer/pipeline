@@ -1,4 +1,5 @@
 pipeline:
   - stage(test):
     - tasks:
-      - shell: tests/pipeline-006.sh
+      - shell:
+          script: tests/pipeline-006.sh

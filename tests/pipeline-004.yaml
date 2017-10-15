@@ -8,6 +8,7 @@ pipeline:
         stage_message: hello world at stage level!
 
     - tasks:
-      - shell: |
-          echo "$pipeline_message"
-          echo "$stage_message"
+      - shell:
+          script: |
+            echo "$pipeline_message"
+            echo "$stage_message"

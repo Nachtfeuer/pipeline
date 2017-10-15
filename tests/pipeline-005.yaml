@@ -12,7 +12,8 @@ pipeline:
       - env:
           tasks_message: hello world at tasks level!
 
-      - shell: |
-          echo "$pipeline_message"
-          echo "$stage_message"
-          echo "$tasks_message"
+      - shell:
+          script: |
+            echo "$pipeline_message"
+            echo "$stage_message"
+            echo "$tasks_message"

@@ -1,0 +1,36 @@
+# Travis configuration
+language: python
+
+# whitelist
+branches:
+    only:
+        - master
+
+# enable docker
+services:
+ - docker
+
+env:
+    matrix:
+     - PYTHON_VERSION=py27
+
+before_install:
+    - sudo apt-get update -qq
+    - docker version
+
+install:
+    - pip install pip --upgrade
+    - pip install coveralls
+    - python -V
+    - pip -V
+
+script:
+    - validate.sh
+    - unitests.sh
+
+notifications:
+    email:
+        recipients:
+           - thomas.lehmann.private@gmail.com
+        on_success: always
+        on_failure: always

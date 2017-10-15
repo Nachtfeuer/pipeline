@@ -1,5 +1,7 @@
 # Welcome to the pipeline tool
 
+[![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
+
 **Work in progress; not yet for use; stay tuned**
 
 # Quick start

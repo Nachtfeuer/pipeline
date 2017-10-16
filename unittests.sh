@@ -1,6 +1,9 @@
 #!/bin/bash
+bats_url=https://github.com/bats-core/bats-core.git
+
 if [ ! -d bats-core ]; then
-    git clone https://github.com/bats-core/bats-core.git
+    echo "Downloading bats tool from ${bats_url}"
+    git clone ${bats_url}
 fi
 
 WORKSPACE=$PWD

@@ -147,8 +147,6 @@ class Pipeline(object):
 
     def run(self):
         """Processing the whole pipeline definition."""
-    def run(self):
-        """Processing the whole pipeline definition."""
         for entry in self.data.pipeline:
             key = entry.keys()[0]
             if key == "env":

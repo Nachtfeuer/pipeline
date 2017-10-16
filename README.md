@@ -11,7 +11,7 @@ You cannot run a Jenkinsfile locally without mocking things since the used DSL
 refer to installed Jenkins plugins. Similar is also valid for a  .travis.yml.
 
 However it would be great when I could define a pipeline
-that is capable of running locally. Of course I would like to have some well
+that is capable of running locally. Of course it would be great to have some well
 known features of the existing pipelines and some that do not exist. Following
 features will be considered for now:
 
@@ -50,6 +50,71 @@ cd pipeline
 ./validate.sh
 ./unittests.sh
 ```
+
+# The pipeline syntax
+
+It's organized through a yaml file. Looking at the unittests of this
+project the file `unittests.sh`could be implemented as a `unittests.yaml`
+like following:
+
+```
+pipeline:
+  - env:
+      bats_url: https://github.com/bats-core/bats-core.git
+
+  - stage(unittests):
+    - tasks:
+      - shell:
+          script: |
+            if [ ! -d bats-core ]; then
+              echo "Downloading bats tool from ${bats_url}"
+              git clone ${bats_url}
+            fi
+
+      - shell:
+          script: |
+            WORKSPACE=$PWD bats-core/bin/bats tests
+```
+
+The execution is done that way:
+
+```
+./pipeline --definition=unittests.yaml
+2017-10-16 05:35:56,977 Running with Python 2.7.13 (default, Jan 19 2017, 14:48:08) [GCC 6.3.0 20170118]
+2017-10-16 05:35:56,983 Running on platform Linux-4.9.0-3-amd64-x86_64-with-debian-9.1
+2017-10-16 05:35:56,987 Processing pipeline definition 'unittests.yaml'
+2017-10-16 05:35:56,989 Updating environment at level 0 with {'bats_url': 'https://github.com/bats-core/bats-core.git'}
+2017-10-16 05:35:56,990 Processing pipeline stage 'unittests'
+2017-10-16 05:35:56,990 Processing group of tasks
+2017-10-16 05:35:56,990 Processing Bash code: start
+2017-10-16 05:35:56,992 Running script /tmp/pipeline-script-VmGqRs.sh
+2017-10-16 05:35:58,325  | Downloading bats tool from https://github.com/bats-core/bats-core.git
+2017-10-16 05:35:58,325  | Cloning into 'bats-core'...
+2017-10-16 05:35:58,325  |
+2017-10-16 05:35:58,325 Exit code has been 0
+2017-10-16 05:35:58,326 Processing Bash code: finished
+2017-10-16 05:35:58,326 Processing Bash code: start
+2017-10-16 05:35:58,326 Running script /tmp/pipeline-script-N9jVvh.sh
+2017-10-16 05:35:59,648  | 1..10
+2017-10-16 05:35:59,649  | ok 1 /work/pipeline/tests/pipeline-001.bats :: Testing valid inline bash code
+2017-10-16 05:35:59,649  | ok 2 /work/pipeline/tests/pipeline-002.bats :: Testing failing inline bash code
+2017-10-16 05:35:59,649  | ok 3 /work/pipeline/tests/pipeline-003.bats :: Testing use of environment variables (pipeline level)
+2017-10-16 05:35:59,649  | ok 4 /work/pipeline/tests/pipeline-004.bats :: Testing use of environment variables (stage level, merging)
+2017-10-16 05:35:59,649  | ok 5 /work/pipeline/tests/pipeline-005.bats :: Testing use of environment variables (tasks level, merging)
+2017-10-16 05:35:59,649  | ok 6 /work/pipeline/tests/pipeline-006.bats :: Testing valid bash file
+2017-10-16 05:35:59,649  | ok 7 /work/pipeline/tests/pipeline-007.bats :: Testing valid matrix with two entries
+2017-10-16 05:35:59,649  | ok 8 /work/pipeline/tests/pipeline-008.bats :: Testing filtering by first tag
+2017-10-16 05:35:59,649  | ok 9 /work/pipeline/tests/pipeline-008.bats :: Testing filtering by second tag
+2017-10-16 05:35:59,649  | ok 10 /work/pipeline/tests/pipeline-008.bats :: Testing filtering by both tags
+2017-10-16 05:35:59,649  |
+2017-10-16 05:35:59,649 Exit code has been 0
+2017-10-16 05:35:59,649 Processing Bash code: finished
+```
+
+If you are wondering why I'm not using that in given `.travis.yml` then
+the answer is simple: while build the pipeline tool is not yet verified
+and might have problems producing wrong build results; that's why an
+external test mechanism is better for this project.
 
 # Some hints
 

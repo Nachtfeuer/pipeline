@@ -1,0 +1,16 @@
+pipeline:
+  - env:
+      bats_url: https://github.com/bats-core/bats-core.git
+
+  - stage(unittests):
+    - tasks:
+      - shell:
+          script: |
+            if [ ! -d bats-core ]; then
+              echo "Downloading bats tool from ${bats_url}"
+              git clone ${bats_url}
+            fi
+
+      - shell:
+          script: |
+            WORKSPACE=$PWD bats-core/bin/bats tests

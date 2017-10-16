@@ -76,7 +76,6 @@ pipeline:
             WORKSPACE=$PWD bats-core/bin/bats tests
 ```
 
-The execution is done that way:
 
 ```
 ./pipeline --definition=unittests.yaml
@@ -115,6 +114,51 @@ If you are wondering why I'm not using that in given `.travis.yml` then
 the answer is simple: while build the pipeline tool is not yet verified
 and might have problems producing wrong build results; that's why an
 external test mechanism is better for this project.
+
+### The pipeline block
+
+The pipeline is a list of stages. It also may have environment blocks.
+
+### The stage block
+
+Each stage is a list of tasks blocks. It also may have environment blocks.
+
+### The tasks block
+
+Each tasks block is a list of shell scripts. It also may have environment blocks.
+
+### The shell (the task)
+
+Each shell can have inline Bash code or refer to an external file.
+A shell can break the pipeline when the exit code it not zero.
+Also a shell may have a list of tags which allow to filter for those of interests.
+The bash code also can have multiple lines as shown after here. Independent whether
+the code is inline or via external final it will be copied into a temporary
+file and those one will be executed only.
+
+```
+shell:
+  script: |
+    echo "hello world"
+    exit 0
+  tags:
+    - test
+    - simple
+```
+
+### The environment block:
+
+On all levels (pipeline, stages and tasks) you can have such environment blocks.
+When a shell script is executed the environment is copied and overwritten in
+mentioned order. As a base are all OS environment variables provided as they
+exist when the pipeline has been started.
+
+```
+env:
+  foo: hello
+  bar: world
+```
+
 
 # Some hints
 

@@ -22,7 +22,7 @@ features will be considered for now:
  - parallel execution (todo)
  - execution time on each level: pipeline, stage, tasks and shell (todo)
  - automatic schema validation for yaml file (schema is there but validation is still manual)
- - cleanup hooks (todo)
+ - cleanup hooks (done)
  - filtered execution via tags (done)
  - one report (todo):
     - one html only

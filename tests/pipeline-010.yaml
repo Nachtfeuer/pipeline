@@ -1,0 +1,18 @@
+hooks:
+  cleanup:
+    script: |
+      echo "cleanup has been called!"
+      echo "${message}"
+      echo "PIPELINE_RESULT=${PIPELINE_RESULT}"
+      echo "PIPELINE_SHELL_EXIT_CODE=${PIPELINE_SHELL_EXIT_CODE}"
+
+pipeline:
+  - env:
+      message: "hello world at pipeline level!"
+
+  - stage(test):
+    - tasks:
+      - shell:
+          script: |
+            echo "hello world!"
+            exit 123

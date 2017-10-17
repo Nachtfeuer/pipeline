@@ -6,6 +6,11 @@ matrix:
     env:
         mode: two
 
+hooks:
+    cleanup: 
+        script: |
+            echo "cleanup has been called"
+
 pipeline:
   - env:
       foo: foo at pipeline level

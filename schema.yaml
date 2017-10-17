@@ -25,6 +25,15 @@ mapping:
               regex;(.+):
                   type: str
 
+  hooks:
+    type: map
+    mapping:
+      cleanup:
+        type: map
+        mapping:
+          script:
+            type: str
+
   pipeline:
     required: yes
     type: seq

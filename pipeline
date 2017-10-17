@@ -13,12 +13,17 @@ import tempfile
 import click
 import yaml
 
+class Hooks(object):
+    def __init__(self):
+        self.cleanup = ""
+
 
 class Bash(object):
     """Wrapper for Bash execution."""
 
     def __init__(self, script, env={}):
         """Initialize with Bash code and optional environment variables."""
+        self.success = False
         self.temp = tempfile.NamedTemporaryFile(
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
         if os.path.isfile(script):
@@ -38,36 +43,36 @@ class Bash(object):
         self.shell = False
         self.env = os.environ.copy()
         self.env.update(env)
+        self.exit_code = 0
 
     def process(self):
         """Running the Bash code."""
-        success = False
         try:
             process = subprocess.Popen(
                 self.args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
             out, _ = process.communicate()
             for line in out.split("\n"):
                 yield line
+            self.exit_code = process.returncode
             logging.info("Exit code has been %d", process.returncode)
-            success = True if process.returncode == 0 else False
+            self.success = True if process.returncode == 0 else False
         except OSError as exception:
+            self.exit_code = 1
             yield str(exception)
 
         # removing script
         os.remove(self.temp.name)
-        if not success:
-            logging.error("Pipeline has failed: immediately leaving!")
-            sys.exit(1)
 
 
 class PipelineData(object):
     """Class for keeping pipeline data."""
 
-    def __init__(self, pipeline, tags=[]):
+    def __init__(self, pipeline, tags=[], hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pipeline = pipeline
         self.env_list = [{}, {}, {}]
         self.tags = tags
+        self.hooks = hooks
 
 
 class Tasks(object):
@@ -108,7 +113,18 @@ class Tasks(object):
                 shell = Bash(entry[key]['script'], env)
                 for line in shell.process():
                     logging.info(" | %s", line)
-                logging.info("Processing Bash code: finished")
+
+                if shell.success:
+                    logging.info("Processing Bash code: finished")
+                else:
+                    if len(self.pipeline.data.hooks.cleanup) > 0:
+                        env.update({'PIPELINE_RESULT': 'FAILURE'})
+                        env.update({'PIPELINE_SHELL_EXIT_CODE': str(shell.exit_code)})
+                        cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, env)
+                        for line in cleanup_shell.process():
+                            logging.info(" | %s", line)
+                    logging.error("Pipeline has failed: immediately leaving!")
+                    sys.exit(shell.exit_code)
                 continue
 
 
@@ -140,9 +156,9 @@ class Stage(object):
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, pipeline, env={}, tags=[]):
+    def __init__(self, pipeline, env={}, tags=[], hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
-        self.data = PipelineData(pipeline, tags)
+        self.data = PipelineData(pipeline, tags, hooks)
         self.data.env_list[0].update(env)
 
     def run(self):
@@ -158,6 +174,14 @@ class Pipeline(object):
             if key.startswith("stage"):
                 stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
                 stage.process(entry[key])
+
+        if len(self.data.hooks.cleanup) > 0:
+            env = self.data.env_list[0].copy()
+            env.update({'PIPELINE_RESULT': 'SUCCESS'})
+            env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
+            cleanup_shell = Bash(self.data.hooks.cleanup, env)
+            for line in cleanup_shell.process():
+                logging.info(" | %s", line)
 
 
 def setup_logging():
@@ -179,14 +203,19 @@ def main(definition="", tags=""):
     document = yaml.load(open(definition).read())
     tag_list = [] if  len(tags) == 0 else tags.split(",")
 
+    hooks = Hooks()
+    if 'hooks' in document:
+        if 'cleanup' in document['hooks']:
+            hooks.cleanup = document['hooks']['cleanup']['script']
+
     if 'matrix' in document:
         matrix = document['matrix']
         for entry in matrix:
             logging.info("Processing pipeline for matrix entry '%s'", entry['name'])
-            pipeline = Pipeline(document['pipeline'], env=entry['env'], tags=tag_list)
+            pipeline = Pipeline(document['pipeline'], env=entry['env'], tags=tag_list, hooks=hooks)
             pipeline.run()
     else:
-        pipeline = Pipeline(document['pipeline'], tags=tag_list)
+        pipeline = Pipeline(document['pipeline'], tags=tag_list, hooks=hooks)
         pipeline.run()
 
 

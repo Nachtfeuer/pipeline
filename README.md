@@ -17,12 +17,12 @@ features will be considered for now:
 
  - matrix based pipeline (done)
  - pipeline stages (done)
- - shell scrip execution: inline and file (done)
+ - shell script execution: inline and file (done)
  - environment variables merged across each level: matrix, pipeline, stage, and tasks (done)
  - parallel execution (todo)
  - execution time on each level: pipeline, stage, tasks and shell (todo)
  - automatic schema validation for yaml file (schema is there but validation is still manual)
- - cleanup hooks (done)
+ - cleanup hook (done)
  - filtered execution via tags (done)
  - one report (todo):
     - one html only
@@ -146,7 +146,7 @@ shell:
     - simple
 ```
 
-### The environment block:
+### The environment block
 
 On all levels (pipeline, stages and tasks) you can have such environment blocks.
 When a shell script is executed the environment is copied and overwritten in
@@ -157,6 +157,26 @@ exist when the pipeline has been started.
 env:
   foo: hello
   bar: world
+```
+
+### The cleanup hook
+
+It's basically same as for a shell script with a few differences only:
+
+ - When the pipeline succeeds all variables from pipeline level are available.
+ - When a shell script fails all variables on that level are available
+ - Additionally the variable **PIPELINE_RESULT** can have the value **SUCCESS** or **FAILURE**.
+ - Additionally the variable **PIPELINE_SHELL_EXIT_CODE** has the shell exit code
+   of the failed shell or 0 (default)
+
+```
+hooks:
+  cleanup:
+    script: |
+      echo "cleanup has been called!"
+      echo "${message}"
+      echo "PIPELINE_RESULT=${PIPELINE_RESULT}"
+      echo "PIPELINE_SHELL_EXIT_CODE=${PIPELINE_SHELL_EXIT_CODE}"
 ```
 
 

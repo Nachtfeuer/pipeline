@@ -2,7 +2,7 @@ SCRIPT="python ${WORKSPACE}/pipeline"
 
 # From the root of the repository you also can test this
 # with following command. ./pipeline --definition=tests/pipeline-010.yaml
-@test "$BATS_TEST_FILENAME :: Testing cleanup after pipeline run" {
+@test "$BATS_TEST_FILENAME :: Testing cleanup when a shell has failed" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-010.yaml
     # verifying exit code
     [ ${status} -eq 123 ]

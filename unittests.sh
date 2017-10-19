@@ -8,9 +8,11 @@ fi
 
 WORKSPACE=$PWD
 export WORKSPACE
+PYTHONPATH=$PWD
+export PYTHONPATH
 
 # one simple run
-python ${WORKSPACE}/pipeline --definition=tests/pipeline-001.yaml
+python ${WORKSPACE}/scripts/pipeline --definition=tests/pipeline-001.yaml
 
 # running all tests
 bats-core/bin/bats tests

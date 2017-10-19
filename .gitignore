@@ -1,2 +1,6 @@
 .vscode/
 bats-core/
+*.pyc
+.tox/
+ccm.xml
+pipeline.egg-info

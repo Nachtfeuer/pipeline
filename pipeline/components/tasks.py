@@ -50,35 +50,39 @@ class Tasks(object):
                 continue
 
             if key == "shell":
-                if len(self.pipeline.data.tags) > 0:
-                    count = 0
-                    if 'tags' in entry[key]:
-                        for tag in self.pipeline.data.tags:
-                            if tag in entry[key]['tags']:
-                                count += 1
-
-                    if count == 0:
-                        continue
-
-                # copying and merging environment variables
-                env = self.pipeline.data.env_list[0].copy()
-                env.update(self.pipeline.data.env_list[1].copy())
-                env.update(self.pipeline.data.env_list[2].copy())
-
-                logging.info("Processing Bash code: start")
-                shell = Bash(entry[key]['script'], env)
-                for line in shell.process():
-                    logging.info(" | %s", line)
-
-                if shell.success:
-                    logging.info("Processing Bash code: finished")
-                else:
-                    if len(self.pipeline.data.hooks.cleanup) > 0:
-                        env.update({'PIPELINE_RESULT': 'FAILURE'})
-                        env.update({'PIPELINE_SHELL_EXIT_CODE': str(shell.exit_code)})
-                        cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, env)
-                        for line in cleanup_shell.process():
-                            logging.info(" | %s", line)
-                    logging.error("Pipeline has failed: immediately leaving!")
-                    sys.exit(shell.exit_code)
+                self.process_shell(entry, key)
                 continue
+
+    def process_shell(self, entry, key):
+        """Processing a shell entry."""
+        if len(self.pipeline.data.tags) > 0:
+            count = 0
+            if 'tags' in entry[key]:
+                for tag in self.pipeline.data.tags:
+                    if tag in entry[key]['tags']:
+                        count += 1
+
+            if count == 0:
+                return
+
+        # copying and merging environment variables
+        env = self.pipeline.data.env_list[0].copy()
+        env.update(self.pipeline.data.env_list[1].copy())
+        env.update(self.pipeline.data.env_list[2].copy())
+
+        logging.info("Processing Bash code: start")
+        shell = Bash(entry[key]['script'], env)
+        for line in shell.process():
+            logging.info(" | %s", line)
+
+        if shell.success:
+            logging.info("Processing Bash code: finished")
+        else:
+            if len(self.pipeline.data.hooks.cleanup) > 0:
+                env.update({'PIPELINE_RESULT': 'FAILURE'})
+                env.update({'PIPELINE_SHELL_EXIT_CODE': str(shell.exit_code)})
+                cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, env)
+                for line in cleanup_shell.process():
+                    logging.info(" | %s", line)
+            logging.error("Pipeline has failed: immediately leaving!")
+            sys.exit(shell.exit_code)

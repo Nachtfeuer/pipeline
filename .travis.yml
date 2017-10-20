@@ -20,7 +20,7 @@ before_install:
 
 install:
     - pip install pip --upgrade
-    - pip install click pyaml pykwalify
+    - pip install click pyaml pykwalify tox
     - which python
     - python -V
     - pip -V
@@ -28,6 +28,7 @@ install:
 script:
     - ./validate.sh
     - ./unittests.sh
+    - tox -e radon -e pep8 -e pep257
 
 notifications:
     email:

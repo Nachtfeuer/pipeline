@@ -30,11 +30,11 @@ import sys
 import platform
 import logging
 
-from pipeline import Pipeline
-from components.hooks import Hooks
-
 import click
 import yaml
+
+from .pipeline import Pipeline
+from .components.hooks import Hooks
 
 
 class Application(object):
@@ -44,12 +44,13 @@ class Application(object):
         """Initialize application with definition and tags."""
         self.definition = definition
         self.tags = tags
+        self.logging_level = logging.DEBUG
         self.setup_logging()
 
     def setup_logging(self):
         """Setup of application logging."""
         logging_format = "%(asctime)-15s %(message)s"
-        logging.basicConfig(format=logging_format, level=logging.DEBUG)
+        logging.basicConfig(format=logging_format, level=self.logging_level)
 
     def run(self):
         """Processing the pipeline."""
@@ -83,6 +84,7 @@ def main(definition="", tags=""):
     """Pipeline tool."""
     application = Application(definition, tags)
     application.run()
+
 
 if __name__ == "__main__":
     main()

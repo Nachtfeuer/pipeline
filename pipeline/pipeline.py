@@ -29,28 +29,28 @@
 import logging
 import re
 
-from components.bash import Bash
-from components.stage import Stage
+from .components.bash import Bash
+from .components.stage import Stage
 
 
 class PipelineData(object):
     """Class for keeping pipeline data."""
 
-    def __init__(self, pipeline, tags=[], hooks=None):
+    def __init__(self, pipeline, tags=None, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pipeline = pipeline
         self.env_list = [{}, {}, {}]
-        self.tags = tags
+        self.tags = [] if tags is None else tags
         self.hooks = hooks
 
 
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, pipeline, env={}, tags=[], hooks=None):
+    def __init__(self, pipeline, env=None, tags=None, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
-        self.data = PipelineData(pipeline, tags, hooks)
-        self.data.env_list[0].update(env)
+        self.data = PipelineData(pipeline, [] if tags is None else tags, hooks)
+        self.data.env_list[0].update([] if env is None else env)
 
     def run(self):
         """Processing the whole pipeline definition."""

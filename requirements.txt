@@ -2,8 +2,8 @@ nose
 mock == 2.0.0
 pyhamcrest
 coverage
-radon == 1.4.2
-pylint == 1.6.5
+radon == 2.1.1
+pylint == 1.7.2
 pep8 == 1.7.0
 pep257 == 0.7.0
 flake8 == 3.3.0

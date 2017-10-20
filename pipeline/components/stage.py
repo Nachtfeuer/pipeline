@@ -27,7 +27,7 @@
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import logging
-from tasks import Tasks
+from .tasks import Tasks
 
 
 class Stage(object):

@@ -28,7 +28,7 @@
 """
 import sys
 import logging
-from bash import Bash
+from .bash import Bash
 
 
 class Tasks(object):

@@ -36,7 +36,7 @@ import tempfile
 class Bash(object):
     """Wrapper for Bash execution."""
 
-    def __init__(self, script, env={}):
+    def __init__(self, script, env=None):
         """Initialize with Bash code and optional environment variables."""
         self.success = False
         self.temp = tempfile.NamedTemporaryFile(
@@ -57,7 +57,7 @@ class Bash(object):
         self.stderr = subprocess.STDOUT
         self.shell = False
         self.env = os.environ.copy()
-        self.env.update(env)
+        self.env.update({} if env is None else env)
         self.exit_code = 0
 
     def process(self):

@@ -35,18 +35,19 @@ class Stage(object):
 
     def __init__(self, pipeline, title):
         """Initializing with referenz to pipeline main object."""
+        self.logger = logging.getLogger(__name__)
         self.pipeline = pipeline
         self.title = title
 
     def process(self, stage):
         """Processing one stage."""
-        logging.info("Processing pipeline stage '%s'", self.title)
+        self.logger.info("Processing pipeline stage '%s'", self.title)
         for entry in stage:
             key = entry.keys()[0]
             if key == "env":
                 self.pipeline.data.env_list[1].update(entry[key])
-                logging.debug("Updating environment at level 1 with %s",
-                              self.pipeline.data.env_list[1])
+                self.logger.debug("Updating environment at level 1 with %s",
+                                  self.pipeline.data.env_list[1])
                 continue
 
             if key == "tasks":

@@ -39,6 +39,7 @@ class Bash(object):
 
     def __init__(self, script, env=None):
         """Initialize with Bash code and optional environment variables."""
+        self.logger = logging.getLogger(__name__)
         self.success = False
         self.temp = tempfile.NamedTemporaryFile(
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
@@ -51,7 +52,7 @@ class Bash(object):
         # make Bash script executable
         os.chmod(self.temp.name, 0777)
 
-        logging.info("Running script %s", self.temp.name)
+        self.logger.info("Running script %s", self.temp.name)
 
         self.args = shlex.split("bash %s" % self.temp.name)
         self.stdout = subprocess.PIPE
@@ -70,7 +71,7 @@ class Bash(object):
             for line in out.split("\n"):
                 yield line
             self.exit_code = process.returncode
-            logging.info("Exit code has been %d", process.returncode)
+            self.logger.info("Exit code has been %d", process.returncode)
             self.success = True if process.returncode == 0 else False
         except OSError as exception:
             self.exit_code = 1

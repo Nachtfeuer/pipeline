@@ -7,10 +7,10 @@ SCRIPT="python ${WORKSPACE}/scripts/pipeline"
     # verifying exit code
     [ ${status} -eq 123 ]
     # verifying output
-    [ "$(echo ${lines[-7]}|cut -d' ' -f3-)" == "| cleanup has been called!" ]
-    [ "$(echo ${lines[-6]}|cut -d' ' -f3-)" == "| hello world at pipeline level!" ]
-    [ "$(echo ${lines[-5]}|cut -d' ' -f3-)" == "| PIPELINE_RESULT=FAILURE" ]
-    [ "$(echo ${lines[-4]}|cut -d' ' -f3-)" == "| PIPELINE_SHELL_EXIT_CODE=123" ]
-    [ "$(echo ${lines[-2]}|cut -d' ' -f3-)" == "Exit code has been 0" ]
-    [ "$(echo ${lines[-1]}|cut -d' ' -f3-)" == "Pipeline has failed: immediately leaving!" ]
+    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "| cleanup has been called!" ]
+    [ "$(echo ${lines[-6]}|cut -d' ' -f6-)" == "| hello world at pipeline level!" ]
+    [ "$(echo ${lines[-5]}|cut -d' ' -f6-)" == "| PIPELINE_RESULT=FAILURE" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| PIPELINE_SHELL_EXIT_CODE=123" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Pipeline has failed: immediately leaving!" ]
 }

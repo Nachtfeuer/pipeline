@@ -15,22 +15,26 @@ that is capable of running locally. Of course it would be great to have some wel
 known features of the existing pipelines and some that do not exist. Following
 features will be considered for now:
 
- - matrix based pipeline (done)
- - pipeline stages (done)
- - shell script execution: inline and file (done)
- - environment variables merged across each level: matrix, pipeline, stage, and tasks (done)
- - parallel execution (todo)
- - execution time on each level: pipeline, stage, tasks and shell (todo)
- - automatic schema validation for yaml file (schema is there but validation is still manual)
- - cleanup hook (done)
- - filtered execution via tags (done)
- - one report (todo):
-    - one html only
+**Features**:
+ - automatic schema validation for yaml file
+ - matrix based pipeline
+ - pipeline stages (names groups)
+ - shell script execution: inline and file
+ - environment variables merged across each level: matrix, pipeline, stage, and tasks
+ - cleanup hook
+ - filtered execution via tags
+
+**Todo**:
+ - parallel tasks execution
+ - parallel pipelines (matrix)
+ - execution time on each level: pipeline, stage, tasks and shell
+ - one report:
+    - one HTML file only
     - simple
     - nice
     - compact
 
-It can be used by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
+It should be usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
 
 # Quick start
 

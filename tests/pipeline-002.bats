@@ -7,6 +7,6 @@ SCRIPT="python ${WORKSPACE}/scripts/pipeline"
     # verifying exit code
     [ ${status} -eq 1 ]
     # verifying output
-    [ "$(echo ${lines[-2]}|cut -d' ' -f3-)" == "Exit code has been 1" ]
-    [ "$(echo ${lines[-1]}|cut -d' ' -f3-)" == "Pipeline has failed: immediately leaving!" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 1" ]
+    [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Pipeline has failed: immediately leaving!" ]
 }

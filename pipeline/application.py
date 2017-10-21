@@ -28,10 +28,13 @@
 """
 import sys
 import platform
+import os
 import logging
 
 import click
 import yaml
+from pykwalify.core import Core
+from pykwalify.errors import SchemaError
 
 from .pipeline import Pipeline
 from .components.hooks import Hooks
@@ -40,23 +43,45 @@ from .components.hooks import Hooks
 class Application(object):
     """Pipeline application."""
 
-    def __init__(self, definition="", tags=""):
+    def __init__(self, definition, tags, validate_only):
         """Initialize application with definition and tags."""
         self.definition = definition
         self.tags = tags
+        self.validate_only = validate_only
         self.logging_level = logging.DEBUG
+        self.logger = logging.getLogger(__name__)
         self.setup_logging()
 
     def setup_logging(self):
         """Setup of application logging."""
-        logging_format = "%(asctime)-15s %(message)s"
+        logging_format = "%(asctime)-15s - %(name)s - %(message)s"
         logging.basicConfig(format=logging_format, level=self.logging_level)
+
+    def validate_definition(self):
+        """Validate given pipeline definition file."""
+        logging.getLogger('pykwalify.core').setLevel(logging.WARNING)
+        logging.getLogger('pykwalify.rule').setLevel(logging.WARNING)
+        schema_file = os.path.join(os.path.dirname(__file__), 'schema.yaml')
+        core = Core(source_file=self.definition, schema_files=[schema_file])
+        try:
+            core.validate(raise_exception=True)
+            self.logger.info("Schema validation for '%s' succeeded", self.definition)
+        except SchemaError as exception:
+            for line in str(exception).split("\n"):
+                self.logger.error(line)
+            self.logger.info("Schema validation for '%s' has failed", self.definition)
+            sys.exit(1)
 
     def run(self):
         """Processing the pipeline."""
-        logging.info("Running with Python %s", sys.version.replace("\n", ""))
-        logging.info("Running on platform %s", platform.platform())
-        logging.info("Processing pipeline definition '%s'", self.definition)
+        self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
+        self.logger.info("Running on platform %s", platform.platform())
+        self.logger.info("Processing pipeline definition '%s'", self.definition)
+
+        self.validate_definition()
+        if self.validate_only:
+            self.logger.info("Stopping after validation as requested!")
+            return
 
         document = yaml.load(open(self.definition).read())
         tag_list = [] if len(self.tags) == 0 else self.tags.split(",")
@@ -69,7 +94,7 @@ class Application(object):
         if 'matrix' in document:
             matrix = document['matrix']
             for entry in matrix:
-                logging.info("Processing pipeline for matrix entry '%s'", entry['name'])
+                self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
                 pipeline = Pipeline(document['pipeline'], env=entry['env'], tags=tag_list, hooks=hooks)
                 pipeline.run()
         else:
@@ -79,10 +104,13 @@ class Application(object):
 
 @click.command()
 @click.option('--definition', help="Pipeline definition in yaml format")
-@click.option('--tags', default='', help="Comma separated list of tags")
-def main(definition="", tags=""):
+@click.option('--tags', type=click.STRING, default='',
+              help="Comma separated list of tags")
+@click.option('--validate-only', is_flag=True, default=False,
+              help="When used validates given pipeline definition only")
+def main(definition="", tags="", validate_only=False):
     """Pipeline tool."""
-    application = Application(definition, tags)
+    application = Application(definition, tags, validate_only)
     application.run()
 
 

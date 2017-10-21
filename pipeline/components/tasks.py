@@ -37,16 +37,17 @@ class Tasks(object):
     def __init__(self, pipeline):
         """Initializing with referenz to pipeline main object."""
         self.pipeline = pipeline
+        self.logger = logging.getLogger(__name__)
 
     def process(self, tasks):
         """Processing a group of tasks."""
-        logging.info("Processing group of tasks")
+        self.logger.info("Processing group of tasks")
         for entry in tasks:
             key = entry.keys()[0]
             if key == "env":
                 self.pipeline.data.env_list[2].update(entry[key])
-                logging.debug("Updating environment at level 2 with %s",
-                              self.pipeline.data.env_list[2])
+                self.logger.debug("Updating environment at level 2 with %s",
+                                  self.pipeline.data.env_list[2])
                 continue
 
             if key == "shell":
@@ -70,19 +71,19 @@ class Tasks(object):
         env.update(self.pipeline.data.env_list[1].copy())
         env.update(self.pipeline.data.env_list[2].copy())
 
-        logging.info("Processing Bash code: start")
+        self.logger.info("Processing Bash code: start")
         shell = Bash(entry[key]['script'], env)
         for line in shell.process():
-            logging.info(" | %s", line)
+            self.logger.info(" | %s", line)
 
         if shell.success:
-            logging.info("Processing Bash code: finished")
+            self.logger.info("Processing Bash code: finished")
         else:
             if len(self.pipeline.data.hooks.cleanup) > 0:
                 env.update({'PIPELINE_RESULT': 'FAILURE'})
                 env.update({'PIPELINE_SHELL_EXIT_CODE': str(shell.exit_code)})
                 cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, env)
                 for line in cleanup_shell.process():
-                    logging.info(" | %s", line)
-            logging.error("Pipeline has failed: immediately leaving!")
+                    self.logger.info(" | %s", line)
+            self.logger.error("Pipeline has failed: immediately leaving!")
             sys.exit(shell.exit_code)

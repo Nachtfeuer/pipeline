@@ -26,6 +26,7 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import re
 import logging
 from .tasks import Tasks
 
@@ -50,7 +51,7 @@ class Stage(object):
                                   self.pipeline.data.env_list[1])
                 continue
 
-            if key == "tasks":
-                tasks = Tasks(self.pipeline)
+            if key.startswith("tasks"):
+                tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
                 tasks.process(entry[key])
                 continue

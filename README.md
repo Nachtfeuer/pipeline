@@ -23,9 +23,9 @@ features will be considered for now:
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
  - cleanup hook
  - filtered execution via tags
+ - parallel tasks execution
 
 **Todo**:
- - parallel tasks execution
  - parallel pipelines (matrix)
  - execution time on each level: pipeline, stage, tasks and shell
  - one report:

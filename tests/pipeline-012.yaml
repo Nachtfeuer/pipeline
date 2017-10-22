@@ -1,0 +1,9 @@
+pipeline:
+  - stage(test):
+    - tasks(parallel):
+      - shell:
+          script: |
+            sleep 2s
+            echo "first!"
+      - shell:
+          script: echo "second!"

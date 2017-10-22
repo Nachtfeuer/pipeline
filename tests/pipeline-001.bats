@@ -6,7 +6,6 @@ SCRIPT="python ${WORKSPACE}/scripts/pipeline"
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-001.yaml
     # verifying exit code
     [ ${status} -eq 0 ]
-    echo "${lines[@]}" > /tmp/my.txt
     # verifying output
     [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
     [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| hello world!" ]

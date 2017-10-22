@@ -21,16 +21,19 @@ pipeline:
         foo: foo at stage level
         bar: bar at stage level
 
-    - tasks:
+    - tasks(parallel):
       - env:
           foo: foo at task group level
           bar: bar at task group level
 
       - shell:
-            script: echo "hello world! (mode=$mode)"
+            script: |
+                echo "first: hello world! (mode=$mode)"
+                sleep 2s
             tags:
                 - demo
       - shell:
             script: |
+                echo "second:"
                 echo "foo=$foo"
                 echo "bar=$bar"

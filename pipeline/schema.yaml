@@ -47,7 +47,7 @@ mapping:
               - include: env_map
               - type: map
                 mapping:
-                  tasks:
+                  regex;((tasks\(parallel\)|tasks\(ordered\)|tasks)$):
                     type: seq
                     sequence:
                       - include: env_map

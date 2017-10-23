@@ -1,9 +1,11 @@
 pipeline:
   - stage(test):
     - tasks(parallel):
+      - env:
+          message: parallel one
       - shell:
           script: |
             sleep 2s
-            echo "first!"
+            echo "first - $message!"
       - shell:
-          script: echo "second!"
+          script: echo "second - $message!"

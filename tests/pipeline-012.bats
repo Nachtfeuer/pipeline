@@ -8,7 +8,7 @@ SCRIPT="python ${WORKSPACE}/scripts/pipeline"
     [ ${status} -eq 0 ]
     # verifying output
     [ "$(echo ${lines[-10]}|cut -d' ' -f6-)" == "Run tasks in parallel" ]
-    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "| second!" ]
-    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| first!" ]
+    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "| second: parallel one!" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| first: parallel one!" ]
     [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Parallel Processing Bash code: finished" ]
 }

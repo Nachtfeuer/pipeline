@@ -52,7 +52,7 @@ class Application(object):
         self.logging_level = logging.DEBUG
         self.logging_config = logging_config
         self.setup_logging()
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.get_logger(__name__)
 
     def setup_logging(self):
         """Setup of application logging."""
@@ -60,7 +60,7 @@ class Application(object):
             Logger.configure_by_file(self.logging_config)
         else:
             logging_format = "%(asctime)-15s - %(name)s - %(message)s"
-            Logger.configure_default(format=logging_format, level=self.logging_level)
+            Logger.configure_default(logging_format, self.logging_level)
 
     def validate_definition(self):
         """Validate given pipeline definition file."""

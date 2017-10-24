@@ -28,7 +28,6 @@
 """
 # pylint: disable=no-member
 import sys
-import logging
 import multiprocessing
 from contextlib import closing
 from .bash import Bash
@@ -50,7 +49,7 @@ class Tasks(object):
         """Initializing with referenz to pipeline main object."""
         self.pipeline = pipeline
         self.parallel = parallel
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.get_logger(__name__)
 
     def get_merged_env(self):
         """Copying and merging environment variables."""

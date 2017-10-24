@@ -51,7 +51,7 @@ class Pipeline(object):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.data = PipelineData(pipeline, [] if tags is None else tags, hooks)
         self.data.env_list[0].update([] if env is None else env)
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.get_logger(__name__)
 
     def run(self):
         """Processing the whole pipeline definition."""

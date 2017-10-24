@@ -33,12 +33,13 @@ import subprocess
 import tempfile
 from ..tools.logger import Logger
 
+
 class Bash(object):
     """Wrapper for Bash execution."""
 
     def __init__(self, script, env=None):
         """Initialize with Bash code and optional environment variables."""
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.get_logger(__name__)
         self.success = False
         self.temp = tempfile.NamedTemporaryFile(
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)

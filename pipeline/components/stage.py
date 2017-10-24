@@ -30,12 +30,13 @@ import re
 from .tasks import Tasks
 from ..tools.logger import Logger
 
+
 class Stage(object):
     """Class for representing a name group (title)."""
 
     def __init__(self, pipeline, title):
         """Initializing with referenz to pipeline main object."""
-        self.logger = Logger.getLogger(__name__)
+        self.logger = Logger.get_logger(__name__)
         self.pipeline = pipeline
         self.title = title
 

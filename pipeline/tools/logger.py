@@ -30,6 +30,7 @@ import logging
 
 
 class Logger(object):
+    """Wrapper for logging calls."""
 
     use_external_configuration = False
 
@@ -40,12 +41,13 @@ class Logger(object):
         Logger.use_external_configuration = True
 
     @staticmethod
-    def configure_default(format, level):
+    def configure_default(logging_format, level):
         """Default configuration."""
-        logging.basicConfig(format=format, level=level)
+        logging.basicConfig(format=logging_format, level=level)
 
     @staticmethod
-    def getLogger(name):
+    def get_logger(name):
+        """Get a logger by name."""
         logger = logging.getLogger(name)
         if Logger.use_external_configuration:
             logger.propagate = False

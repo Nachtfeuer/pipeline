@@ -38,7 +38,7 @@ def worker(data):
     """Running on shell via multiprocessing."""
     shell = Bash(data['entry'][data['key']]['script'], data['env'])
     for line in shell.process():
-        Logger.getLogger(__name__ + '.worker').info(" | %s", line)
+        Logger.get_logger(__name__ + '.worker').info(" | %s", line)
     return shell.success
 
 

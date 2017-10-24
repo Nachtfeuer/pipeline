@@ -1,8 +1,8 @@
 """
    Tasks is a group of tasks/shells with no name.
 
-.. module:: hooks
-    :platform: Unix, Windows
+.. module:: tasks
+    :platform: Unix
     :synopis: Tasks is a group of tasks/shells with no name.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
@@ -32,13 +32,14 @@ import logging
 import multiprocessing
 from contextlib import closing
 from .bash import Bash
+from ..tools.logger import Logger
 
 
 def worker(data):
     """Running on shell via multiprocessing."""
     shell = Bash(data['entry'][data['key']]['script'], data['env'])
     for line in shell.process():
-        logging.getLogger(__name__ + '.worker').info(" | %s", line)
+        Logger.getLogger(__name__ + '.worker').info(" | %s", line)
     return shell.success
 
 
@@ -49,7 +50,7 @@ class Tasks(object):
         """Initializing with referenz to pipeline main object."""
         self.pipeline = pipeline
         self.parallel = parallel
-        self.logger = logging.getLogger(__name__)
+        self.logger = Logger.getLogger(__name__)
 
     def get_merged_env(self):
         """Copying and merging environment variables."""

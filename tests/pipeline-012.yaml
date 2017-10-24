@@ -4,6 +4,17 @@ pipeline:
       - env:
           message: parallel one
       - shell:
+          # ensuring that first tasks message comes later than second one
+          script: |
+            sleep 2s
+            echo "first - $message!"
+      - shell:
+          script: echo "second - $message!"
+
+      - env:
+          message: parallel two
+      - shell:
+          # ensuring that first tasks message comes later than second one
           script: |
             sleep 2s
             echo "first - $message!"

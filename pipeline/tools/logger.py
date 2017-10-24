@@ -1,9 +1,9 @@
 """
-   Stage is a named group in a pipeline.
+   Provide configured logger.
 
-.. module:: hooks
-    :platform: Unix, Windows
-    :synopis: Stage is a named group in a pipeline.
+.. module:: tools
+    :platform: Unix
+    :synopis: Provide configured logger.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======
@@ -26,31 +26,27 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import re
-from .tasks import Tasks
-from ..tools.logger import Logger
+import logging
 
-class Stage(object):
-    """Class for representing a name group (title)."""
 
-    def __init__(self, pipeline, title):
-        """Initializing with referenz to pipeline main object."""
-        self.logger = Logger.getLogger(__name__)
-        self.pipeline = pipeline
-        self.title = title
+class Logger(object):
 
-    def process(self, stage):
-        """Processing one stage."""
-        self.logger.info("Processing pipeline stage '%s'", self.title)
-        for entry in stage:
-            key = entry.keys()[0]
-            if key == "env":
-                self.pipeline.data.env_list[1].update(entry[key])
-                self.logger.debug("Updating environment at level 1 with %s",
-                                  self.pipeline.data.env_list[1])
-                continue
+    use_external_configuration = False
 
-            if key.startswith("tasks"):
-                tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
-                tasks.process(entry[key])
-                continue
+    @staticmethod
+    def configure_by_file(filename):
+        """Read logging configuration from an external file."""
+        logging.config.fileConfig(filename)
+        Logger.use_external_configuration = True
+
+    @staticmethod
+    def configure_default(format, level):
+        """Default configuration."""
+        logging.basicConfig(format=format, level=level)
+
+    @staticmethod
+    def getLogger(name):
+        logger = logging.getLogger(name)
+        if Logger.use_external_configuration:
+            logger.propagate = False
+        return logger

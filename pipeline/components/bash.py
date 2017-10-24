@@ -1,8 +1,8 @@
 """
    Executing a bash script.
 
-.. module:: hooks
-    :platform: Unix, Windows
+.. module:: bash
+    :platform: Unix
     :synopis: Executing a bash script.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
@@ -29,17 +29,16 @@
 # pylint: disable=too-many-instance-attributes
 import os
 import shlex
-import logging
 import subprocess
 import tempfile
-
+from ..tools.logger import Logger
 
 class Bash(object):
     """Wrapper for Bash execution."""
 
     def __init__(self, script, env=None):
         """Initialize with Bash code and optional environment variables."""
-        self.logger = logging.getLogger(__name__)
+        self.logger = Logger.getLogger(__name__)
         self.success = False
         self.temp = tempfile.NamedTemporaryFile(
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)

@@ -1,8 +1,8 @@
 """
    Pipeline is list of stages.
 
-.. module:: hooks
-    :platform: Unix, Windows
+.. module:: pipeline
+    :platform: Unix
     :synopis: Pipeline is list of stages.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
@@ -26,11 +26,11 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-import logging
 import re
 
 from .components.bash import Bash
 from .components.stage import Stage
+from .tools.logger import Logger
 
 
 class PipelineData(object):
@@ -51,6 +51,7 @@ class Pipeline(object):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.data = PipelineData(pipeline, [] if tags is None else tags, hooks)
         self.data.env_list[0].update([] if env is None else env)
+        self.logger = Logger.getLogger(__name__)
 
     def run(self):
         """Processing the whole pipeline definition."""
@@ -58,8 +59,8 @@ class Pipeline(object):
             key = entry.keys()[0]
             if key == "env":
                 self.data.env_list[0].update(entry[key])
-                logging.debug("Updating environment at level 0 with %s",
-                              self.data.env_list[0])
+                self.logger.debug("Updating environment at level 0 with %s",
+                                  self.data.env_list[0])
                 continue
 
             if key.startswith("stage"):
@@ -72,4 +73,4 @@ class Pipeline(object):
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
             cleanup_shell = Bash(self.data.hooks.cleanup, env)
             for line in cleanup_shell.process():
-                logging.info(" | %s", line)
+                self.logger.info(" | %s", line)

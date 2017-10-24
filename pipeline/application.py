@@ -38,24 +38,29 @@ from pykwalify.errors import SchemaError
 
 from .pipeline import Pipeline
 from .components.hooks import Hooks
+from .tools.logger import Logger
 
 
 class Application(object):
     """Pipeline application."""
 
-    def __init__(self, definition, tags, validate_only):
+    def __init__(self, definition, tags, validate_only, logging_config):
         """Initialize application with definition and tags."""
         self.definition = definition
         self.tags = tags
         self.validate_only = validate_only
         self.logging_level = logging.DEBUG
-        self.logger = logging.getLogger(__name__)
+        self.logging_config = logging_config
         self.setup_logging()
+        self.logger = Logger.getLogger(__name__)
 
     def setup_logging(self):
         """Setup of application logging."""
-        logging_format = "%(asctime)-15s - %(name)s - %(message)s"
-        logging.basicConfig(format=logging_format, level=self.logging_level)
+        if len(self.logging_config) > 0 and os.path.isfile(self.logging_config):
+            Logger.configure_by_file(self.logging_config)
+        else:
+            logging_format = "%(asctime)-15s - %(name)s - %(message)s"
+            Logger.configure_default(format=logging_format, level=self.logging_level)
 
     def validate_definition(self):
         """Validate given pipeline definition file."""
@@ -108,9 +113,11 @@ class Application(object):
               help="Comma separated list of tags")
 @click.option('--validate-only', is_flag=True, default=False,
               help="When used validates given pipeline definition only")
-def main(definition="", tags="", validate_only=False):
+@click.option('--logging-config', default="", type=click.STRING,
+              help="Path and filename of logging configuration")
+def main(definition="", tags="", validate_only=False, logging_config=""):
     """Pipeline tool."""
-    application = Application(definition, tags, validate_only)
+    application = Application(definition, tags, validate_only, logging_config)
     application.run()
 
 

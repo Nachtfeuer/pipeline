@@ -2,4 +2,7 @@ pipeline:
   - stage(test):
     - tasks:
       - shell:
-          script: echo "hello world!"
+          title: print out hello world
+          script: echo "hello world 1!"
+      - shell:
+          script: echo "hello world 2!"

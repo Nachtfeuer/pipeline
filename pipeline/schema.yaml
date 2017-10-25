@@ -56,8 +56,11 @@ mapping:
                           shell:
                             type: map
                             mapping:
+                              title:
+                                type: str
                               script:
                                 type: str
+                                required: yes
                               tags:
                                 type: seq
                                 sequence:

@@ -71,6 +71,6 @@ class Pipeline(object):
             env = self.data.env_list[0].copy()
             env.update({'PIPELINE_RESULT': 'SUCCESS'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
-            cleanup_shell = Bash(self.data.hooks.cleanup, env)
+            cleanup_shell = Bash(self.data.hooks.cleanup, '', env)
             for line in cleanup_shell.process():
                 self.logger.info(" | %s", line)

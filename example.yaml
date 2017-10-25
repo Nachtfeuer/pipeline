@@ -27,6 +27,7 @@ pipeline:
           bar: bar at task group level
 
       - shell:
+            title: print out hello world!
             script: |
                 echo "first: hello world! (mode=$mode)"
                 sleep 2s

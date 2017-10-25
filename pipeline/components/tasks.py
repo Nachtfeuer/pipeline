@@ -36,7 +36,9 @@ from ..tools.logger import Logger
 
 def worker(data):
     """Running on shell via multiprocessing."""
-    shell = Bash(data['entry'][data['key']]['script'], data['env'])
+    shell_data = data['entry']
+    title = '' if 'title' not in shell_data else shell_data['title']
+    shell = Bash(shell_data['script'], title, data['env'])
     for line in shell.process():
         Logger.get_logger(__name__ + '.worker').info(" | %s", line)
     return shell.success
@@ -77,7 +79,7 @@ class Tasks(object):
                 continue
 
             if key == "shell":
-                shells.append({'entry': entry, 'key': key, 'env': self.get_merged_env()})
+                shells.append({'entry': entry[key], 'env': self.get_merged_env()})
                 continue
 
         self.process_shells(shells)
@@ -98,22 +100,23 @@ class Tasks(object):
                 sys.exit(99)
         else:
             for shell in shells:
-                self.process_shell(shell['entry'], shell['key'], shell['env'])
+                self.process_shell(shell['entry'], shell['env'])
 
-    def process_shell(self, entry, key, env):
+    def process_shell(self, entry, env):
         """Processing a shell entry."""
         if len(self.pipeline.data.tags) > 0:
             count = 0
-            if 'tags' in entry[key]:
+            if 'tags' in entry:
                 for tag in self.pipeline.data.tags:
-                    if tag in entry[key]['tags']:
+                    if tag in entry['tags']:
                         count += 1
 
             if count == 0:
                 return
 
         self.logger.info("Processing Bash code: start")
-        shell = Bash(entry[key]['script'], env)
+        title = '' if 'title' not in entry else entry['title']
+        shell = Bash(entry['script'], title, env)
         for line in shell.process():
             self.logger.info(" | %s", line)
 
@@ -129,6 +132,6 @@ class Tasks(object):
         if len(self.pipeline.data.hooks.cleanup) > 0:
             env.update({'PIPELINE_RESULT': 'FAILURE'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
-            cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, env)
+            cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, '', env)
             for line in cleanup_shell.process():
                 self.logger.info(" | %s", line)

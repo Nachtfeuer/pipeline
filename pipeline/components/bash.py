@@ -37,7 +37,7 @@ from ..tools.logger import Logger
 class Bash(object):
     """Wrapper for Bash execution."""
 
-    def __init__(self, script, env=None):
+    def __init__(self, script, title='', env=None):
         """Initialize with Bash code and optional environment variables."""
         self.logger = Logger.get_logger(__name__)
         self.success = False
@@ -52,6 +52,8 @@ class Bash(object):
         # make Bash script executable
         os.chmod(self.temp.name, 0777)
 
+        if len(title) > 0:
+            self.logger.info(title)
         self.logger.info("Running script %s", self.temp.name)
 
         self.args = shlex.split("bash %s" % self.temp.name)

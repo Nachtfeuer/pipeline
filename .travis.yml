@@ -20,7 +20,7 @@ before_install:
 
 install:
     - pip install pip --upgrade
-    - pip install click pyaml pykwalify tox
+    - pip install click pyaml jinja pykwalify tox
     - which python
     - python -V
     - pip -V

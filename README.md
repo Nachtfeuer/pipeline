@@ -144,6 +144,15 @@ The bash code also can have multiple lines as shown after here. Independent whet
 the code is inline or via external final it will be copied into a temporary
 file and those one will be executed only.
 
+```
+shell:
+  script: |
+    echo "hello world"
+    exit 0
+  tags:
+    - test
+    - simple
+```
 It's also possible to use Jinja templating but it does work only for the
 yaml script text (not for external bash files). Currently it is restricted
 for using environment variables.
@@ -157,17 +166,6 @@ for using environment variables.
           {% for c in range(env.count|int) %}
           echo "{{ c+1 }}:{{ env.message }}"
           {% endfor %}
-```
-
-
-```
-shell:
-  script: |
-    echo "hello world"
-    exit 0
-  tags:
-    - test
-    - simple
 ```
 
 ### The environment block

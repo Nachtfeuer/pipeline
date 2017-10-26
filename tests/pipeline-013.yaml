@@ -1,0 +1,13 @@
+pipeline:
+  - env:
+      message: hello world!
+
+  - stage(test):
+    - tasks:
+      - env:
+          count: "3"
+      - shell:
+          script: |
+              {% for c in range(env.count|int) %}
+              echo "{{ c+1 }}:{{ env.message }}"
+              {% endfor %}

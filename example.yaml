@@ -21,7 +21,7 @@ pipeline:
         foo: foo at stage level
         bar: bar at stage level
 
-    - tasks(parallel):
+    - tasks:
       - env:
           foo: foo at task group level
           bar: bar at task group level
@@ -38,3 +38,8 @@ pipeline:
                 echo "second:"
                 echo "foo=$foo"
                 echo "bar=$bar"
+
+      - shell:
+            script: echo "foo={{ env.foo }}"
+            tags:
+                - jinja

@@ -31,6 +31,7 @@ import os
 import shlex
 import subprocess
 import tempfile
+from jinja2 import Template
 from ..tools.logger import Logger
 
 
@@ -41,28 +42,37 @@ class Bash(object):
         """Initialize with Bash code and optional environment variables."""
         self.logger = Logger.get_logger(__name__)
         self.success = False
-        self.temp = tempfile.NamedTemporaryFile(
-            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
-        if os.path.isfile(script):
-            content = str(open(script).read())
-            self.temp.writelines(content)
-        else:
-            self.temp.writelines("#!/bin/bash\n" + script)
-        self.temp.close()
-        # make Bash script executable
-        os.chmod(self.temp.name, 0777)
+
+        template = Template(script)
+        rendered_script = template.render(env=env)
+        self.temp_filename = Bash.create_file_for(rendered_script)
 
         if len(title) > 0:
             self.logger.info(title)
-        self.logger.info("Running script %s", self.temp.name)
+        self.logger.info("Running script %s", self.temp_filename)
 
-        self.args = shlex.split("bash %s" % self.temp.name)
+        self.args = shlex.split("bash %s" % self.temp_filename)
         self.stdout = subprocess.PIPE
         self.stderr = subprocess.STDOUT
         self.shell = False
         self.env = os.environ.copy()
         self.env.update({} if env is None else env)
         self.exit_code = 0
+
+    @staticmethod
+    def create_file_for(script):
+        """Create a temporary, executable bash file."""
+        temp = tempfile.NamedTemporaryFile(
+            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
+        if os.path.isfile(script):
+            content = str(open(script).read())
+            temp.writelines(content)
+        else:
+            temp.writelines("#!/bin/bash\n" + script)
+        temp.close()
+        # make Bash script executable
+        os.chmod(temp.name, 0777)
+        return temp.name
 
     def process(self):
         """Running the Bash code."""
@@ -80,4 +90,4 @@ class Bash(object):
             yield str(exception)
 
         # removing script
-        os.remove(self.temp.name)
+        os.remove(self.temp_filename)

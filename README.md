@@ -24,9 +24,13 @@ features will be considered for now:
  - cleanup hook
  - filtered execution via tags
  - parallel tasks execution
+ - supporting Jinja templating in Bash scripts
 
 **Todo**:
  - parallel pipelines (matrix)
+ - tags for matrix elements (filtering capability)
+ - support for templates / code snippets
+ - support for Docker containerss
  - execution time on each level: pipeline, stage, tasks and shell
  - one report:
     - one HTML file only
@@ -139,6 +143,22 @@ Also a shell may have a list of tags which allow to filter for those of interest
 The bash code also can have multiple lines as shown after here. Independent whether
 the code is inline or via external final it will be copied into a temporary
 file and those one will be executed only.
+
+It's also possible to use Jinja templating but it does work only for the
+yaml script text (not for external bash files). Currently it is restricted
+for using environment variables.
+
+```
+- tasks:
+  - env:
+      count: "3"
+  - shell:
+      script: |
+          {% for c in range(env.count|int) %}
+          echo "{{ c+1 }}:{{ env.message }}"
+          {% endfor %}
+```
+
 
 ```
 shell:

@@ -79,10 +79,12 @@ class Tasks(object):
                 continue
 
             if key == "shell":
-                shells.append({'entry': entry[key], 'env': self.get_merged_env()})
+                if self.can_process_shell(entry[key]):
+                    shells.append({'entry': entry[key], 'env': self.get_merged_env()})
                 continue
 
-        self.process_shells(shells)
+        if len(shells) > 0:
+            self.process_shells(shells)
 
     def process_shells(self, shells):
         """Processing a list of shells."""
@@ -102,18 +104,21 @@ class Tasks(object):
             for shell in shells:
                 self.process_shell(shell['entry'], shell['env'])
 
+    def can_process_shell(self, entry):
+        """:return: True when shell can be executed."""
+        if len(self.pipeline.data.tags) == 0:
+            return True
+
+        count = 0
+        if 'tags' in entry:
+            for tag in self.pipeline.data.tags:
+                if tag in entry['tags']:
+                    count += 1
+
+        return count > 0
+
     def process_shell(self, entry, env):
         """Processing a shell entry."""
-        if len(self.pipeline.data.tags) > 0:
-            count = 0
-            if 'tags' in entry:
-                for tag in self.pipeline.data.tags:
-                    if tag in entry['tags']:
-                        count += 1
-
-            if count == 0:
-                return
-
         self.logger.info("Processing Bash code: start")
         title = '' if 'title' not in entry else entry['title']
         shell = Bash(entry['script'], title, env)

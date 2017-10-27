@@ -24,6 +24,10 @@ mapping:
             mapping:
               regex;(.+):
                   type: str
+          tags:
+            type: seq
+            sequence:
+              - type: str
 
   hooks:
     type: map

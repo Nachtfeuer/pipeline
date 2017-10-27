@@ -1,0 +1,18 @@
+matrix:
+  - name: first
+    env:
+      matrix_message: first hello world on matrix level
+    tags:
+      - first
+
+  - name: second
+    env:
+      matrix_message: second hello world on matrix level
+    tags:
+      - second
+
+pipeline:
+  - stage(test):
+    - tasks:
+      - shell:
+          script: echo $matrix_message

@@ -26,6 +26,7 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+# pylint: disable=too-many-arguments
 import sys
 import platform
 import os
@@ -44,10 +45,11 @@ from .tools.logger import Logger
 class Application(object):
     """Pipeline application."""
 
-    def __init__(self, definition, tags, validate_only, logging_config):
+    def __init__(self, definition, matrix_tags, tags, validate_only, logging_config):
         """Initialize application with definition and tags."""
         self.definition = definition
-        self.tags = tags
+        self.matrix_tag_list = [] if len(matrix_tags) == 0 else matrix_tags.split(",")
+        self.tag_list = [] if len(tags) == 0 else tags.split(",")
         self.validate_only = validate_only
         self.logging_level = logging.DEBUG
         self.logging_config = logging_config
@@ -77,6 +79,19 @@ class Application(object):
             self.logger.info("Schema validation for '%s' has failed", self.definition)
             sys.exit(1)
 
+    def can_process_matrix(self, entry):
+        """:return: True when matrix entry can be processed."""
+        if len(self.matrix_tag_list) == 0:
+            return True
+
+        count = 0
+        if 'tags' in entry:
+            for tag in self.matrix_tag_list:
+                if tag in entry['tags']:
+                    count += 1
+
+        return count > 0
+
     def run(self):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -89,7 +104,6 @@ class Application(object):
             return
 
         document = yaml.load(open(self.definition).read())
-        tag_list = [] if len(self.tags) == 0 else self.tags.split(",")
 
         hooks = Hooks()
         if 'hooks' in document:
@@ -99,25 +113,31 @@ class Application(object):
         if 'matrix' in document:
             matrix = document['matrix']
             for entry in matrix:
-                self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
-                pipeline = Pipeline(document['pipeline'], env=entry['env'], tags=tag_list, hooks=hooks)
-                pipeline.run()
+                if self.can_process_matrix(entry):
+                    self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
+                    pipeline = Pipeline(document['pipeline'], env=entry['env'],
+                                        tags=self.tag_list, hooks=hooks)
+                    pipeline.run()
         else:
-            pipeline = Pipeline(document['pipeline'], tags=tag_list, hooks=hooks)
+            pipeline = Pipeline(document['pipeline'], tags=self.tag_list, hooks=hooks)
             pipeline.run()
 
 
 @click.command()
 @click.option('--definition', help="Pipeline definition in yaml format")
 @click.option('--tags', type=click.STRING, default='',
+              help="Comma separated list of tags for filtering individual tasks (shells)")
+@click.option('--matrix-tags', type=click.STRING, default='',
+              help="Comma separated list of tags for filtering individual matrix runs")
+@click.option('--tags', type=click.STRING, default='',
               help="Comma separated list of tags")
 @click.option('--validate-only', is_flag=True, default=False,
               help="When used validates given pipeline definition only")
 @click.option('--logging-config', default="", type=click.STRING,
               help="Path and filename of logging configuration")
-def main(definition="", tags="", validate_only=False, logging_config=""):
+def main(definition="", matrix_tags="", tags="", validate_only=False, logging_config=""):
     """Pipeline tool."""
-    application = Application(definition, tags, validate_only, logging_config)
+    application = Application(definition, matrix_tags, tags, validate_only, logging_config)
     application.run()
 
 

@@ -2,9 +2,14 @@ matrix:
   - name: one
     env:
         mode: one
+    tags:
+        - first
+
   - name: two
     env:
         mode: two
+    tags:
+        - second
 
 hooks:
     cleanup: 

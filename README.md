@@ -123,6 +123,34 @@ the answer is simple: while build the pipeline tool is not yet verified
 and might have problems producing wrong build results; that's why an
 external test mechanism is better for this project.
 
+### The matrix block
+
+A matrix basically has a name and assigned environment variables. The purpose is
+to support that same pipeline can run for different parameters. Examples are
+running with different compilers, interpreters or databases. In addition you can
+specify tags which allow to filter for certain matrix runs.
+
+```
+matrix:
+  - name: one
+    env:
+        mode: one
+    tags:
+        - first
+
+  - name: two
+    env:
+        mode: two
+    tags:
+        - second
+```
+
+With this example you can filter for second matrix item like this:
+```
+pipeline --definition=example.yaml --matrix-tags=second
+```
+
+
 ### The pipeline block
 
 The pipeline is a list of stages. It also may have environment blocks.
@@ -202,7 +230,7 @@ hooks:
 ```
 
 
-# Some hints
+# Dev hints
 
 The following code should print the loaded yaml just
 basing on pure Python data (dict, list, str and so on).

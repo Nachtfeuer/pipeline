@@ -35,8 +35,7 @@ mapping:
       cleanup:
         type: map
         mapping:
-          script:
-            type: str
+          script: { type: str }
 
   pipeline:
     required: yes
@@ -60,11 +59,8 @@ mapping:
                           shell:
                             type: map
                             mapping:
-                              title:
-                                type: str
-                              script:
-                                type: str
-                                required: yes
+                              title:  { type: str }
+                              script: { type: str, required: yes }
                               tags:
                                 type: seq
                                 sequence:
@@ -74,13 +70,10 @@ mapping:
                           docker(container):
                             type: map
                             mapping:
-                              title:
-                                type: str
-                              image:
-                                type: str
-                              script:
-                                type: str
-                                required: yes
+                              title:  { type: str }
+                              image:  { type: str }
+                              remove: { type: bool, enum: [true, false], default: true }
+                              script: { type: str, required: yes }
                               tags:
                                 type: seq
                                 sequence:

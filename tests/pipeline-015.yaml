@@ -14,3 +14,9 @@ pipeline:
           script: cat /etc/redhat-release
           tags:
             - with-image
+
+      - docker(container):
+          remove: False
+          script: echo "hello world!"
+          tags:
+            - no-remove

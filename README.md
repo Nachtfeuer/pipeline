@@ -170,13 +170,56 @@ pipeline --definition=example.yaml --matrix-tags=second
 
 The pipeline is a list of stages. It also may have environment blocks.
 
+```
+pipeline:
+  - env:
+      mode: test
+
+  - stage(one):
+    - tasks(ordered):
+      - shell:
+        - script: echo "{{ env.mode }}: script one"
+
+  - stage(two):
+    - tasks(ordered):
+      - shell:
+        - script: echo "{{ env.mode }}: script two"
+```
+
 ## <a name="stage-block">The Stage Block</a>
 
 Each stage is a list of tasks blocks. It also may have environment blocks.
 
+```
+- stage(one):
+  - env:
+      mode: test
+
+  - tasks(ordered):
+    - shell:
+      - script: echo "{{ env.mode }}: script one"
+
+  - tasks(ordered):
+    - shell:
+      - script: echo "{{ env.mode }}: script two"
+```
+
+
 ### <a name="tasks-block">The Tasks Block</a>
 
 Each tasks block is a list of shell scripts. It also may have environment blocks.
+
+```
+- tasks(ordered):
+  - env:
+      mode: test
+
+  - shell:
+    - script: echo "{{ env.mode }}: script one"
+
+  - shell:
+    - script: echo "{{ env.mode }}: script two"
+```
 
 ### <a name="shell-block">The Shell (Task) Block</a>
 

@@ -31,14 +31,19 @@ import sys
 import multiprocessing
 from contextlib import closing
 from .bash import Bash
+from .docker import Container
 from ..tools.logger import Logger
+
+
+def get_creator_by_name(name):
+    """Get creator function by name."""
+    return {'Container': Container.creator, 'Bash': Bash.creator}[name]
 
 
 def worker(data):
     """Running on shell via multiprocessing."""
-    shell_data = data['entry']
-    title = '' if 'title' not in shell_data else shell_data['title']
-    shell = Bash(shell_data['script'], title, data['env'])
+    creator = get_creator_by_name(data['creator'])
+    shell = creator(data['entry'], data['env'])
     for line in shell.process():
         Logger.get_logger(__name__ + '.worker').info(" | %s", line)
     return shell.success
@@ -80,7 +85,14 @@ class Tasks(object):
 
             if key == "shell":
                 if self.can_process_shell(entry[key]):
-                    shells.append({'entry': entry[key], 'env': self.get_merged_env()})
+                    shells.append({
+                        'creator': Bash.__name__, 'entry': entry[key], 'env': self.get_merged_env()})
+                continue
+
+            if key == "docker(container)":
+                if self.can_process_shell(entry[key]):
+                    shells.append({
+                        'creator': Container.__name__, 'entry': entry[key], 'env': self.get_merged_env()})
                 continue
 
         if len(shells) > 0:
@@ -102,7 +114,7 @@ class Tasks(object):
                 sys.exit(99)
         else:
             for shell in shells:
-                self.process_shell(shell['entry'], shell['env'])
+                self.process_shell(get_creator_by_name(shell['creator']), shell['entry'], shell['env'])
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
@@ -117,11 +129,11 @@ class Tasks(object):
 
         return count > 0
 
-    def process_shell(self, entry, env):
+    def process_shell(self, creator, entry, env):
         """Processing a shell entry."""
         self.logger.info("Processing Bash code: start")
-        title = '' if 'title' not in entry else entry['title']
-        shell = Bash(entry['script'], title, env)
+
+        shell = creator(entry, env)
         for line in shell.process():
             self.logger.info(" | %s", line)
 

@@ -57,7 +57,14 @@ class Bash(object):
         self.shell = False
         self.env = os.environ.copy()
         self.env.update({} if env is None else env)
+        self.env.update({'PIPELINE_BASH_FILE': self.temp_filename})
         self.exit_code = 0
+
+    @staticmethod
+    def creator(shell_parameters, env):
+        """Creator function for creating an instance of a Bash."""
+        title = '' if 'title' not in shell_parameters else shell_parameters['title']
+        return Bash(script=shell_parameters['script'], title=title, env=env)
 
     @staticmethod
     def create_file_for(script):

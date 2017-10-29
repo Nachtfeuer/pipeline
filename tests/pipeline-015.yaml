@@ -1,0 +1,16 @@
+pipeline:
+  - stage(test):
+    - tasks(ordered):
+      - docker(container):
+          script: |
+            yum -y install epel-release > /dev/null 2>&1
+            yum -y install figlet  > /dev/null 2>&1
+            figlet -f standard "docker" | sed -e 's: :.:g'
+          tags:
+            - no-image
+
+      - docker(container):
+          image: centos:7.3.1611
+          script: cat /etc/redhat-release
+          tags:
+            - with-image

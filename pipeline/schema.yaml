@@ -69,3 +69,19 @@ mapping:
                                 type: seq
                                 sequence:
                                   - type: str
+                      - type: map
+                        mapping:
+                          docker(container):
+                            type: map
+                            mapping:
+                              title:
+                                type: str
+                              image:
+                                type: str
+                              script:
+                                type: str
+                                required: yes
+                              tags:
+                                type: seq
+                                sequence:
+                                  - type: str

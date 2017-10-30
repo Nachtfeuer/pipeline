@@ -39,6 +39,7 @@ class Stage(object):
         self.logger = Logger.get_logger(__name__)
         self.pipeline = pipeline
         self.title = title
+        self.pipeline.data.env_list[1].update({'PIPELINE_STAGE': self.title})
 
     def process(self, stage):
         """Processing one stage."""

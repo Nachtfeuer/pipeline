@@ -26,6 +26,7 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import os
 import re
 
 from .components.bash import Bash
@@ -38,8 +39,9 @@ class PipelineData(object):
 
     def __init__(self, pipeline, tags=None, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
+        self.pid = str(os.getpid())
         self.pipeline = pipeline
-        self.env_list = [{}, {}, {}]
+        self.env_list = [{'PIPELINE_PID': self.pid}, {}, {}]
         self.tags = [] if tags is None else tags
         self.hooks = hooks
 

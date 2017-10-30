@@ -17,6 +17,17 @@ pipeline:
 
       - docker(container):
           remove: False
-          script: echo "hello world!"
+          script: echo "Docker container created!"
+          tags:
+            - no-remove
+
+      - shell:
+          script: |
+            {% raw %}
+            echo "PIPELINE_PID=${PIPELINE_PID}"
+            echo "PIPELINE_STAGE=${PIPELINE_STAGE}"
+            ID=$(docker ps -a --filter="label=pipeline=${PIPELINE_PID}" --filter="label=pipeline-stage=${PIPELINE_STAGE}" --format="{{.ID}}")
+            docker rm ${ID}
+            {% endraw %}
           tags:
             - no-remove

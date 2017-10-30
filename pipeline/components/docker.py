@@ -38,6 +38,8 @@ if [ $# -eq 0 ]; then
     docker run --rm=%(remove)s \
         -v $(dirname ${PIPELINE_BASH_FILE}):/root/scripts \
         -e UID=$(id -u) -e GID=$(id -g) \
+        --label="pipeline=${PIPELINE_PID}" \
+        --label="pipeline-stage=${PIPELINE_STAGE}" \
         --label="creator=$$" \
         --label="context=pipeline" \
         -i %(image)s \

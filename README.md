@@ -328,6 +328,18 @@ Here's an extract of the output:
 2017-10-29 12:46:07,583 - pipeline.components.tasks -  |
 ```
 
+**Also to know**:
+ - Each Docker container gets additional labels:
+   - **pipeline** - which contains the PID of the pipeline.
+   - **pipeline-stage** - pipeline stage in which the Docker container has been created.
+   - **context** - always "pipeline"
+   - **creator** - the PID of the shell which created the Docker container.
+ - with those information you have some control for being able to query a concrete container without knowing the Docker container name (you need not worry about container names since Docker does it for you).
+ - If you create multiple Docker container per stage then (TODO) there will be a label that can be
+   adjusted via the yaml to reduce the query to the right container.
+   Have a look at the test [pipeline-015.yaml](tests/pipeline-015.yaml).
+
+
 ### <a name="cleanup-hook">The cleanup hook</a>
 
 It's basically same as for a shell script with a few differences only:

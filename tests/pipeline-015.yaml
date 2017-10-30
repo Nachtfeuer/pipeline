@@ -11,7 +11,9 @@ pipeline:
 
       - docker(container):
           image: centos:7.3.1611
-          script: cat /etc/redhat-release
+          script: |
+            cat /etc/redhat-release
+            echo "PIPELINE_STAGE=${PIPELINE_STAGE}"
           tags:
             - with-image
 

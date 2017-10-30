@@ -37,7 +37,7 @@ class Container(Bash):
 if [ $# -eq 0 ]; then
     docker run --rm=%(remove)s \
         -v $(dirname ${PIPELINE_BASH_FILE}):/root/scripts \
-        -e UID=$(id -u) -e GID=$(id -g) \
+        -e UID=$(id -u) -e GID=$(id -g) %(environment)s \
         --label="pipeline=${PIPELINE_PID}" \
         --label="pipeline-stage=${PIPELINE_STAGE}" \
         --label="creator=$$" \
@@ -63,6 +63,7 @@ fi
         wrapped_script = Container.TEMPLATE % {
             'image': image,
             'remove': remove,
-            'script': shell_parameters['script']
+            'script': shell_parameters['script'],
+            'environment': ' '.join(["-e \"%s=%s\"" % (key, value) for key, value in env.items()])
         }
         return Container(script=wrapped_script, title=title, env=env)

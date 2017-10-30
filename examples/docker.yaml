@@ -1,0 +1,15 @@
+pipeline:
+  - stage(example):
+    - tasks:
+      - docker(container):
+          script: sleep infinity
+          background: true
+          tags:
+            - background-and-auto-remove
+
+      - docker(container):
+          script: sleep infinity
+          background: true
+          remove: false
+          tags:
+            - background-and-keep

@@ -31,7 +31,7 @@ features will be considered for now:
 
 **Features**:
  - automatic schema validation for yaml file
- - matrix based pipeline
+ - matrix based pipeline with tags
  - pipeline stages (names groups)
  - shell script execution: inline and file
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
@@ -42,9 +42,7 @@ features will be considered for now:
  - support for Docker containers
 
 **Todo**:
- - Extending Docker container (background mode, mounts, ...)
  - parallel pipelines (matrix)
- - tags for matrix elements (filtering capability)
  - support for templates / code snippets
  - execution time on each level: pipeline, stage, tasks and shell
  - one report:

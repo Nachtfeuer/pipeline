@@ -138,7 +138,7 @@ the answer is simple: while build the pipeline tool is not yet verified
 and might have problems producing wrong build results; that's why an
 external test mechanism is better for this project.
 
-### <a name="matrix-block">The Matrix Block</a>
+## <a name="matrix-block">The Matrix Block</a>
 
 A matrix basically has a name and assigned environment variables. The purpose is
 to support that same pipeline can run for different parameters. Examples are
@@ -166,7 +166,7 @@ pipeline --definition=example.yaml --matrix-tags=second
 ```
 
 
-### <a name="pipeline-block">The Pipeline Block</a>
+## <a name="pipeline-block">The Pipeline Block</a>
 
 The pipeline is a list of stages. It also may have environment blocks.
 
@@ -205,7 +205,7 @@ Each stage is a list of tasks blocks. It also may have environment blocks.
 ```
 
 
-### <a name="tasks-block">The Tasks Block</a>
+## <a name="tasks-block">The Tasks Block</a>
 
 Each tasks block is a list of shell scripts. It also may have environment blocks.
 
@@ -221,7 +221,7 @@ Each tasks block is a list of shell scripts. It also may have environment blocks
     - script: echo "{{ env.mode }}: script two"
 ```
 
-### <a name="shell-block">The Shell (Task) Block</a>
+## <a name="shell-block">The Shell (Task) Block</a>
 
 Each shell can have inline Bash code or refer to an external file.
 A shell can break the pipeline when the exit code it not zero.
@@ -254,7 +254,7 @@ for using environment variables.
           {% endfor %}
 ```
 
-### <a name="environment-block">The Environment Block</a>
+## <a name="environment-block">The Environment Block</a>
 
 On all levels (pipeline, stages and tasks) you can have such environment blocks.
 When a shell script is executed the environment is copied and overwritten in
@@ -287,7 +287,7 @@ following block as an example:
       - no-image
 ```
 
-The code snipper you can find in the tests:
+The code snippet you can find in the tests:
 
 ```
 $ PYTHONPATH=$PWD python scripts/pipeline --definition=tests/pipeline-015.yaml --tags=no-image
@@ -310,6 +310,7 @@ $ PYTHONPATH=$PWD python scripts/pipeline --definition=tests/pipeline-015.yaml -
 2017-10-29 12:34:16,405 - pipeline.components.tasks - Processing Bash code: finished
 ```
 
+### Specifying an image
 You also can specify an image:
 
 ```
@@ -328,7 +329,7 @@ Here's an extract of the output:
 2017-10-29 12:46:07,583 - pipeline.components.tasks -  |
 ```
 
-**Also to know**:
+### How to find a Docker container
  - Each Docker container gets additional labels:
    - **pipeline** - which contains the PID of the pipeline.
    - **pipeline-stage** - pipeline stage in which the Docker container has been created.
@@ -337,10 +338,37 @@ Here's an extract of the output:
  - with those information you have some control for being able to query a concrete container without knowing the Docker container name (you need not worry about container names since Docker does it for you).
  - If you create multiple Docker container per stage then (TODO) there will be a label that can be
    adjusted via the yaml to reduce the query to the right container.
-   Have a look at the test [pipeline-015.yaml](tests/pipeline-015.yaml).
+ - Have a look at the examples [docker.yaml](examples/docker.yaml).
+
+### Mounts
+For good reasons various number of mounts have been minimized to the most essential ones:
+ - one mount (always) for the script mechanism (you shouldn't care)
+ - one mount (on demand) if you need to exchange things with the host
+
+The next example does activate the second mount which maps $PWD as `/mnt/host` inside
+the Docker container. Here I write a file to the host and another script dumps it
+and removes the file afterwards.
+
+```
+- docker(container):
+    script: |
+      echo "hello world" > /mnt/host/hello.txt
+      chown ${UID}:$(GID} /mnt/host/hello.txt
+    mount: true
+
+- shell:
+    script: |
+      cat hello.txt
+      rm -f hello.txt
+```
+
+**Please note:** Usually the Docker user is root (by default) and when you copy
+content to the host the caller might fail on removing that files and folders because
+of missing permissions. That's why the user id and group id is always passed to the
+container allowing you to adjust the permissions correctly.
 
 
-### <a name="cleanup-hook">The cleanup hook</a>
+## <a name="cleanup-hook">The cleanup hook</a>
 
 It's basically same as for a shell script with a few differences only:
 
@@ -360,7 +388,7 @@ hooks:
       echo "PIPELINE_SHELL_EXIT_CODE=${PIPELINE_SHELL_EXIT_CODE}"
 ```
 
-# <a name="links">Links</a>
+## <a name="links">Links</a>
  - http://pykwalify.readthedocs.io/en/unstable/
  - http://pykwalify.readthedocs.io/en/unstable/partial-schemas.html
  - https://github.com/bats-core/bats-core

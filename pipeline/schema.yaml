@@ -74,6 +74,7 @@ mapping:
                               image:  { type: str }
                               remove: { type: bool, enum: [true, false], default: true }
                               background: { type: bool, enum: [true, false], default: false }
+                              mount: { type: bool, enum: [true, false], default: false }
                               script: { type: str, required: yes }
                               tags:
                                 type: seq

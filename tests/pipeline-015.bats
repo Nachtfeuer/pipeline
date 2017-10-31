@@ -28,3 +28,11 @@ SCRIPT="python ${WORKSPACE}/scripts/pipeline"
 
     [ "$(docker ps -a --format="{{.Names}}"|wc -l)" == "0" ]
 }
+
+@test "$BATS_TEST_FILENAME :: Testing valid Docker container (with mount)" {
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-015.yaml --tags=using-mount
+    # verifying exit code
+    [ ${status} -eq 0 ]
+    # verifying output
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| hello world" ]
+}

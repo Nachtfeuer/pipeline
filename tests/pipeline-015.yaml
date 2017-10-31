@@ -33,3 +33,19 @@ pipeline:
             {% endraw %}
           tags:
             - no-remove
+
+      # use --tags=using-mount
+      - docker(container):
+          script: |
+            echo "hello world" > /mnt/host/hello.txt
+          mount: true
+          tags:
+            - using-mount
+
+      # use --tags=using-mount
+      - shell:
+          script: |
+            cat hello.txt
+            rm -f hello.txt
+          tags:
+            - using-mount

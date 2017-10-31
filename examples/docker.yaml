@@ -1,15 +1,45 @@
 pipeline:
   - stage(example):
     - tasks:
+      # use --tags=background-and-auto-remove
       - docker(container):
           script: sleep infinity
           background: true
           tags:
             - background-and-auto-remove
 
+      # use --tags=background-and-keep
       - docker(container):
           script: sleep infinity
           background: true
           remove: false
           tags:
             - background-and-keep
+
+      # use --tags=background-and-keep,remove-docker-container
+      - shell:
+          script: |
+            {% raw %}
+            ID=$(docker ps -a --filter="label=pipeline=${PIPELINE_PID}" --filter="label=pipeline-stage=${PIPELINE_STAGE}" --format="{{.ID}}")
+            {% endraw %}
+            echo "Stopped container: $(docker stop ${ID})"
+            echo "Removed container: $(docker rm ${ID})"
+          tags:
+            - remove-docker-container
+
+      # use --tags=using-mount
+      - docker(container):
+          script: |
+            echo "hello world" > /mnt/host/hello.txt
+            chown ${UID}:$(GID} /mnt/host/hello.txt
+          mount: true
+          tags:
+            - using-mount
+
+      # use --tags=using-mount
+      - shell:
+          script: |
+            cat hello.txt
+            rm -f hello.txt
+          tags:
+            - using-mount

@@ -36,12 +36,18 @@ class Container(Bash):
     TEMPLATE = """
 if [ $# -eq 0 ]; then
     BACKGROUND_MODE=-i
+    MOUNT=
+
     if [ "%(background)s" == "true" ]; then
         BACKGROUND_MODE=-d
     fi
 
+    if [ "%(mount)s" == "true" ]; then
+        MOUNT="-v $PWD:/mnt/host"
+    fi
+
     docker run --rm=%(remove)s \
-        -v $(dirname ${PIPELINE_BASH_FILE}):/root/scripts \
+        -v $(dirname ${PIPELINE_BASH_FILE}):/root/scripts ${MOUNT} \
         -e UID=$(id -u) -e GID=$(id -g) %(environment)s \
         --label="pipeline=${PIPELINE_PID}" \
         --label="pipeline-stage=${PIPELINE_STAGE}" \
@@ -65,11 +71,13 @@ fi
         image = 'centos:7' if 'image' not in shell_parameters else shell_parameters['image']
         remove = True if 'remove' not in shell_parameters else shell_parameters['remove']
         background = False if 'background' not in shell_parameters else shell_parameters['background']
+        mount = False if 'mount' not in shell_parameters else shell_parameters['mount']
 
         wrapped_script = Container.TEMPLATE % {
             'image': image,
             'remove': str(remove).lower(),
             'background': str(background).lower(),
+            'mount': str(mount).lower(),
             'script': shell_parameters['script'],
             'environment': ' '.join(["-e \"%s=%s\"" % (key, value) for key, value in env.items()])
         }

@@ -32,6 +32,7 @@ import re
 from .components.bash import Bash
 from .components.stage import Stage
 from .tools.logger import Logger
+from .tools.event import Event
 
 
 class PipelineData(object):
@@ -51,6 +52,7 @@ class Pipeline(object):
 
     def __init__(self, pipeline, env=None, tags=None, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
+        self.event = Event.create(__name__)
         self.data = PipelineData(pipeline, [] if tags is None else tags, hooks)
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
@@ -76,3 +78,5 @@ class Pipeline(object):
             cleanup_shell = Bash(self.data.hooks.cleanup, '', env)
             for line in cleanup_shell.process():
                 self.logger.info(" | %s", line)
+
+        self.event.succeeded()

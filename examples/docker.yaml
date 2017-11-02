@@ -31,7 +31,7 @@ pipeline:
       - docker(container):
           script: |
             echo "hello world" > /mnt/host/hello.txt
-            chown ${UID}:$(GID} /mnt/host/hello.txt
+            chown ${UID}:${GID} /mnt/host/hello.txt
           mount: true
           tags:
             - using-mount

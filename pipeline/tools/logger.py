@@ -29,6 +29,22 @@
 import logging
 
 
+class NoLogger(object):
+    """A logger that does nothing."""
+
+    def info(self, *args, **kwargs):
+        """Hide information messages."""
+        pass
+
+    def warning(self, *args, **kwargs):
+        """Hide warning messages."""
+        pass
+
+    def severe(self, *args, **kwargs):
+        """Hide severe messages."""
+        pass
+
+
 class Logger(object):
     """Wrapper for logging calls."""
 
@@ -48,6 +64,9 @@ class Logger(object):
     @staticmethod
     def get_logger(name):
         """Get a logger by name."""
+        if name is None:
+            return NoLogger()
+
         logger = logging.getLogger(name)
         if Logger.use_external_configuration:
             logger.propagate = False

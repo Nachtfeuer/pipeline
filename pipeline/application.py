@@ -26,7 +26,7 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-# pylint: disable=too-many-arguments
+# pylint: disable=too-many-arguments, too-many-instance-attributes
 import sys
 import platform
 import os
@@ -40,6 +40,7 @@ from pykwalify.errors import SchemaError
 from .pipeline import Pipeline
 from .components.hooks import Hooks
 from .tools.logger import Logger
+from .tools.event import Event
 
 
 class Application(object):
@@ -47,6 +48,7 @@ class Application(object):
 
     def __init__(self, definition, matrix_tags, tags, validate_only, logging_config):
         """Initialize application with definition and tags."""
+        self.event = Event.create(__name__)
         self.definition = definition
         self.matrix_tag_list = [] if len(matrix_tags) == 0 else matrix_tags.split(",")
         self.tag_list = [] if len(tags) == 0 else tags.split(",")
@@ -122,6 +124,8 @@ class Application(object):
             pipeline = Pipeline(document['pipeline'], tags=self.tag_list, hooks=hooks)
             pipeline.run()
 
+        self.event.succeeded()
+
 
 @click.command()
 @click.option('--definition', help="Pipeline definition in yaml format")
@@ -135,8 +139,12 @@ class Application(object):
               help="When used validates given pipeline definition only")
 @click.option('--logging-config', default="", type=click.STRING,
               help="Path and filename of logging configuration")
-def main(definition="", matrix_tags="", tags="", validate_only=False, logging_config=""):
-    """Pipeline tool."""
+@click.option('--event-logging', is_flag=True, default=False,
+              help="When enabled then it does log event details")
+def main(definition="", matrix_tags="", tags="", validate_only=False, logging_config="", event_logging=False):
+    """The Pipeline tool."""
+    Event.configure(is_logging_enabled=event_logging)
+
     application = Application(definition, matrix_tags, tags, validate_only, logging_config)
     application.run()
 

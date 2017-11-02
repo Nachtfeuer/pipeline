@@ -33,6 +33,7 @@ import subprocess
 import tempfile
 from jinja2 import Template
 from ..tools.logger import Logger
+from ..tools.event import Event
 
 
 class Bash(object):
@@ -40,6 +41,7 @@ class Bash(object):
 
     def __init__(self, script, title='', env=None):
         """Initialize with Bash code and optional environment variables."""
+        self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.success = False
 
@@ -95,6 +97,11 @@ class Bash(object):
         except OSError as exception:
             self.exit_code = 1
             yield str(exception)
+        finally:
+            # removing script
+            os.remove(self.temp_filename)
 
-        # removing script
-        os.remove(self.temp_filename)
+            if self.exit_code == 0:
+                self.event.succeeded()
+            else:
+                self.event.failed(exit_code=self.exit_code)

@@ -33,6 +33,7 @@ from contextlib import closing
 from .bash import Bash
 from .docker import Container
 from ..tools.logger import Logger
+from ..tools.event import Event
 
 
 def get_creator_by_name(name):
@@ -54,6 +55,7 @@ class Tasks(object):
 
     def __init__(self, pipeline, parallel):
         """Initializing with referenz to pipeline main object."""
+        self.event = Event.create(__name__)
         self.pipeline = pipeline
         self.parallel = parallel
         self.logger = Logger.get_logger(__name__)
@@ -98,6 +100,8 @@ class Tasks(object):
         if len(shells) > 0:
             self.process_shells(shells)
 
+        self.event.succeeded()
+
     def process_shells(self, shells):
         """Processing a list of shells."""
         if self.parallel:
@@ -111,6 +115,7 @@ class Tasks(object):
             else:
                 self.run_cleanup(shells[0]['env'], 99)
                 self.logger.error("Pipeline has failed: immediately leaving!")
+                self.event.failed()
                 sys.exit(99)
         else:
             for shell in shells:
@@ -142,6 +147,7 @@ class Tasks(object):
         else:
             self.run_cleanup(env, shell.exit_code)
             self.logger.error("Pipeline has failed: immediately leaving!")
+            self.event.failed()
             sys.exit(shell.exit_code)
 
     def run_cleanup(self, env, exit_code):

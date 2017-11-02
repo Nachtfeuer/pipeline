@@ -29,6 +29,7 @@
 import re
 from .tasks import Tasks
 from ..tools.logger import Logger
+from ..tools.event import Event
 
 
 class Stage(object):
@@ -36,6 +37,7 @@ class Stage(object):
 
     def __init__(self, pipeline, title):
         """Initializing with referenz to pipeline main object."""
+        self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.pipeline = pipeline
         self.title = title
@@ -56,3 +58,5 @@ class Stage(object):
                 tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
                 tasks.process(entry[key])
                 continue
+
+        self.event.succeeded()

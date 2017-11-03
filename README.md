@@ -16,6 +16,7 @@
 [The Environment Block](#environment-block)  
 [The Docker Container Block](#docker-container-block)  
 [The Cleanup Hook](#cleanup-hook)  
+[Performance Logging](#event-logging)  
 [Links](#links)  
 
 # <a name="motivation">Motivation</a>

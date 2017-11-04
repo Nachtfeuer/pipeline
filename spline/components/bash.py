@@ -80,7 +80,7 @@ class Bash(object):
             temp.writelines("#!/bin/bash\n" + script)
         temp.close()
         # make Bash script executable
-        os.chmod(temp.name, 0777)
+        os.chmod(temp.name, 777)
         return temp.name
 
     def process(self):
@@ -89,8 +89,8 @@ class Bash(object):
             process = subprocess.Popen(
                 self.args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
             out, _ = process.communicate()
-            for line in out.split("\n"):
-                yield line
+            for line in out.split(b"\n"):
+                yield line.decode('ascii')
             self.exit_code = process.returncode
             self.logger.info("Exit code has been %d", process.returncode)
             self.success = True if process.returncode == 0 else False

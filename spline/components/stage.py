@@ -47,7 +47,7 @@ class Stage(object):
         """Processing one stage."""
         self.logger.info("Processing pipeline stage '%s'", self.title)
         for entry in stage:
-            key = entry.keys()[0]
+            key = list(entry.keys())[0]
             if key == "env":
                 self.pipeline.data.env_list[1].update(entry[key])
                 self.logger.debug("Updating environment at level 1 with %s",

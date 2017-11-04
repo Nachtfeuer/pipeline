@@ -8,11 +8,11 @@ branches:
 
 # enable docker
 services:
- - docker
+    - docker
 
-env:
-    matrix:
-     - PYTHON_VERSION=py27
+python:
+    - "2.7"
+    - "3.5"
 
 before_install:
     - sudo apt-get update -qq
@@ -20,15 +20,14 @@ before_install:
 
 install:
     - pip install pip --upgrade
-    - pip install click pyaml Jinja2 pykwalify tox
+    - pip install click pyaml Jinja2 pykwalify tox tox-travis
     - which python
     - python -V
     - pip -V
 
 script:
-    - ./validate.sh
     - ./unittests.sh
-    - tox -e pylint -e radon -e pep8 -e pep257 -e package
+    - tox
 
 notifications:
     email:

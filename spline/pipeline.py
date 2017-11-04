@@ -60,7 +60,7 @@ class Pipeline(object):
     def run(self):
         """Processing the whole pipeline definition."""
         for entry in self.data.pipeline:
-            key = entry.keys()[0]
+            key = list(entry.keys())[0]
             if key == "env":
                 self.data.env_list[0].update(entry[key])
                 self.logger.debug("Updating environment at level 0 with %s",

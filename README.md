@@ -60,7 +60,8 @@ It should be usable by Jenkinsfile as well as by a `.travis.yml` (or other pipel
 pip install spline
 ```
 
-Following dependencies are required:
+Following dependencies are required only if you do not install the tool
+but clone the repository:
 
 ```
 pip install click pyaml pykwalify
@@ -73,8 +74,8 @@ be another section.
 ```
 git clone https://github.com/Nachtfeuer/pipeline.git
 cd pipeline
-./validate.sh
 ./unittests.sh
+tox -e pylint -e radon -e pep8 -e pep257 -e package
 ```
 
 # <a name="pipeline-syntax">The Pipeline Syntax</a>

@@ -75,7 +75,7 @@ class Tasks(object):
 
         shells = []
         for entry in tasks:
-            key = entry.keys()[0]
+            key = list(entry.keys())[0]
             if key == "env":
                 self.process_shells(shells)
                 shells = []

@@ -1,9 +1,9 @@
 """
-   Represents the main entry point for the pipeline tool.
+   Represent the main entry point for the pipeline tool.
 
-.. module:: hooks
+.. module:: application
     :platform: Unix, Windows
-    :synopis: Stage is a named group in a pipeline.
+    :synopis: Represent the main entry point for the pipeline tool.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======
@@ -128,7 +128,8 @@ class Application(object):
 
 
 @click.command()
-@click.option('--definition', help="Pipeline definition in yaml format")
+@click.option('--definition', type=click.Path(exists=True, file_okay=True, dir_okay=False),
+              required=True, help="Pipeline definition in yaml format")
 @click.option('--tags', type=click.STRING, default='',
               help="Comma separated list of tags for filtering individual tasks (shells)")
 @click.option('--matrix-tags', type=click.STRING, default='',

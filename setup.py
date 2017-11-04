@@ -25,13 +25,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 """
 import os
 from setuptools import setup
-from spline import VERSION
+from spline.version import VERSION
 
 
 setup(name='spline',
       version=VERSION,
-      description='(s)hell oriented (p)ipe(line) tool',
-      long_description="(s)hell oriented (p)ipe(line) tool using yaml definition file",
+      description='(s)hell oriented (p)ipe(line) tool (CI/CD)',
+      long_description="(s)hell oriented (p)ipe(line) tool using yaml definition file (CI/CD)",
       author='Thomas Lehmann',
       author_email='thomas.lehmann.private@gmail.com',
       license="MIT",
@@ -44,6 +44,9 @@ setup(name='spline',
       classifiers=[
           "Programming Language :: Python :: 2.7",
           "Development Status :: 5 - Production/Stable",
+          "Intended Audience :: Developers",
           "License :: OSI Approved :: MIT License",
-          "Operating System :: Unix"
+          "Operating System :: Unix",
+          "Environment :: Console",
+          "Topic :: Utilities"
       ])

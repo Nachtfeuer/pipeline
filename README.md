@@ -1,6 +1,7 @@
 # Welcome to the pipeline tool
 
 [![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
+[![PyPI version](https://badge.fury.io/py/spline.png)](https://badge.fury.io/py/spline)
 
 **Table Of Content**:  
 [Motivation](#motivation)  

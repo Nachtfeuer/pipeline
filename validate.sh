@@ -8,4 +8,4 @@
 pykwalify \
     --verbose \
     --data-file ${PWD}/example.yaml \
-    --schema-file ${PWD}/pipeline/schema.yaml
+    --schema-file ${PWD}/spline/schema.yaml

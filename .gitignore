@@ -2,5 +2,7 @@
 bats-core/
 *.pyc
 .tox/
+build/
+dist/
 ccm.xml
-pipeline.egg-info
+spline.egg-info

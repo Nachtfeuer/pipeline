@@ -25,24 +25,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 """
 import os
 from setuptools import setup
-from pipeline import VERSION
+from spline import VERSION
 
 
-def read(fname):
-    """ reading a file from current path of this file. """
-    return open(os.path.join(os.path.dirname(__file__), fname)).read()
-
-setup(name='pipeline',
+setup(name='spline',
       version=VERSION,
-      description='pipeine tool',
-      long_description="pipeline tool",
+      description='(s)hell oriented (p)ipe(line) tool',
+      long_description="(s)hell oriented (p)ipe(line) tool using yaml definition file",
       author='Thomas Lehmann',
       author_email='thomas.lehmann.private@gmail.com',
       license="MIT",
-      install_requires=["click", "pyaml"],
-      packages=['pipeline', 'pipeline.components'],
-      data_files=[('concept', ['scripts/pipeline'])],
-      keywords="pipeline tool ci/cd",
+      install_requires=["click", "pyaml", "jinja2", "pykwalify"],
+      packages=['spline', 'spline.components', 'spline.tools'],
+      scripts=['scripts/spline'],
+      package_data={'spline': ['schema.yaml']},
+      keywords="pipeline tool ci/cd bash docker",
       url="https://github.com/Nachtfeuer/pipeline",
       classifiers=[
           "Programming Language :: Python :: 2.7",

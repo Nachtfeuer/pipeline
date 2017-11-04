@@ -1,5 +1,0 @@
-#!/usr/bin/python
-from pipeline.application import main
-
-if __name__ == "__main__":
-    main()

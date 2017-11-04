@@ -1,7 +1,4 @@
-SCRIPT="python ${WORKSPACE}/scripts/pipeline"
-
-# From the root of the repository you also can test this
-# with following command. ./pipeline --definition=tests/pipeline-015.yaml
+SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing valid Docker container (with no image specified)" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-015.yaml --tags=no-image

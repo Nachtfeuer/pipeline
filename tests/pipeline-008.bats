@@ -1,7 +1,4 @@
-SCRIPT="python ${WORKSPACE}/scripts/pipeline"
-
-# From the root of the repository you also can test this
-# with following command. ./pipeline --definition=tests/pipeline-008.yaml
+SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing filtering by first tag" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-008.yaml --tags=one

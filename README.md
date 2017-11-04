@@ -2,8 +2,6 @@
 
 [![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
 
-**Work in progress; not yet for use; stay tuned; feel free to try**
-
 **Table Of Content**:  
 [Motivation](#motivation)  
 [Quickstart](#quick-start)  
@@ -55,6 +53,11 @@ features will be considered for now:
 It should be usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
 
 # <a name="quick-start">Quick start</a>
+
+```
+# (s)hell oriented (p)ipe(line) tool.
+pip install spline
+```
 
 Following dependencies are required:
 

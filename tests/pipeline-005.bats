@@ -1,7 +1,5 @@
-SCRIPT="python ${WORKSPACE}/scripts/pipeline"
+SCRIPT="python ${WORKSPACE}/scripts/spline"
 
-# From the root of the repository you also can test this
-# with following command. ./pipeline --definition=tests/pipeline-005.yaml
 @test "$BATS_TEST_FILENAME :: Testing use of environment variables (tasks level, merging)" {
     run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-005.yaml
     # verifying exit code

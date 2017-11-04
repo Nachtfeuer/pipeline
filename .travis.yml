@@ -28,7 +28,7 @@ install:
 script:
     - ./validate.sh
     - ./unittests.sh
-    - tox -e pylint -e radon -e pep8 -e pep257
+    - tox -e pylint -e radon -e pep8 -e pep257 -e package
 
 notifications:
     email:

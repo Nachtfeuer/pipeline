@@ -3,7 +3,7 @@
 
 .. module:: hooks
     :platform: Unix, Windows
-    :synopis: Hooks for pipeline
+    :synopsis: Hooks for pipeline
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======

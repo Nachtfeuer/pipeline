@@ -3,7 +3,7 @@
 
 .. module:: docker
     :platform: Unix
-    :synopis: Generic Docker container handling.
+    :synopsis: Generic Docker container handling.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======

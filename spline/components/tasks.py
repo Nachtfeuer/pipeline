@@ -3,7 +3,7 @@
 
 .. module:: tasks
     :platform: Unix
-    :synopis: Tasks is a group of tasks/shells with no name.
+    :synopsis: Tasks is a group of tasks/shells with no name.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======

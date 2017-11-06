@@ -3,7 +3,7 @@
 
 .. module:: hooks
     :platform: Unix, Windows
-    :synopis: Stage is a named group in a pipeline.
+    :synopsis: Stage is a named group in a pipeline.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======

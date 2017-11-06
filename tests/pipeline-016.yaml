@@ -1,0 +1,21 @@
+matrix(parallel):
+  - name: one
+    env:
+      sleep_in_seconds: "4"
+  
+  - name: two
+    env:
+      sleep_in_seconds: "3"
+
+  - name: three
+    env:
+      sleep_in_seconds: "2"
+
+pipeline:
+  - stage(test):
+    - tasks:
+      - shell:
+          script: |
+            echo "start - sleep {{ env.sleep_in_seconds }}s"
+            sleep {{ env.sleep_in_seconds }}s
+            echo "done - sleep {{ env.sleep_in_seconds }}s"

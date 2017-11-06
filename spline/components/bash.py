@@ -3,7 +3,7 @@
 
 .. module:: bash
     :platform: Unix
-    :synopis: Executing a bash script.
+    :synopsis: Executing a bash script.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======

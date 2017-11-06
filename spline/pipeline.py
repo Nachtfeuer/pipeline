@@ -3,7 +3,7 @@
 
 .. module:: pipeline
     :platform: Unix
-    :synopis: Pipeline is list of stages.
+    :synopsis: Pipeline is list of stages.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======

@@ -10,8 +10,7 @@ schema;env_map:
 
 type: map
 mapping:
-
-  matrix:
+  regex;((matrix\(parallel\)|matrix\(ordered\)|matrix)$):
     type: seq
     sequence:
       - type: map

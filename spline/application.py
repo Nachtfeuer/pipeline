@@ -3,7 +3,7 @@
 
 .. module:: application
     :platform: Unix, Windows
-    :synopis: Represent the main entry point for the pipeline tool.
+    :synopsis: Represent the main entry point for the pipeline tool.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======
@@ -26,11 +26,13 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-# pylint: disable=too-many-arguments, too-many-instance-attributes
+# pylint: disable=too-many-arguments, too-many-instance-attributes, no-member
 import sys
 import platform
 import os
 import logging
+import multiprocessing
+from contextlib import closing
 
 import click
 import yaml
@@ -41,6 +43,14 @@ from .pipeline import Pipeline
 from .components.hooks import Hooks
 from .tools.logger import Logger
 from .tools.event import Event
+
+
+def matrix_worker(data):
+    """Run pipelines in parallel."""
+    matrix = data['matrix']
+    Logger.get_logger(__name__ + '.worker').info("Processing pipeline for matrix entry '%s'", matrix['name'])
+    pipeline = Pipeline(data['document'], env=matrix['env'], tags=data['tags'], hooks=data['hooks'])
+    pipeline.run()
 
 
 class Application(object):
@@ -112,14 +122,21 @@ class Application(object):
             if 'cleanup' in document['hooks']:
                 hooks.cleanup = document['hooks']['cleanup']['script']
 
-        if 'matrix' in document:
-            matrix = document['matrix']
+        if 'matrix' in document or 'matrix(ordered)' in document:
+            matrix = document['matrix'] if 'matrix' in document else document['matrix(ordered)']
             for entry in matrix:
                 if self.can_process_matrix(entry):
                     self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
                     pipeline = Pipeline(document['pipeline'], env=entry['env'],
                                         tags=self.tag_list, hooks=hooks)
                     pipeline.run()
+        elif 'matrix(parallel)' in document:
+            matrix = document['matrix(parallel)']
+            worker_data = [{'matrix': entry, 'document': document['pipeline'],
+                            'tags': self.tag_list, 'hooks': hooks} for entry in matrix]
+            with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
+                for _ in pool.map(matrix_worker, worker_data):
+                    pass
         else:
             pipeline = Pipeline(document['pipeline'], tags=self.tag_list, hooks=hooks)
             pipeline.run()

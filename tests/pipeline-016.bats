@@ -5,7 +5,6 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
 
-    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| done - sleep 2s" ]
-    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "| done - sleep 3s" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "| done - sleep 2s" ]
     [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "| done - sleep 4s" ]
 }

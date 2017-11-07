@@ -1,0 +1,30 @@
+matrix(parallel):
+  - name: one
+    env:
+      message: first matrix item
+      wait_in_seconds: 4s
+    tags:
+      - first
+
+  - name: two
+    env:
+      message: second matrix item
+      wait_in_seconds: 3s
+    tags:
+      - second
+
+  - name: three
+    env:
+      message: third matrix item
+      wait_in_seconds: 1s
+    tags:
+      - third
+
+pipeline:
+  - stage(example):
+    - tasks(ordered):
+      - shell:
+          script: |
+            echo "message: $message"
+            sleep ${wait_in_seconds}
+            echo "sleep ${wait_in_seconds} done."

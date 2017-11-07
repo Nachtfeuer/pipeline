@@ -30,7 +30,7 @@ known features of the existing pipelines and some that do not exist. Following
 features will be considered for now:
 
 **Features**:
- - Python support for 2.7, 3.5 and 3.6
+ - Python support for 2.7.x, 3.4.x, 3.5.x and 3.6.x
  - automatic schema validation for yaml file
  - matrix based pipeline with tags
  - pipeline stages (names groups)

@@ -33,6 +33,7 @@ features will be considered for now:
  - Python support for 2.7.x, 3.4.x, 3.5.x and 3.6.x
  - automatic schema validation for yaml file
  - matrix based pipeline with tags
+ - parallel pipelines (matrix)
  - pipeline stages (names groups)
  - shell script execution: inline and file
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
@@ -44,7 +45,6 @@ features will be considered for now:
  - execution time on each level: pipeline, stage, tasks and shell
 
 **Todo**:
- - parallel pipelines (matrix)
  - support for templates / code snippets
  - one report:
     - one HTML file only

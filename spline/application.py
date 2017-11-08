@@ -50,7 +50,7 @@ def matrix_worker(data):
     matrix = data['matrix']
     Logger.get_logger(__name__ + '.worker').info("Processing pipeline for matrix entry '%s'", matrix['name'])
     pipeline = Pipeline(data['document'], env=matrix['env'], tags=data['tags'], hooks=data['hooks'])
-    pipeline.run()
+    return pipeline.run()
 
 
 class Application(object):
@@ -104,6 +104,17 @@ class Application(object):
 
         return count > 0
 
+    def run_matrix_ordered(self, document, hooks):
+        """Running pipelines one after the other."""
+        matrix = document['matrix'] if 'matrix' in document else document['matrix(ordered)']
+        for entry in matrix:
+            if self.can_process_matrix(entry):
+                self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
+                pipeline = Pipeline(document['pipeline'], env=entry['env'],
+                                    tags=self.tag_list, hooks=hooks)
+                if not pipeline.run():
+                    sys.exit(1)
+
     def run(self):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -123,23 +134,23 @@ class Application(object):
                 hooks.cleanup = document['hooks']['cleanup']['script']
 
         if 'matrix' in document or 'matrix(ordered)' in document:
-            matrix = document['matrix'] if 'matrix' in document else document['matrix(ordered)']
-            for entry in matrix:
-                if self.can_process_matrix(entry):
-                    self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
-                    pipeline = Pipeline(document['pipeline'], env=entry['env'],
-                                        tags=self.tag_list, hooks=hooks)
-                    pipeline.run()
+            self.run_matrix_ordered(document, hooks)
+
         elif 'matrix(parallel)' in document:
             matrix = document['matrix(parallel)']
             worker_data = [{'matrix': entry, 'document': document['pipeline'],
                             'tags': self.tag_list, 'hooks': hooks} for entry in matrix]
+            success = True
             with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
-                for _ in pool.map(matrix_worker, worker_data):
-                    pass
+                for result in pool.map(matrix_worker, worker_data):
+                    if not result:
+                        success = False
+            if not success:
+                sys.exit(1)
         else:
             pipeline = Pipeline(document['pipeline'], tags=self.tag_list, hooks=hooks)
-            pipeline.run()
+            if not pipeline.run():
+                sys.exit(1)
 
         self.event.succeeded()
 

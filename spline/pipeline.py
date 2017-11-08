@@ -69,7 +69,8 @@ class Pipeline(object):
 
             if key.startswith("stage"):
                 stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
-                stage.process(entry[key])
+                if not stage.process(entry[key]):
+                    return False
 
         if len(self.data.hooks.cleanup) > 0:
             env = self.data.env_list[0].copy()
@@ -80,3 +81,4 @@ class Pipeline(object):
                 self.logger.info(" | %s", line)
 
         self.event.succeeded()
+        return True

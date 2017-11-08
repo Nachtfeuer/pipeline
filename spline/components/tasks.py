@@ -27,7 +27,6 @@
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 # pylint: disable=no-member
-import sys
 import multiprocessing
 from contextlib import closing
 from .bash import Bash
@@ -98,9 +97,11 @@ class Tasks(object):
                 continue
 
         if len(shells) > 0:
-            self.process_shells(shells)
+            if not self.process_shells(shells):
+                return False
 
         self.event.succeeded()
+        return True
 
     def process_shells(self, shells):
         """Processing a list of shells."""
@@ -112,14 +113,18 @@ class Tasks(object):
                         success = False
             if success:
                 self.logger.info("Parallel Processing Bash code: finished")
-            else:
-                self.run_cleanup(shells[0]['env'], 99)
-                self.logger.error("Pipeline has failed: immediately leaving!")
-                self.event.failed()
-                sys.exit(99)
+                return True
+
+            self.run_cleanup(shells[0]['env'], 99)
+            self.logger.error("Pipeline has failed: immediately leaving!")
+            self.event.failed()
+            return False
         else:
             for shell in shells:
-                self.process_shell(get_creator_by_name(shell['creator']), shell['entry'], shell['env'])
+                if not self.process_shell(
+                        get_creator_by_name(shell['creator']), shell['entry'], shell['env']):
+                    return False
+        return True
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
@@ -144,11 +149,12 @@ class Tasks(object):
 
         if shell.success:
             self.logger.info("Processing Bash code: finished")
-        else:
-            self.run_cleanup(env, shell.exit_code)
-            self.logger.error("Pipeline has failed: immediately leaving!")
-            self.event.failed()
-            sys.exit(shell.exit_code)
+            return True
+
+        self.run_cleanup(env, shell.exit_code)
+        self.logger.error("Pipeline has failed: leaving as soon as possible!")
+        self.event.failed()
+        return False
 
     def run_cleanup(self, env, exit_code):
         """Run cleanup hook when configured."""

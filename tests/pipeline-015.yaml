@@ -5,7 +5,7 @@ pipeline:
           script: |
             yum -y install epel-release > /dev/null 2>&1
             yum -y install figlet  > /dev/null 2>&1
-            figlet -f standard "docker" | sed -e 's: :.:g'
+            figlet -f standard "docker" | sed -e 's: :.:g' | sed -e 's/\(.*\)/figlet: \1/'
           tags:
             - no-image
 

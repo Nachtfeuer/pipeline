@@ -43,7 +43,7 @@ def get_creator_by_name(name):
 def worker(data):
     """Running on shell via multiprocessing."""
     creator = get_creator_by_name(data['creator'])
-    shell = creator(data['entry'], data['env'])
+    shell = creator(data['entry'], data['model'], data['env'])
     for line in shell.process():
         Logger.get_logger(__name__ + '.worker').info(" | %s", line)
     return shell.success
@@ -87,13 +87,19 @@ class Tasks(object):
             if key == "shell":
                 if self.can_process_shell(entry[key]):
                     shells.append({
-                        'creator': Bash.__name__, 'entry': entry[key], 'env': self.get_merged_env()})
+                        'creator': Bash.__name__,
+                        'entry': entry[key],
+                        'model': self.pipeline.model,
+                        'env': self.get_merged_env()})
                 continue
 
             if key == "docker(container)":
                 if self.can_process_shell(entry[key]):
                     shells.append({
-                        'creator': Container.__name__, 'entry': entry[key], 'env': self.get_merged_env()})
+                        'creator': Container.__name__,
+                        'entry': entry[key],
+                        'model': self.pipeline.model,
+                        'env': self.get_merged_env()})
                 continue
 
         if len(shells) > 0:
@@ -122,7 +128,7 @@ class Tasks(object):
         else:
             for shell in shells:
                 if not self.process_shell(
-                        get_creator_by_name(shell['creator']), shell['entry'], shell['env']):
+                        get_creator_by_name(shell['creator']), shell['entry'], shell['model'], shell['env']):
                     return False
         return True
 
@@ -139,11 +145,11 @@ class Tasks(object):
 
         return count > 0
 
-    def process_shell(self, creator, entry, env):
+    def process_shell(self, creator, entry, model, env):
         """Processing a shell entry."""
         self.logger.info("Processing Bash code: start")
 
-        shell = creator(entry, env)
+        shell = creator(entry, model, env)
         for line in shell.process():
             self.logger.info(" | %s", line)
 
@@ -161,6 +167,6 @@ class Tasks(object):
         if len(self.pipeline.data.hooks.cleanup) > 0:
             env.update({'PIPELINE_RESULT': 'FAILURE'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
-            cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, '', env)
+            cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, '', self.pipeline.model, env)
             for line in cleanup_shell.process():
                 self.logger.info(" | %s", line)

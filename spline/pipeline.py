@@ -26,6 +26,7 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+# pylint: disable=too-many-arguments
 import os
 import re
 
@@ -50,9 +51,10 @@ class PipelineData(object):
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, pipeline, env=None, tags=None, hooks=None):
+    def __init__(self, pipeline, model=None, env=None, tags=None, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.event = Event.create(__name__)
+        self.model = {} if not isinstance(model, dict) else model
         self.data = PipelineData(pipeline, [] if tags is None else tags, hooks)
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
@@ -76,7 +78,7 @@ class Pipeline(object):
             env = self.data.env_list[0].copy()
             env.update({'PIPELINE_RESULT': 'SUCCESS'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
-            cleanup_shell = Bash(self.data.hooks.cleanup, '', env)
+            cleanup_shell = Bash(self.data.hooks.cleanup, '', self.model, env)
             for line in cleanup_shell.process():
                 self.logger.info(" | %s", line)
 

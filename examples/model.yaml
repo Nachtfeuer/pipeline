@@ -1,0 +1,15 @@
+model:
+  a: 10
+  b: [ 10, 20 ]
+  c: {"message": "hello"}
+
+pipeline:
+  - stage(example):
+    - tasks(ordered):
+      - shell:
+          script: |
+            echo "a = {{ model.a }}"
+            {% for entry in model.b %}
+              echo "b = {{ entry }} (index={{loop.index}})"
+            {% endfor %}
+            echo "c = {{ model.c["message"] }}"

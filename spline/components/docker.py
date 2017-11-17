@@ -60,12 +60,12 @@ else
 fi
 """
 
-    def __init__(self, script, title='', env=None):
+    def __init__(self, script, title='', model=None, env=None):
         """Initialize with Bash code and optional environment variables."""
-        super(Container, self).__init__(script, title, env)
+        super(Container, self).__init__(script, title, model, env)
 
     @staticmethod
-    def creator(shell_parameters, env):
+    def creator(shell_parameters, model, env):
         """Creator function for creating an instance of a Bash."""
         title = '' if 'title' not in shell_parameters else shell_parameters['title']
         image = 'centos:7' if 'image' not in shell_parameters else shell_parameters['image']
@@ -81,4 +81,4 @@ fi
             'script': shell_parameters['script'],
             'environment': ' '.join(["-e \"%s=%s\"" % (key, value) for key, value in env.items()])
         }
-        return Container(script=wrapped_script, title=title, env=env)
+        return Container(script=wrapped_script, title=title, model=model, env=env)

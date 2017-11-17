@@ -39,14 +39,14 @@ from ..tools.event import Event
 class Bash(object):
     """Wrapper for Bash execution."""
 
-    def __init__(self, script, title='', env=None):
+    def __init__(self, script, title='', model=None, env=None):
         """Initialize with Bash code and optional environment variables."""
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.success = False
 
         template = Template(script)
-        rendered_script = template.render(env=env)
+        rendered_script = template.render(model=model, env=env)
         self.temp_filename = Bash.create_file_for(rendered_script)
 
         if len(title) > 0:
@@ -63,10 +63,10 @@ class Bash(object):
         self.exit_code = 0
 
     @staticmethod
-    def creator(shell_parameters, env):
+    def creator(shell_parameters, model, env):
         """Creator function for creating an instance of a Bash."""
         title = '' if 'title' not in shell_parameters else shell_parameters['title']
-        return Bash(script=shell_parameters['script'], title=title, env=env)
+        return Bash(script=shell_parameters['script'], title=title, model=model, env=env)
 
     @staticmethod
     def create_file_for(script):

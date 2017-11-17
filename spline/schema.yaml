@@ -36,6 +36,12 @@ mapping:
         mapping:
           script: { type: str }
 
+  model:
+    type: map
+    mapping:
+      regex;([a-z][a-z]*):
+        type: any
+
   pipeline:
     required: yes
     type: seq

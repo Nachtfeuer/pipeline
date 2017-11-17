@@ -48,8 +48,10 @@ from .tools.event import Event
 def matrix_worker(data):
     """Run pipelines in parallel."""
     matrix = data['matrix']
+    model = {} if 'model' not in data else data['model']
     Logger.get_logger(__name__ + '.worker').info("Processing pipeline for matrix entry '%s'", matrix['name'])
-    pipeline = Pipeline(data['document'], env=matrix['env'], tags=data['tags'], hooks=data['hooks'])
+    pipeline = Pipeline(data['document'], model=model, env=matrix['env'],
+                        tags=data['tags'], hooks=data['hooks'])
     return pipeline.run()
 
 
@@ -110,7 +112,8 @@ class Application(object):
         for entry in matrix:
             if self.can_process_matrix(entry):
                 self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
-                pipeline = Pipeline(document['pipeline'], env=entry['env'],
+                model = {} if 'model' not in document else document['model']
+                pipeline = Pipeline(document['pipeline'], model=model, env=entry['env'],
                                     tags=self.tag_list, hooks=hooks)
                 if not pipeline.run():
                     sys.exit(1)
@@ -148,7 +151,8 @@ class Application(object):
             if not success:
                 sys.exit(1)
         else:
-            pipeline = Pipeline(document['pipeline'], tags=self.tag_list, hooks=hooks)
+            model = {} if 'model' not in document else document['model']
+            pipeline = Pipeline(document['pipeline'], model=model, tags=self.tag_list, hooks=hooks)
             if not pipeline.run():
                 sys.exit(1)
 

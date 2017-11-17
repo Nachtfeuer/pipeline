@@ -8,6 +8,7 @@
 [Quickstart](#quick-start)  
 [The Pipeline Syntax](#pipeline-syntax)  
 [The Matrix Block](#matrix-block)  
+[The Model Block](#model-block)  
 [The Pipeline Block](#pipeline-block)  
 [The Stage Block](#stage-block)  
 [The Tasks Block](#tasks-block)  
@@ -43,9 +44,9 @@ features will be considered for now:
  - supporting Jinja templating in Bash scripts
  - support for Docker containers
  - execution time on each level: pipeline, stage, tasks and shell
+ - support for model data (a dictionary of anything you need)
 
 **Todo**:
- - support for templates / code snippets
  - one report:
     - one HTML file only
     - simple
@@ -76,7 +77,8 @@ be another section.
 git clone https://github.com/Nachtfeuer/pipeline.git
 cd pipeline
 ./unittests.sh
-tox -e pylint -e radon -e pep8 -e pep257 -e package
+# OR tox -e py35 OR tox -e py36 (see tox.ini)
+tox -e py27
 ```
 
 # <a name="pipeline-syntax">The Pipeline Syntax</a>
@@ -170,6 +172,22 @@ With this example you can filter for second matrix item like this:
 pipeline --definition=example.yaml --matrix-tags=second
 ```
 
+## <a name="model-block">The Model Block</a>
+The model is basically a dictionary of anythings. The keys should look like "limit",
+or "upper-limit" (all lowercase and optional a dash after first letter).
+
+```
+model:
+  limit: 100
+  values: [10, "foo", 3.1415926535]
+  other-values: {"name": "spline"}
+```
+
+Inside a Bash script (includes Docker)
+you can refer to it like seen here: `{{ model.limit }}`
+
+At the moment the model is global (location is same level as matrix, hooks and pipeline)
+and cannot be overwritten (might change later).
 
 ## <a name="pipeline-block">The Pipeline Block</a>
 

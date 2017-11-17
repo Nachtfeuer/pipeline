@@ -1,0 +1,15 @@
+model:
+  count: 3
+  names: ["Gandalf", "Carolinus", "Belgarath"]
+
+pipeline:
+  - stage(example):
+    - tasks(ordered):
+      - shell:
+          script: |
+            {% for _ in range(model.count) %}
+              echo "{{ loop.index }}"
+            {% endfor %}
+            {% for name in model.names %}
+              echo "{{ name }}"
+            {% endfor %}

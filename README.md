@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
 [![PyPI version](https://badge.fury.io/py/spline.png)](https://badge.fury.io/py/spline)
+[![Read The Docs](https://readthedocs.org/projects/spline/badge/?version=latest)](http://spline.readthedocs.io/en/latest/?badge=latest)
 
 **Table Of Content**:  
 [Motivation](#motivation)  
@@ -45,6 +46,7 @@ features will be considered for now:
  - support for Docker containers
  - execution time on each level: pipeline, stage, tasks and shell
  - support for model data (a dictionary of anything you need)
+ - documentation at read the docs: 
 
 **Todo**:
  - one report:

@@ -11,6 +11,7 @@ Welcome to spline's documentation!
    :caption: Contents:
 
    motivation
+   quickstart
 
 
 Indices and tables

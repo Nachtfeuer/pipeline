@@ -1,0 +1,5 @@
+pipeline:
+    - stage(Example):
+        - tasks(ordered):
+            - shell:
+                script: echo "hello world!"

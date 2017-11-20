@@ -15,11 +15,4 @@ Welcome to spline's documentation!
    shell
    model
    env
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
+   tasks

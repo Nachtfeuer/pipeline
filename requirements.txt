@@ -14,3 +14,4 @@ wheel == 0.29.0
 click == 6.7
 pyaml == 17.8.0
 pykwalify == 1.6.0
+sphinx_rtd_theme == 0.2.4

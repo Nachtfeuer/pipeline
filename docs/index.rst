@@ -14,6 +14,7 @@ Welcome to spline's documentation!
    quickstart
    shell
    model
+   env
 
 
 Indices and tables

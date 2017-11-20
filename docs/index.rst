@@ -13,6 +13,7 @@ Welcome to spline's documentation!
    motivation
    quickstart
    shell
+   model
 
 
 Indices and tables

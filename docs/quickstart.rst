@@ -1,6 +1,8 @@
 Quickstart
 ==========
 
+Usage
+-----
 That installs the spline tool including all of its dependencies:
 
 ::
@@ -46,3 +48,15 @@ The output:
     2017-11-18 11:24:25,949 - spline.components.tasks -  |
     2017-11-18 11:24:25,950 - spline.components.bash - Exit code has been 0
     2017-11-18 11:24:25,950 - spline.components.tasks - Processing Bash code: finished
+
+Development
+-----------
+
+::
+
+    git clone https://github.com/Nachtfeuer/pipeline.git
+    cd pipeline
+    ./unittests.sh
+    # OR tox -e py35 OR tox -e py36 (see tox.ini)
+    tox -e py27
+

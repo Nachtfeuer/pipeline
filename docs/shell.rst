@@ -47,10 +47,18 @@ Here's a simple example for the access:
 
 ::
 
-    - shell:
-        script: |
-            echo "USER={{ env.USER }}"
-            echo "foo={{ model['foo'] }}"
+    - tasks:
+        - env:
+            count: "3"
+
+        - shell:
+            script: |
+                {% for c in range(env.count|int) %}
+                echo "{{ c+1 }}:{{ env.message }}"
+                {% endfor %}
+                echo "USER={{ env.USER }}"
+                echo "foo={{ model['foo'] }}"
+
 
 More details on **env** and **model** you can see in a separate chapter.
 

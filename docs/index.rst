@@ -12,7 +12,13 @@ Welcome to spline's documentation!
 
    motivation
    quickstart
+   pipeline
+   matrix
+   stages
    shell
    model
    env
    tasks
+   docker_container
+   hooks
+   event_logging

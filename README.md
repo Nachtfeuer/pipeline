@@ -3,6 +3,7 @@
 [![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
 [![PyPI version](https://badge.fury.io/py/spline.png)](https://badge.fury.io/py/spline)
 [![Read The Docs](https://readthedocs.org/projects/spline/badge/?version=latest)](http://spline.readthedocs.io/en/latest/?badge=latest)
+[![Known Vulnerabilities](https://snyk.io/test/github/nachtfeuer/pipeline/badge.svg)](https://snyk.io/test/github/nachtfeuer/pipeline)
 
 **Table Of Content**:  
 [Motivation](docs/motivation.rst)  

@@ -12,14 +12,14 @@ The Environment Variables
             b: "world"
 
         - tasks(ordered):
-        - env:
-            c: "for all"
+            - env:
+                c: "for all"
 
-        - shell:
-            script: |
-                echo "a=$a"
-                echo "b=$b"
-                echo "c=$c"
+            - shell:
+                script: |
+                    echo "a=$a"
+                    echo "b=$b"
+                    echo "c=$c"
 
 An extract from the output when running the pipeline:
 

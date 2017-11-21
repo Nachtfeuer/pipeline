@@ -20,7 +20,6 @@ Ordered tasks can written as ``- tasks:`` or as ``- tasks(ordered):``
 
 Parallel tasks
 --------------
-
 All tasks are running in parallel as much as possible. The
 Python module **multiprocessing** is used.
 

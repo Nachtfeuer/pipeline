@@ -28,7 +28,7 @@ You also can have multiple lines:
 Jinja templating supported
 --------------------------
 Jinja templating is supported. Currently two variables
-are supported: **env** and **model**:
+are available:
 
 **env**
 

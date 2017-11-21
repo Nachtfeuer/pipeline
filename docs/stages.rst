@@ -3,6 +3,7 @@ Pipeline stages
 Each stage is a list of tasks blocks. It also may have environment blocks.
 
 ::
+
     - stage(one):
         - env:
             mode: test

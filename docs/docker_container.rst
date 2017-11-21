@@ -91,7 +91,7 @@ and removes the file afterwards.
         script: |
             echo "hello world" > /mnt/host/hello.txt
             chown ${UID}:$(GID} /mnt/host/hello.txt
-            mount: true
+        mount: true
 
     - shell:
         script: |

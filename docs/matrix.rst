@@ -8,16 +8,16 @@ specify tags which allow to filter for certain matrix runs.
 ::
 
     matrix:
-    - name: one
-        env:
+        - name: one
+          env:
             mode: one
-        tags:
+          tags:
             - first
 
-    - name: two
-        env:
+        - name: two
+          env:
             mode: two
-        tags:
+          tags:
             - second
 
 

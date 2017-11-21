@@ -84,19 +84,10 @@ class Tasks(object):
                                   self.pipeline.data.env_list[2])
                 continue
 
-            if key == "shell":
+            if key in ["shell", "docker(container)"]:
                 if self.can_process_shell(entry[key]):
                     shells.append({
-                        'creator': Bash.__name__,
-                        'entry': entry[key],
-                        'model': self.pipeline.model,
-                        'env': self.get_merged_env()})
-                continue
-
-            if key == "docker(container)":
-                if self.can_process_shell(entry[key]):
-                    shells.append({
-                        'creator': Container.__name__,
+                        'creator': Bash.__name__ if key == "shell" else Container.__name__,
                         'entry': entry[key],
                         'model': self.pipeline.model,
                         'env': self.get_merged_env()})

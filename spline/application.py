@@ -118,6 +118,19 @@ class Application(object):
                 if not pipeline.run():
                     sys.exit(1)
 
+    def run_matrix_in_parallel(self, document, hooks):
+        """Running pipelines in parallel."""
+        matrix = document['matrix(parallel)']
+        worker_data = [{'matrix': entry, 'document': document['pipeline'],
+                        'tags': self.tag_list, 'hooks': hooks} for entry in matrix]
+        success = True
+        with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
+            for result in pool.map(matrix_worker, worker_data):
+                if not result:
+                    success = False
+        if not success:
+            sys.exit(1)
+
     def run(self):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -140,16 +153,7 @@ class Application(object):
             self.run_matrix_ordered(document, hooks)
 
         elif 'matrix(parallel)' in document:
-            matrix = document['matrix(parallel)']
-            worker_data = [{'matrix': entry, 'document': document['pipeline'],
-                            'tags': self.tag_list, 'hooks': hooks} for entry in matrix]
-            success = True
-            with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
-                for result in pool.map(matrix_worker, worker_data):
-                    if not result:
-                        success = False
-            if not success:
-                sys.exit(1)
+            self.run_matrix_in_parallel(document, hooks)
         else:
             model = {} if 'model' not in document else document['model']
             pipeline = Pipeline(document['pipeline'], model=model, tags=self.tag_list, hooks=hooks)

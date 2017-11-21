@@ -4,6 +4,7 @@
 [![PyPI version](https://badge.fury.io/py/spline.png)](https://badge.fury.io/py/spline)
 [![Read The Docs](https://readthedocs.org/projects/spline/badge/?version=latest)](http://spline.readthedocs.io/en/latest/?badge=latest)
 [![Known Vulnerabilities](https://snyk.io/test/github/nachtfeuer/pipeline/badge.svg)](https://snyk.io/test/github/nachtfeuer/pipeline)
+[![BCH compliance](https://bettercodehub.com/edge/badge/Nachtfeuer/pipeline?branch=master)](https://bettercodehub.com/)
 
 **Table Of Content**:  
 [Motivation](docs/motivation.rst)  

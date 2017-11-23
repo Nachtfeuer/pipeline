@@ -7,3 +7,7 @@ dist/
 ccm.xml
 spline.egg-info
 _build/
+.coverage
+coverage.xml
+coverage/
+tests.xml

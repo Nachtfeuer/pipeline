@@ -92,8 +92,12 @@ class Bash(object):
             for line in out.split(b"\n"):
                 yield line.decode('ascii')
             self.exit_code = process.returncode
-            self.logger.info("Exit code has been %d", process.returncode)
-            self.success = True if process.returncode == 0 else False
+            if process.returncode == 0:
+                self.logger.info("Exit code has been %d", process.returncode)
+                self.success = True
+            else:
+                self.logger.error("Exit code has been %d", process.returncode)
+                self.success = False
         except OSError as exception:
             self.exit_code = 1
             yield str(exception)

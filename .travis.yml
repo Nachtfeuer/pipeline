@@ -23,7 +23,7 @@ before_install:
 
 install:
     - pip install pip --upgrade
-    - pip install click pyaml Jinja2 pykwalify tox tox-travis
+    - pip install click pyaml Jinja2 pykwalify tox tox-travis coveralls
     - which python
     - python -V
     - pip -V
@@ -31,6 +31,9 @@ install:
 script:
     - ./unittests.sh
     - tox
+
+after_success:
+    - coveralls
 
 notifications:
     email:

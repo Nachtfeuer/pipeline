@@ -19,6 +19,7 @@ python:
 
 before_install:
     - sudo apt-get update -qq
+    - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce
     - docker version
 
 install:

@@ -2,8 +2,6 @@
 # pylint: disable=no-self-use, invalid-name
 import logging
 import unittest
-import multiprocessing
-import codecs
 from io import StringIO
 from hamcrest import assert_that, equal_to
 

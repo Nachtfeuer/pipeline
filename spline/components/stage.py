@@ -56,7 +56,8 @@ class Stage(object):
 
             if key.startswith("tasks"):
                 tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
-                if not tasks.process(entry[key]):
+                result = tasks.process(entry[key])
+                if not result['success']:
                     return False
 
         self.event.succeeded()

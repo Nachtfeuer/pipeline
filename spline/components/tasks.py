@@ -44,9 +44,11 @@ def worker(data):
     """Running on shell via multiprocessing."""
     creator = get_creator_by_name(data['creator'])
     shell = creator(data['entry'], data['model'], data['env'])
+    output = []
     for line in shell.process():
+        output.append(line)
         Logger.get_logger(__name__ + '.worker').info(" | %s", line)
-    return shell.success
+    return {'success': shell.success, 'output': output}
 
 
 class Tasks(object):
@@ -93,35 +95,49 @@ class Tasks(object):
                         'env': self.get_merged_env()})
                 continue
 
+        result = {}
         if len(shells) > 0:
-            if not self.process_shells(shells):
-                return False
+            result = self.process_shells(shells)
+            if not result['success']:
+                return result
 
         self.event.succeeded()
-        return True
+        return result
+
+    def process_shells_parallel(self, shells):
+        """Processing a list of shells parallel."""
+        output = []
+        success = True
+        with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
+            for result in pool.map(worker, [shell for shell in shells]):
+                output += result['output']
+                if not result['success']:
+                    success = False
+        if success:
+            self.logger.info("Parallel Processing Bash code: finished")
+            return {'success': True, 'output': output}
+
+        self.run_cleanup(shells[0]['env'], 99)
+        self.logger.error("Pipeline has failed: immediately leaving!")
+        self.event.failed()
+        return {'success': False, 'output': output}
+
+    def process_shells_ordered(self, shells):
+        """Processing a list of shells one after the other."""
+        output = []
+        for shell in shells:
+            result = self.process_shell(
+                get_creator_by_name(shell['creator']), shell['entry'], shell['model'], shell['env'])
+            if not result['success']:
+                return {'success': False, 'output': output}
+            output += result['output']
+        return {'success': True, 'output': output}
 
     def process_shells(self, shells):
         """Processing a list of shells."""
         if self.parallel:
-            success = True
-            with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
-                for result in pool.map(worker, [shell for shell in shells]):
-                    if not result:
-                        success = False
-            if success:
-                self.logger.info("Parallel Processing Bash code: finished")
-                return True
-
-            self.run_cleanup(shells[0]['env'], 99)
-            self.logger.error("Pipeline has failed: immediately leaving!")
-            self.event.failed()
-            return False
-        else:
-            for shell in shells:
-                if not self.process_shell(
-                        get_creator_by_name(shell['creator']), shell['entry'], shell['model'], shell['env']):
-                    return False
-        return True
+            return self.process_shells_parallel(shells)
+        return self.process_shells_ordered(shells)
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
@@ -140,18 +156,20 @@ class Tasks(object):
         """Processing a shell entry."""
         self.logger.info("Processing Bash code: start")
 
+        output = []
         shell = creator(entry, model, env)
         for line in shell.process():
+            output.append(line)
             self.logger.info(" | %s", line)
 
         if shell.success:
             self.logger.info("Processing Bash code: finished")
-            return True
+            return {'success': True, 'output': output}
 
         self.run_cleanup(env, shell.exit_code)
         self.logger.error("Pipeline has failed: leaving as soon as possible!")
         self.event.failed()
-        return False
+        return {'success': False, 'output': output}
 
     def run_cleanup(self, env, exit_code):
         """Run cleanup hook when configured."""

@@ -12,7 +12,7 @@ PYTHONPATH=$PWD
 export PYTHONPATH
 
 # one simple run
-python ${WORKSPACE}/scripts/spline --definition=tests/pipeline-012.yaml
+python ${WORKSPACE}/scripts/spline --definition=tests/pipeline-015.yaml --tags=no-image
 
 # running all tests
-bats-core/bin/bats tests
+# bats-core/bin/bats tests

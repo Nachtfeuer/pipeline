@@ -117,7 +117,8 @@ class Tasks(object):
             self.logger.info("Parallel Processing Bash code: finished")
             return {'success': True, 'output': output}
 
-        self.run_cleanup(shells[0]['env'], 99)
+        for line in self.run_cleanup(shells[0]['env'], 99):
+            output.append(line)
         self.logger.error("Pipeline has failed: immediately leaving!")
         self.event.failed()
         return {'success': False, 'output': output}
@@ -128,9 +129,9 @@ class Tasks(object):
         for shell in shells:
             result = self.process_shell(
                 get_creator_by_name(shell['creator']), shell['entry'], shell['model'], shell['env'])
+            output += result['output']
             if not result['success']:
                 return {'success': False, 'output': output}
-            output += result['output']
         return {'success': True, 'output': output}
 
     def process_shells(self, shells):
@@ -166,16 +167,21 @@ class Tasks(object):
             self.logger.info("Processing Bash code: finished")
             return {'success': True, 'output': output}
 
-        self.run_cleanup(env, shell.exit_code)
+        for line in self.run_cleanup(env, shell.exit_code):
+            output.append(line)
+
         self.logger.error("Pipeline has failed: leaving as soon as possible!")
         self.event.failed()
         return {'success': False, 'output': output}
 
     def run_cleanup(self, env, exit_code):
         """Run cleanup hook when configured."""
+        output = []
         if len(self.pipeline.data.hooks.cleanup) > 0:
             env.update({'PIPELINE_RESULT': 'FAILURE'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
             cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, '', self.pipeline.model, env)
             for line in cleanup_shell.process():
+                output.append(line)
                 self.logger.info(" | %s", line)
+        return output

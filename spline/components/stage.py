@@ -36,7 +36,7 @@ class Stage(object):
     """Class for representing a name group (title)."""
 
     def __init__(self, pipeline, title):
-        """Initializing with referenz to pipeline main object."""
+        """Initializing with reference to pipeline main object."""
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.pipeline = pipeline
@@ -46,6 +46,7 @@ class Stage(object):
     def process(self, stage):
         """Processing one stage."""
         self.logger.info("Processing pipeline stage '%s'", self.title)
+        output = []
         for entry in stage:
             key = list(entry.keys())[0]
             if key == "env":
@@ -57,8 +58,10 @@ class Stage(object):
             if key.startswith("tasks"):
                 tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
                 result = tasks.process(entry[key])
+                for line in result['output']:
+                    output.append(line)
                 if not result['success']:
-                    return False
+                    return {'success': False, 'output': output}
 
         self.event.succeeded()
-        return True
+        return {'success': True, 'output': output}

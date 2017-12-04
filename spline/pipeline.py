@@ -71,7 +71,8 @@ class Pipeline(object):
 
             if key.startswith("stage"):
                 stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
-                if not stage.process(entry[key]):
+                result = stage.process(entry[key])
+                if not result['success']:
                     return False
 
         if len(self.data.hooks.cleanup) > 0:

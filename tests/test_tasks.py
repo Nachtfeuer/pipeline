@@ -1,4 +1,4 @@
-"""Testing of class Logger."""
+"""Testing of class Tasks."""
 # pylint: disable=no-self-use, invalid-name
 import unittest
 from hamcrest import assert_that, equal_to

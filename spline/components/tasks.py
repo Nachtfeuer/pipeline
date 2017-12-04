@@ -74,11 +74,17 @@ class Tasks(object):
         if self.parallel:
             self.logger.info("Run tasks in parallel")
 
+        self.pipeline.data.env_list[2] = {}
+
+        output = []
         shells = []
         for entry in tasks:
             key = list(entry.keys())[0]
             if key == "env":
-                self.process_shells(shells)
+                result = self.process_shells(shells)
+                output += result['output']
+                if not result['success']:
+                    return {'success': False, 'output': output}
                 shells = []
 
                 self.pipeline.data.env_list[2].update(entry[key])
@@ -95,14 +101,13 @@ class Tasks(object):
                         'env': self.get_merged_env()})
                 continue
 
-        result = {}
-        if len(shells) > 0:
-            result = self.process_shells(shells)
-            if not result['success']:
-                return result
+        result = self.process_shells(shells)
+        output += result['output']
+        if not result['success']:
+            return {'success': False, 'output': output}
 
         self.event.succeeded()
-        return result
+        return {'success': True, 'output': output}
 
     def process_shells_parallel(self, shells):
         """Processing a list of shells parallel."""
@@ -136,9 +141,11 @@ class Tasks(object):
 
     def process_shells(self, shells):
         """Processing a list of shells."""
-        if self.parallel:
+        if self.parallel and len(shells) > 1:
             return self.process_shells_parallel(shells)
-        return self.process_shells_ordered(shells)
+        if len(shells) > 0:
+            return self.process_shells_ordered(shells)
+        return {'success': True, 'output': []}
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""

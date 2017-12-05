@@ -26,33 +26,22 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-# pylint: disable=too-many-arguments, too-many-instance-attributes, no-member
+# pylint: disable=too-many-arguments, too-many-instance-attributes
 import sys
 import platform
 import os
 import logging
-import multiprocessing
-from contextlib import closing
 
 import click
 import yaml
 from pykwalify.core import Core
 from pykwalify.errors import SchemaError
 
+from .matrix import Matrix
 from .pipeline import Pipeline
 from .components.hooks import Hooks
 from .tools.logger import Logger
 from .tools.event import Event
-
-
-def matrix_worker(data):
-    """Run pipelines in parallel."""
-    matrix = data['matrix']
-    model = {} if 'model' not in data else data['model']
-    Logger.get_logger(__name__ + '.worker').info("Processing pipeline for matrix entry '%s'", matrix['name'])
-    pipeline = Pipeline(data['document'], model=model, env=matrix['env'],
-                        tags=data['tags'], hooks=data['hooks'])
-    return pipeline.run()
 
 
 class Application(object):
@@ -93,45 +82,6 @@ class Application(object):
             self.logger.info("Schema validation for '%s' has failed", self.definition)
             sys.exit(1)
 
-    def can_process_matrix(self, entry):
-        """:return: True when matrix entry can be processed."""
-        if len(self.matrix_tag_list) == 0:
-            return True
-
-        count = 0
-        if 'tags' in entry:
-            for tag in self.matrix_tag_list:
-                if tag in entry['tags']:
-                    count += 1
-
-        return count > 0
-
-    def run_matrix_ordered(self, document, hooks):
-        """Running pipelines one after the other."""
-        matrix = document['matrix'] if 'matrix' in document else document['matrix(ordered)']
-        for entry in matrix:
-            if self.can_process_matrix(entry):
-                self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
-                model = {} if 'model' not in document else document['model']
-                pipeline = Pipeline(document['pipeline'], model=model, env=entry['env'],
-                                    tags=self.tag_list, hooks=hooks)
-                result = pipeline.run()
-                if not result['success']:
-                    sys.exit(1)
-
-    def run_matrix_in_parallel(self, document, hooks):
-        """Running pipelines in parallel."""
-        matrix = document['matrix(parallel)']
-        worker_data = [{'matrix': entry, 'document': document['pipeline'],
-                        'tags': self.tag_list, 'hooks': hooks} for entry in matrix]
-        success = True
-        with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
-            for result in pool.map(matrix_worker, worker_data):
-                if not result['success']:
-                    success = False
-        if not success:
-            sys.exit(1)
-
     def run(self):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -144,21 +94,25 @@ class Application(object):
             return
 
         document = yaml.load(open(self.definition).read())
+        model = {} if 'model' not in document else document['model']
+        matrix = document['matrix'] if 'matrix' in document \
+            else document['matrix(ordered)'] if 'matrix(ordered)' in document \
+            else document['matrix(parallel)'] if 'matrix(parallel)' in document \
+            else None
 
         hooks = Hooks()
         if 'hooks' in document:
             if 'cleanup' in document['hooks']:
                 hooks.cleanup = document['hooks']['cleanup']['script']
 
-        if 'matrix' in document or 'matrix(ordered)' in document:
-            self.run_matrix_ordered(document, hooks)
-
-        elif 'matrix(parallel)' in document:
-            self.run_matrix_in_parallel(document, hooks)
-        else:
-            model = {} if 'model' not in document else document['model']
+        if matrix is None:
             pipeline = Pipeline(document['pipeline'], model=model, tags=self.tag_list, hooks=hooks)
             result = pipeline.run()
+            if not result['success']:
+                sys.exit(1)
+        else:
+            matrix = Matrix(matrix, self.matrix_tag_list, 'matrix(parallel)' in document)
+            result = matrix.process(document['pipeline'], model, self.tag_list, hooks)
             if not result['success']:
                 sys.exit(1)
 
@@ -183,7 +137,6 @@ class Application(object):
 def main(definition="", matrix_tags="", tags="", validate_only=False, logging_config="", event_logging=False):
     """The Pipeline tool."""
     Event.configure(is_logging_enabled=event_logging)
-
     application = Application(definition, matrix_tags, tags, validate_only, logging_config)
     application.run()
 

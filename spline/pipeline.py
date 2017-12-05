@@ -77,7 +77,7 @@ class Pipeline(object):
                 if not result['success']:
                     return {'success': False, 'output': output}
 
-        if len(self.data.hooks.cleanup) > 0:
+        if self.data.hooks and len(self.data.hooks.cleanup) > 0:
             env = self.data.env_list[0].copy()
             env.update({'PIPELINE_RESULT': 'SUCCESS'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})

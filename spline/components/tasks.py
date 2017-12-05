@@ -184,7 +184,7 @@ class Tasks(object):
     def run_cleanup(self, env, exit_code):
         """Run cleanup hook when configured."""
         output = []
-        if len(self.pipeline.data.hooks.cleanup) > 0:
+        if self.pipeline.data.hooks and len(self.pipeline.data.hooks.cleanup) > 0:
             env.update({'PIPELINE_RESULT': 'FAILURE'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
             cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, '', self.pipeline.model, env)

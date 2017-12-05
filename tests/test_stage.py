@@ -5,6 +5,7 @@ from hamcrest import assert_that, equal_to
 
 from spline.pipeline import PipelineData
 from spline.components.stage import Stage
+from spline.components.hooks import Hooks
 
 
 class FakePipeline(object):
@@ -61,3 +62,22 @@ class TestStage(unittest.TestCase):
         assert_that(output[1], equal_to('hello 1.1'))
         assert_that(output[2], equal_to('hello 2.0'))
         assert_that(output[3], equal_to('hello 2.1'))
+
+    def test_failed(self):
+        """Testing for failed stage."""
+        hooks = Hooks()
+        hooks.cleanup = '''echo cleanup hello'''
+        pipeline = FakePipeline(hooks=hooks)
+        stage = Stage(pipeline, 'test')
+
+        definition = [{'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
+                                 {'shell': {'script': '''exit 123'''}}]},
+                      {'tasks': [{'shell': {'script': '''echo tasks2:hello1'''}},
+                                 {'shell': {'script': '''echo tasks2:hello2'''}}]}]
+        result = stage.process(definition)
+        output = [line for line in result['output'] if line.find("hello") >= 0]
+
+        assert_that(result['success'], equal_to(False))
+        assert_that(len(output), equal_to(2))
+        assert_that(output[0], equal_to('tasks1:hello1'))
+        assert_that(output[1], equal_to('cleanup hello'))

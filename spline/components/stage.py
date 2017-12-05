@@ -55,13 +55,13 @@ class Stage(object):
                                   self.pipeline.data.env_list[1])
                 continue
 
-            if key.startswith("tasks"):
-                tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
-                result = tasks.process(entry[key])
-                for line in result['output']:
-                    output.append(line)
-                if not result['success']:
-                    return {'success': False, 'output': output}
+            # if not "env" then it must be "tasks" (schema):
+            tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
+            result = tasks.process(entry[key])
+            for line in result['output']:
+                output.append(line)
+            if not result['success']:
+                return {'success': False, 'output': output}
 
         self.event.succeeded()
         return {'success': True, 'output': output}

@@ -115,7 +115,8 @@ class Application(object):
                 model = {} if 'model' not in document else document['model']
                 pipeline = Pipeline(document['pipeline'], model=model, env=entry['env'],
                                     tags=self.tag_list, hooks=hooks)
-                if not pipeline.run():
+                result = pipeline.run()
+                if not result['success']:
                     sys.exit(1)
 
     def run_matrix_in_parallel(self, document, hooks):
@@ -126,7 +127,7 @@ class Application(object):
         success = True
         with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
             for result in pool.map(matrix_worker, worker_data):
-                if not result:
+                if not result['success']:
                     success = False
         if not success:
             sys.exit(1)
@@ -157,7 +158,8 @@ class Application(object):
         else:
             model = {} if 'model' not in document else document['model']
             pipeline = Pipeline(document['pipeline'], model=model, tags=self.tag_list, hooks=hooks)
-            if not pipeline.run():
+            result = pipeline.run()
+            if not result['success']:
                 sys.exit(1)
 
         self.event.succeeded()

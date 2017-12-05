@@ -61,6 +61,7 @@ class Pipeline(object):
 
     def run(self):
         """Processing the whole pipeline definition."""
+        output = []
         for entry in self.data.pipeline:
             key = list(entry.keys())[0]
             if key == "env":
@@ -72,8 +73,9 @@ class Pipeline(object):
             if key.startswith("stage"):
                 stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
                 result = stage.process(entry[key])
+                output += result['output']
                 if not result['success']:
-                    return False
+                    return {'success': False, 'output': output}
 
         if len(self.data.hooks.cleanup) > 0:
             env = self.data.env_list[0].copy()
@@ -81,7 +83,8 @@ class Pipeline(object):
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
             cleanup_shell = Bash(self.data.hooks.cleanup, '', self.model, env)
             for line in cleanup_shell.process():
+                output.append(line)
                 self.logger.info(" | %s", line)
 
         self.event.succeeded()
-        return True
+        return {'success': True, 'output': output}

@@ -86,21 +86,21 @@ Nested templates
 The model also can be used for storing templates that can be injected into scripts.
 You probably also would like to pass then the model and environment variables to it:
 
-```
-model:
-    templates:
-        script: |
-            echo "{{ model.message }} {{ env.who }}!"
-    message: "hello"
+::
 
-pipeline:
-    - env:
-        who: world
+    model:
+        templates:
+            script: |
+                echo "{{ model.message }} {{ env.who }}!"
+        message: "hello"
 
-    - stage(Test):
-        - tasks(ordered):
-            - shell:
-                script: "{{ model.templates.script|render(model=model, env=env) }}"
-```
+    pipeline:
+        - env:
+            who: world
+
+        - stage(Test):
+            - tasks(ordered):
+                - shell:
+                    script: "{{ model.templates.script|render(model=model, env=env) }}"
 
 That's just a very simple example.

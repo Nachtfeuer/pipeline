@@ -1,6 +1,8 @@
 The Model
 =========
 
+Introduction
+------------
 The model is a flexible way to define data.
 For the moment you can define it only once at
 global level:
@@ -78,3 +80,27 @@ For completeness:
 Lists in yaml will be converted into Python lists and yaml dictionaries
 will be converted into Python dictionaries. All basically as you would
 expect.
+
+Nested templates
+----------------
+The model also can be used for storing templates that can be injected into scripts.
+You probably also would like to pass then the model and environment variables to it:
+
+```
+model:
+    templates:
+        script: |
+            echo "{{ model.message }} {{ env.who }}!"
+    message: "hello"
+
+pipeline:
+    - env:
+        who: world
+
+    - stage(Test):
+        - tasks(ordered):
+            - shell:
+                script: "{{ model.templates.script|render(model=model, env=env) }}"
+```
+
+That's just a very simple example.

@@ -2,6 +2,12 @@ model:
   a: 10
   b: [ 10, 20 ]
   c: {"message": "hello"}
+  t: |
+    echo "a = {{ model.a }}"
+    {% for entry in model.b %}
+      echo "b = {{ entry }} (index={{loop.index}})"
+    {% endfor %}
+    echo "c = {{ model.c["message"] }}"
 
 pipeline:
   - stage(example):
@@ -13,3 +19,6 @@ pipeline:
               echo "b = {{ entry }} (index={{loop.index}})"
             {% endfor %}
             echo "c = {{ model.c["message"] }}"
+
+      - shell:
+          script: "{{ model.t|render(model=model) }}"

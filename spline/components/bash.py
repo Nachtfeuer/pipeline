@@ -31,7 +31,7 @@ import os
 import shlex
 import subprocess
 import tempfile
-from jinja2 import Template
+from ..tools.filters import render
 from ..tools.logger import Logger
 from ..tools.event import Event
 
@@ -45,8 +45,7 @@ class Bash(object):
         self.logger = Logger.get_logger(__name__)
         self.success = False
 
-        template = Template(script)
-        rendered_script = template.render(model=model, env=env)
+        rendered_script = render(script, model=model, env=env)
         self.temp_filename = Bash.create_file_for(rendered_script)
 
         if len(title) > 0:

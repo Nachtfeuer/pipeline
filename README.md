@@ -31,18 +31,19 @@
  - pipeline stages (names groups)
  - shell script execution: inline and file
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
+ - support for model data (a dictionary of anything you need)
  - cleanup hook
  - filtered execution via tags
  - parallel tasks execution
- - supporting Jinja templating in Bash scripts
+ - supporting Jinja templating in Bash scripts (also nested inside model)
  - support for Docker containers
  - execution time on each level: pipeline, stage, tasks and shell (event logging)
- - support for model data (a dictionary of anything you need)
- - documentation also at read the docs
+ - documentation here and also at read the docs
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
 
-## <a name="links">Links</a>
+## <a name="links">Interesting Links</a>
 
  - http://pykwalify.readthedocs.io/en/unstable/
  - http://pykwalify.readthedocs.io/en/unstable/partial-schemas.html
  - https://github.com/bats-core/bats-core
+ - https://pypi.python.org/pypi/PyHamcrest

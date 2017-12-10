@@ -44,5 +44,17 @@ def render(value, **kwargs):
     """
     environment = Environment()
     environment.filters['render'] = render
+    environment.filters['docker_environment'] = docker_environment
     template = environment.from_string(value)
     return template.render(**kwargs)
+
+
+def docker_environment(env):
+    """
+    Transform dictionary of environment variables into Docker -e parameters.
+
+    >>> result = docker_environment({'param1': 'val1', 'param2': 'val2'})
+    >>> result in ['-e "param1=val1" -e "param2=val2"', '-e "param2=val2" -e "param1=val1"']
+    True
+    """
+    return ' '.join(["-e \"%s=%s\"" % (key, value) for key, value in env.items()])

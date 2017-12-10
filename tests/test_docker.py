@@ -2,7 +2,7 @@
 # pylint: disable=no-self-use, invalid-name
 import unittest
 from spline.components.docker import Container
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, matches_regexp
 
 
 class TestContainer(unittest.TestCase):
@@ -23,3 +23,19 @@ class TestContainer(unittest.TestCase):
         output = [line for line in container.process() if len(line) > 0]
         assert_that(len(output), equal_to(1))
         assert_that(output[0], equal_to('env foo-model foo'))
+
+    def test_pipeline_bash_file_variable(self):
+        """Testing the injected variable representing the script."""
+        container = Container.creator(
+            {'script': '''echo "PIPELINE_BASH_FILE=$PIPELINE_BASH_FILE"'''}, model={}, env={})
+
+        output = [line for line in container.process() if line.lower().find("pipeline") >= 0]
+        assert_that(len(output), equal_to(1))
+        assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=/root/scripts/pipeline-script-.*.sh'))
+
+        container = Container.creator(
+            {'script': 'echo "PIPELINE_BASH_FILE=$PIPELINE_BASH_FILE"'}, model={}, env={})
+
+        output = [line for line in container.process() if line.lower().find("pipeline") >= 0]
+        assert_that(len(output), equal_to(1))
+        assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=/root/scripts/pipeline-script-.*.sh'))

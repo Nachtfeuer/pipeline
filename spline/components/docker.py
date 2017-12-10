@@ -27,6 +27,7 @@
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 # pylint: disable=useless-super-delegation
+import os
 from .bash import Bash
 
 
@@ -47,14 +48,14 @@ if [ $# -eq 0 ]; then
     fi
 
     docker run --rm=%(remove)s \
-        -v $(dirname ${PIPELINE_BASH_FILE}):/root/scripts ${MOUNT} \
-        -e UID=$(id -u) -e GID=$(id -g) %(environment)s \
+        -v $(dirname ${PIPELINE_BASH_FILE_ORIGINAL}):/root/scripts ${MOUNT} \
+        -e UID=$(id -u) -e GID=$(id -g) {{ env|docker_environment }} \
         --label="pipeline=${PIPELINE_PID}" \
         --label="pipeline-stage=${PIPELINE_STAGE}" \
         --label="creator=$$" \
         --label="context=pipeline" \
         ${BACKGROUND_MODE} %(image)s \
-        /root/scripts/$(basename ${PIPELINE_BASH_FILE}) ME
+        ${PIPELINE_BASH_FILE} ME
 else
     %(script)s
 fi
@@ -63,6 +64,12 @@ fi
     def __init__(self, script, title='', model=None, env=None):
         """Initialize with Bash code and optional environment variables."""
         super(Container, self).__init__(script, title, model, env)
+
+    def update_script_filename(self, filename):
+        """Writing current script path and filename into environment variables."""
+        self.env.update({'PIPELINE_BASH_FILE_ORIGINAL': filename})
+        filename = os.path.join('/root/scripts', os.path.basename(filename))
+        self.env.update({'PIPELINE_BASH_FILE': filename})
 
     @staticmethod
     def creator(shell_parameters, model, env):
@@ -78,7 +85,6 @@ fi
             'remove': str(remove).lower(),
             'background': str(background).lower(),
             'mount': str(mount).lower(),
-            'script': shell_parameters['script'],
-            'environment': ' '.join(["-e \"%s=%s\"" % (key, value) for key, value in env.items()])
+            'script': shell_parameters['script']
         }
         return Container(script=wrapped_script, title=title, model=model, env=env)

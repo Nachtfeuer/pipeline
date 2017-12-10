@@ -44,21 +44,17 @@ class Bash(object):
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.success = False
-
-        rendered_script = render(script, model=model, env=env)
-        self.temp_filename = Bash.create_file_for(rendered_script)
+        self.script = script
+        self.model = model
+        self.env = os.environ.copy()
+        self.env.update({} if env is None else env)
 
         if len(title) > 0:
             self.logger.info(title)
-        self.logger.info("Running script %s", self.temp_filename)
 
-        self.args = shlex.split("bash %s" % self.temp_filename)
         self.stdout = subprocess.PIPE
         self.stderr = subprocess.STDOUT
         self.shell = False
-        self.env = os.environ.copy()
-        self.env.update({} if env is None else env)
-        self.env.update({'PIPELINE_BASH_FILE': self.temp_filename})
         self.exit_code = 0
 
     @staticmethod
@@ -67,16 +63,23 @@ class Bash(object):
         title = '' if 'title' not in shell_parameters else shell_parameters['title']
         return Bash(script=shell_parameters['script'], title=title, model=model, env=env)
 
-    @staticmethod
-    def create_file_for(script):
+    def update_script_filename(self, filename):
+        """Writing current script path and filename into environment variables."""
+        self.env.update({'PIPELINE_BASH_FILE': filename})
+
+    def create_file_for(self, script):
         """Create a temporary, executable bash file."""
         temp = tempfile.NamedTemporaryFile(
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
-        if os.path.isfile(script):
-            content = str(open(script).read())
+
+        self.update_script_filename(temp.name)
+        rendered_script = render(script, model=self.model, env=self.env)
+
+        if os.path.isfile(rendered_script):
+            content = str(open(rendered_script).read())
             temp.writelines(content)
         else:
-            temp.writelines("#!/bin/bash\n" + script)
+            temp.writelines("#!/bin/bash\n" + rendered_script)
         temp.close()
         # make Bash script executable
         os.chmod(temp.name, 777)
@@ -85,8 +88,12 @@ class Bash(object):
     def process(self):
         """Running the Bash code."""
         try:
+            temp_filename = self.create_file_for(self.script)
+            self.logger.info("Running script %s", temp_filename)
+            args = shlex.split("bash %s" % temp_filename)
+
             process = subprocess.Popen(
-                self.args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
+                args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
             out, _ = process.communicate()
             for line in out.split(b"\n"):
                 yield line.decode('ascii')
@@ -102,7 +109,7 @@ class Bash(object):
             yield str(exception)
         finally:
             # removing script
-            os.remove(self.temp_filename)
+            os.remove(temp_filename)
 
             if self.exit_code == 0:
                 self.event.succeeded()

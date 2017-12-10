@@ -12,6 +12,7 @@ Welcome to spline's documentation!
 
    motivation
    quickstart
+   example
    pipeline
    matrix
    stages

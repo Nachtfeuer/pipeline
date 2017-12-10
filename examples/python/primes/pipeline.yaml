@@ -1,0 +1,54 @@
+matrix:
+  - name: Python 2.7
+    env: {PYTHON_VERSION: py27}
+  - name: Python 3.5
+    env: {PYTHON_VERSION: py35}
+
+model:
+  templates:
+    init_py27: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install python27
+      scl enable python27 "bash -c \"pip install setuptools --upgrade\""
+      scl enable python27 "bash -c \"pip install tox\""
+      scl enable python27 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py35: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install rh-python35
+      scl enable rh-python35 "bash -c \"pip install pip --upgrade\""
+      scl enable rh-python35 "bash -c \"pip install setuptools --upgrade\""
+      scl enable rh-python35 "bash -c \"pip install tox\""
+      scl enable rh-python35 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+pipeline:
+  - stage(Build):
+    - tasks(ordered):
+
+      - docker(container):
+          mount: yes
+          script: |
+            case $1 in
+              INIT)
+                {{ model.templates['init_'+env.PYTHON_VERSION]|render(env=env) }}
+                ;;
+              RUN)
+                echo "Running build with $(python -V)"
+                mkdir /build
+
+                # copying all files under version into the container
+                pushd /mnt/host/examples/python/primes
+                tar cvzf /build/demo.tar.gz $(git ls-files)
+                popd
+
+                pushd /build
+                # unpacking the copied sources files
+                tar xvzf demo.tar.gz
+                rm -f demo.tar.gz
+                # running the build
+                tox -e {{ env.PYTHON_VERSION }}
+                popd
+                ;;
+            esac

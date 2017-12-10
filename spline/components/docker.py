@@ -55,7 +55,7 @@ if [ $# -eq 0 ]; then
         --label="creator=$$" \
         --label="context=pipeline" \
         ${BACKGROUND_MODE} %(image)s \
-        ${PIPELINE_BASH_FILE} ME
+        ${PIPELINE_BASH_FILE} INIT
 else
     %(script)s
 fi

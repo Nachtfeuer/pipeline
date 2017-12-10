@@ -1,11 +1,6 @@
 # Travis configuration
 language: python
 
-# whitelist
-branches:
-    only:
-        - master
-
 # enable docker
 services:
     - docker
@@ -30,7 +25,6 @@ install:
     - pip -V
 
 script:
-    - ./unittests.sh
     - tox
 
 after_success:

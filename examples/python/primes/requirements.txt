@@ -1,0 +1,10 @@
+nose
+pyhamcrest
+coverage
+radon == 2.1.1
+pylint == 1.7.2
+pep8 == 1.7.0
+pep257 == 0.7.0
+flake8 == 3.3.0
+sphinx == 1.5.5
+wheel == 0.29.0

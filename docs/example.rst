@@ -23,6 +23,7 @@ the project like following: **-e py27 -e py25**.
     tox -e py27
 
 The tox.ini covers:
+
  - pep8 (tox -e pep8)
  - pep257 (tox -e pep257)
  - pylint (tox -e pylint)
@@ -55,7 +56,7 @@ So let's start with the matrix definition:
 Keeping it simple (demo) I defined just two Python versions
 but with given examples it's pretty easy to add more. The
 given setup will inject the environment variable **PYTHON_VERSION**
-to be used as filter.
+to be used as filter for the templates in the model.
 
 The model
 ---------
@@ -75,9 +76,9 @@ The next step is to define a **model**:
 
 The Python 3.5 part is also contained (see pipeline.yaml).
 The main point here to understand is that **scl enable** does use
-a mechanism where you have to specify script that is executed **in context**
+a mechanism where you have to specify a script that is executed **in context**
 of the specified environent (here: python27). The variable **PIPELINE_BASH_FILE**
-is generated/injected by the **spline** tool. You either can refer to by $ syntax (Bash)
+is generated (injected) by the **spline** tool. You either can refer to by $ syntax (Bash way)
 or using Jinja2 syntax (as done here).
 
 The init part of the script
@@ -136,7 +137,7 @@ of a concrete Python version. Now a build folder will be generated
 where we place the Python code. It's not optimal to run directly on the
 shared workspace (repository) because:
 
- - The Docker standard user is root and generate files and folders
+ - The Docker standard user is root and generated files and folders
    on the Docker host probably raise permission issues when it comes
    to cleanup. Yes you can organize to be same user as in the host
    but with some effort (my personal opinion: avoid it).
@@ -148,7 +149,7 @@ shared workspace (repository) because:
 That's why I have choosen the variant to use Git since Git exactly knows
 all files (and folders) under versions copying it into the build folder
 of the Docker container. After unpacking you simply call **tox -e {{ env.PYTHON_VERSION }}**
-and your build runs fully "locally".
+and your build runs fully isolated inside the Docker container.
 
 The last lines (I don't print all - too many lines) look like following:
 

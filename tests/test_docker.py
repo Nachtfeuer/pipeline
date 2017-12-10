@@ -18,11 +18,11 @@ class TestContainer(unittest.TestCase):
     def test_creator_complete(self):
         """Testing creator function using model data end env. vars via Jinja templating."""
         container = Container.creator(
-            {'script': '''echo "{{ env.foo }}-{{ model.foo }}"''', 'title': 'test'},
+            {'script': '''echo "test:{{ env.foo }}-{{ model.foo }}"''', 'title': 'test'},
             model={'foo': 'model foo'}, env={'foo': 'env foo'})
-        output = [line for line in container.process() if len(line) > 0]
+        output = [line for line in container.process() if line.startswith("test:")]
         assert_that(len(output), equal_to(1))
-        assert_that(output[0], equal_to('env foo-model foo'))
+        assert_that(output[0], equal_to('test:env foo-model foo'))
 
     def test_pipeline_bash_file_variable(self):
         """Testing the injected variable representing the script."""

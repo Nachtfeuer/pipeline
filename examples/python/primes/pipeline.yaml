@@ -1,8 +1,16 @@
 matrix:
   - name: Python 2.7
     env: {PYTHON_VERSION: py27}
+    tags: ['py27']
+  - name: Python 3.3
+    env: {PYTHON_VERSION: py33}
+    tags: ['py33']
+  - name: Python 3.4
+    env: {PYTHON_VERSION: py34}
+    tags: ['py34']
   - name: Python 3.5
     env: {PYTHON_VERSION: py35}
+    tags: ['py35']
 
 model:
   templates:
@@ -13,6 +21,25 @@ model:
       scl enable python27 "bash -c \"pip install setuptools --upgrade\""
       scl enable python27 "bash -c \"pip install tox\""
       scl enable python27 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py33: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install python33
+      scl enable python33 "bash -c \"easy_install pip\""
+      scl enable python33 "bash -c \"pip install pip --upgrade\""
+      scl enable python33 "bash -c \"pip install setuptools --upgrade\""
+      scl enable python33 "bash -c \"pip install tox\""
+      scl enable python33 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py34: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install rh-python34
+      scl enable rh-python34 "bash -c \"pip install pip --upgrade\""
+      scl enable rh-python34 "bash -c \"pip install setuptools --upgrade\""
+      scl enable rh-python34 "bash -c \"pip install tox\""
+      scl enable rh-python34 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
 
     init_py35: |
       yum -y install centos-release-scl yum-utils git

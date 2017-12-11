@@ -13,7 +13,7 @@ Quickstart
 You require spline >= 1.2. It's possible to run tox without parameters
 but then you need to have all listed Python versions installed.
 I usually have Python 2.7.x and Pyton 3.5.x on my machine so I could test
-the project like following: **-e py27 -e py25**. 
+the project like following: **-e py27 -e py35**. 
 
 ::
 
@@ -50,13 +50,16 @@ So let's start with the matrix definition:
     matrix:
     - name: Python 2.7
         env: {PYTHON_VERSION: py27}
+        tags: ['py27']
     - name: Python 3.5
         env: {PYTHON_VERSION: py35}
+        tags: ['py35']
 
-Keeping it simple (demo) I defined just two Python versions
+Keeping it simple (demo) I just defined a few Python versions
 but with given examples it's pretty easy to add more. The
 given setup will inject the environment variable **PYTHON_VERSION**
-to be used as filter for the templates in the model.
+to be used as filter for the templates in the model. The tags are
+provided to allow filtering for one concrete Python version only.
 
 The model
 ---------
@@ -165,9 +168,9 @@ The last lines (I don't print all - too many lines) look like following:
     2017-12-10 11:51:24,232 - spline.components.tasks -  |   py35: commands succeeded
     2017-12-10 11:51:24,232 - spline.components.tasks -  |   congratulations :)
 
-Run the build
--------------
-Remains to show how the matrix build is executed.
+Run the build (without matrix filtering)
+----------------------------------------
+Remains to show how the matrix build is usually executed.
 For the demo inside the spline repository you have
 to be in the root of it (because git requires .git from mount):
 
@@ -175,7 +178,38 @@ to be in the root of it (because git requires .git from mount):
 
      spline --definition=examples/python/primes/pipeline.yaml
 
-That's all.
+Run the build (with a matrix filter)
+------------------------------------
+If you would like to run one Python version only you can use **--matrix-tags**.
+It accepts a comma separated list of tag names. In given example we run the
+whole pipeline for Python 3.5.x only.
+
+::
+
+     spline --definition=examples/python/primes/pipeline.yaml --matrix-tags=py35
+
+Here we run the whole pipeline for Python 2.7.x and Python 3.5.x:
+
+::
+
+     spline --definition=examples/python/primes/pipeline.yaml --matrix-tags=py27,py35
+
+Matrix build in Travis CI
+-------------------------
+The option **--matrix-tags** is also very probably of interest when using it 
+in matrix builds with Travis CI (extract of a .travis.yml file):
+
+::
+
+    env:
+        matrix:
+        - PYTHON_VERSION=py27
+        - PYTHON_VERSION=py33
+        - PYTHON_VERSION=py34
+        - PYTHON_VERSION=py35
+
+    script: spline --definition=pipeline.yaml --matrix-tags=${PYTHON_VERSION}
+
 
 Some final notes
 ----------------

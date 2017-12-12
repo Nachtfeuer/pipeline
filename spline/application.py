@@ -34,14 +34,13 @@ import logging
 
 import click
 import yaml
-from pykwalify.core import Core
-from pykwalify.errors import SchemaError
 
 from .matrix import Matrix
 from .pipeline import Pipeline
 from .components.hooks import Hooks
 from .tools.logger import Logger
 from .tools.event import Event
+from .tools.validation import validate_schema
 
 
 class Application(object):
@@ -69,18 +68,11 @@ class Application(object):
 
     def validate_definition(self):
         """Validate given pipeline definition file."""
-        logging.getLogger('pykwalify.core').setLevel(logging.WARNING)
-        logging.getLogger('pykwalify.rule').setLevel(logging.WARNING)
         schema_file = os.path.join(os.path.dirname(__file__), 'schema.yaml')
-        core = Core(source_file=self.definition, schema_files=[schema_file])
-        try:
-            core.validate(raise_exception=True)
-            self.logger.info("Schema validation for '%s' succeeded", self.definition)
-        except SchemaError as exception:
-            for line in str(exception).split("\n"):
-                self.logger.error(line)
+        if not validate_schema(self.definition, schema_file):
             self.logger.info("Schema validation for '%s' has failed", self.definition)
             sys.exit(1)
+        self.logger.info("Schema validation for '%s' succeeded", self.definition)
 
     def run(self):
         """Processing the pipeline."""

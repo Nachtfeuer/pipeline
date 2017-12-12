@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing filtering by first tag" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-008.yaml --tags=one
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-008.yaml --tags=one
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
@@ -12,7 +12,7 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
 }
 
 @test "$BATS_TEST_FILENAME :: Testing filtering by second tag" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-008.yaml --tags=two
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-008.yaml --tags=two
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
@@ -23,7 +23,7 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
 }
 
 @test "$BATS_TEST_FILENAME :: Testing filtering by both tags" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-008.yaml --tags=one,two
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-008.yaml --tags=one,two
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output

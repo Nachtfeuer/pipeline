@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing valid matrix filtered by first one" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-014.yaml --matrix-tags=first
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-014.yaml --matrix-tags=first
     # verifying exit code
     [ ${status} -eq 0 ]
 
@@ -14,7 +14,7 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
 }
 
 @test "$BATS_TEST_FILENAME :: Testing valid matrix filtered by second one" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-014.yaml --matrix-tags=second
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-014.yaml --matrix-tags=second
     # verifying exit code
     [ ${status} -eq 0 ]
 

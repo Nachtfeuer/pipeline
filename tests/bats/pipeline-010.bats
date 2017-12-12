@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing cleanup when a shell has failed" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-010.yaml
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-010.yaml
     # verifying exit code
     [ ${status} -eq 1 ]
     # verifying output

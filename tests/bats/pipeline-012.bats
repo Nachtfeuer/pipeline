@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing valid bash code running in parallel" {
-    run bash -c "${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-012.yaml 2>&1 | grep '\(second\|first\)'"
+    run bash -c "${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-012.yaml 2>&1 | grep '\(second\|first\)'"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output

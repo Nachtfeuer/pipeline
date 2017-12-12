@@ -2,4 +2,4 @@ pipeline:
   - stage(test):
     - tasks:
       - shell:
-          script: tests/pipeline-006.sh
+          script: tests/bats/pipeline-006.sh

@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing valid bash file" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-006.yaml
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-006.yaml
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output

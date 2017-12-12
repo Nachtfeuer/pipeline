@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing use of environment variables (tasks level, merging)" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-005.yaml
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-005.yaml
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output

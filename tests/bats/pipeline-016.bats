@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing parallel matrix with three entries" {
-    run bash -c "${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-016.yaml 2>&1 | grep done"
+    run bash -c "${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-016.yaml 2>&1 | grep done"
     # verifying exit code
     [ ${status} -eq 0 ]
 

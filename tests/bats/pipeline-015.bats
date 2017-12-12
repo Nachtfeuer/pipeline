@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing valid Docker container (with no image specified)" {
-    run bash -c "${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-015.yaml --tags=no-image 2>&1 | grep figlet"
+    run bash -c "${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-015.yaml --tags=no-image 2>&1 | grep figlet"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
@@ -13,7 +13,7 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
 }
 
 @test "$BATS_TEST_FILENAME :: Testing valid Docker container (with no remove)" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-015.yaml --tags=no-remove
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-015.yaml --tags=no-remove
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
@@ -25,7 +25,7 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
 }
 
 @test "$BATS_TEST_FILENAME :: Testing valid Docker container (with mount)" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-015.yaml --tags=using-mount
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-015.yaml --tags=using-mount
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output

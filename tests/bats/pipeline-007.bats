@@ -1,7 +1,7 @@
 SCRIPT="python ${WORKSPACE}/scripts/spline"
 
 @test "$BATS_TEST_FILENAME :: Testing valid matrix with two entries" {
-    run ${SCRIPT} --definition=${WORKSPACE}/tests/pipeline-007.yaml
+    run ${SCRIPT} --definition=${WORKSPACE}/tests/bats/pipeline-007.yaml
     # verifying exit code
     [ ${status} -eq 0 ]
 

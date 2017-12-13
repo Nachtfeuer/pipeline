@@ -90,20 +90,21 @@ class Bash(object):
         try:
             temp_filename = self.create_file_for(self.script)
             self.logger.info("Running script %s", temp_filename)
-            args = shlex.split("bash %s" % temp_filename)
 
-            process = subprocess.Popen(
-                args, stdout=self.stdout, stderr=self.stderr, shell=self.shell, env=self.env)
-            out, _ = process.communicate()
-            for line in out.split(b"\n"):
-                yield line.decode('ascii')
+            process = subprocess.Popen(shlex.split("bash %s" % temp_filename),
+                                       stdout=self.stdout, stderr=self.stderr,
+                                       shell=self.shell, env=self.env)
+            for line in iter(process.stdout.readline, ' '):
+                if not line:
+                    break
+                yield line.decode('ascii')[0:-1]
+            process.wait()
             self.exit_code = process.returncode
+            self.success = (process.returncode == 0)
             if process.returncode == 0:
                 self.logger.info("Exit code has been %d", process.returncode)
-                self.success = True
             else:
                 self.logger.error("Exit code has been %d", process.returncode)
-                self.success = False
         except OSError as exception:
             self.exit_code = 1
             yield str(exception)

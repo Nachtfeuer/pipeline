@@ -40,7 +40,7 @@ from .pipeline import Pipeline
 from .components.hooks import Hooks
 from .tools.logger import Logger
 from .tools.event import Event
-from .tools.validation import validate_schema
+from .validation import Validator
 
 
 class Application(object):
@@ -66,13 +66,14 @@ class Application(object):
             logging_format = "%(asctime)-15s - %(name)s - %(message)s"
             Logger.configure_default(logging_format, self.logging_level)
 
-    def validate_definition(self):
-        """Validate given pipeline definition file."""
-        schema_file = os.path.join(os.path.dirname(__file__), 'schema.yaml')
-        if not validate_schema(self.definition, schema_file):
+    def validate_document(self, document):
+        """Validate given pipeline document."""
+        document = Validator().validate(document)
+        if document is None:
             self.logger.info("Schema validation for '%s' has failed", self.definition)
             sys.exit(1)
         self.logger.info("Schema validation for '%s' succeeded", self.definition)
+        return document
 
     def run(self):
         """Processing the pipeline."""
@@ -80,12 +81,13 @@ class Application(object):
         self.logger.info("Running on platform %s", platform.platform())
         self.logger.info("Processing pipeline definition '%s'", self.definition)
 
-        self.validate_definition()
+        document = yaml.load(open(self.definition).read())
+
+        document = self.validate_document(document)
         if self.validate_only:
             self.logger.info("Stopping after validation as requested!")
             return
 
-        document = yaml.load(open(self.definition).read())
         model = {} if 'model' not in document else document['model']
         matrix = document['matrix'] if 'matrix' in document \
             else document['matrix(ordered)'] if 'matrix(ordered)' in document \

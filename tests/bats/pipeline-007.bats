@@ -6,16 +6,16 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     [ ${status} -eq 0 ]
 
     # verifying output of second pipeline run
-    [ "$(echo ${lines[-18]}|cut -d' ' -f6-)" == "Processing pipeline for matrix entry 'first'" ]
-    [ "$(echo ${lines[-17]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
-    [ "$(echo ${lines[-13]}|cut -d' ' -f6-)" == "| first hello world on matrix level" ]
-    [ "$(echo ${lines[-11]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
-    [ "$(echo ${lines[-10]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
+    [ "$(echo ${lines[-16]}|cut -d' ' -f6-)" == "Processing pipeline for matrix entry 'first'" ]
+    [ "$(echo ${lines[-15]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
+    [ "$(echo ${lines[-11]}|cut -d' ' -f6-)" == "| first hello world on matrix level" ]
+    [ "$(echo ${lines[-10]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-9]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
 
     # verifying output of second pipeline run
-    [ "$(echo ${lines[-9]}|cut -d' ' -f6-)" == "Processing pipeline for matrix entry 'second'" ]
-    [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
-    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| second hello world on matrix level" ]
+    [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "Processing pipeline for matrix entry 'second'" ]
+    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
+    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| second hello world on matrix level" ]
     [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
     [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
 }

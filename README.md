@@ -43,7 +43,7 @@
 
 ## <a name="links">Interesting Links</a>
 
- - http://pykwalify.readthedocs.io/en/unstable/
- - http://pykwalify.readthedocs.io/en/unstable/partial-schemas.html
+ - https://github.com/keleshev/schema
  - https://github.com/bats-core/bats-core
  - https://pypi.python.org/pypi/PyHamcrest
+ - http://nose.readthedocs.io/en/latest/

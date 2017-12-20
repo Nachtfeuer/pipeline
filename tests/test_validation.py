@@ -1,8 +1,8 @@
 """Testing of module validation."""
 # pylint: disable=no-self-use, invalid-name
 import unittest
-from spline.validation import Validator
 from hamcrest import assert_that, equal_to, is_not
+from spline.validation import Validator
 
 
 class TestValidation(unittest.TestCase):

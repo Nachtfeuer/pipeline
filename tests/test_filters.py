@@ -1,8 +1,8 @@
 """Testing of module filter."""
 # pylint: disable=no-self-use, invalid-name
 import unittest
-from spline.tools.filters import render
 from hamcrest import assert_that, equal_to
+from spline.tools.filters import render
 
 
 class TestFilters(unittest.TestCase):

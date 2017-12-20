@@ -3,9 +3,9 @@
 import os
 import unittest
 from mock import patch
+from hamcrest import assert_that, equal_to, matches_regexp
 from spline.components.bash import Bash
 from spline.components.config import ShellConfig
-from hamcrest import assert_that, equal_to, matches_regexp
 
 
 class TestBash(unittest.TestCase):

@@ -4,9 +4,9 @@ import unittest
 import logging
 from io import StringIO
 from mock import patch
+from hamcrest import assert_that, equal_to
 from spline.tools.logger import Logger, NoLogger
 from spline.tools.stream import stdout_redirector
-from hamcrest import assert_that, equal_to
 
 
 class TestLogger(unittest.TestCase):

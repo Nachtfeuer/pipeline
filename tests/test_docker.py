@@ -1,9 +1,9 @@
 """Testing of class Container."""
 # pylint: disable=no-self-use, invalid-name
 import unittest
+from hamcrest import assert_that, equal_to, matches_regexp
 from spline.components.docker import Container
 from spline.components.config import ShellConfig
-from hamcrest import assert_that, equal_to, matches_regexp
 
 
 class TestContainer(unittest.TestCase):

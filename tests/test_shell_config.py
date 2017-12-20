@@ -1,8 +1,8 @@
 """Testing of module validation."""
 # pylint: disable=no-self-use, invalid-name, redundant-unittest-assert
 import unittest
-from spline.components.config import ShellConfig
 from hamcrest import assert_that, equal_to, contains_string
+from spline.components.config import ShellConfig
 
 
 class TestShellConfig(unittest.TestCase):

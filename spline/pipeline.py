@@ -32,6 +32,7 @@ import re
 
 from .components.bash import Bash
 from .components.stage import Stage
+from .components.config import ShellConfig
 from .tools.logger import Logger
 from .tools.event import Event
 
@@ -81,7 +82,8 @@ class Pipeline(object):
             env = self.data.env_list[0].copy()
             env.update({'PIPELINE_RESULT': 'SUCCESS'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
-            cleanup_shell = Bash(self.data.hooks.cleanup, '', self.model, env)
+            config = ShellConfig(script=self.data.hooks.cleanup, model=self.model, env=env)
+            cleanup_shell = Bash(config)
             for line in cleanup_shell.process():
                 output.append(line)
                 self.logger.info(" | %s", line)

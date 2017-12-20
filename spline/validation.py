@@ -38,13 +38,13 @@ class Validator(object):
         Optional(Regex(r'((matrix\(parallel\)|matrix\(ordered\)|matrix))')): And(len, [{
             'name': And(str, len),
             Optional('env'): And(len, {
-                Regex(r'^([a-zA-Z][_a-zA-Z]*)$'): And(str, len)
+                Regex(r'([a-zA-Z][_a-zA-Z]*)'): And(str, len)
             }),
             Optional('tags'): And(len, [And(str, len)])
         }]),
         # optional model part of the schema
         Optional('model'): And(len, {
-            Regex(r'^([a-z][_a-z]*)$'): object
+            Regex(r'([a-z][_a-z]*)'): object
         }),
         # optional hooks part of the schema
         Optional('hooks'): {
@@ -56,24 +56,25 @@ class Validator(object):
         'pipeline': And(len, [Or(
             # optional environment variables in a pipeline
             {'env': And(len, {
-                Regex(r'^([a-zA-Z][_a-zA-Z]*)$'): And(str, len)
+                Regex(r'([a-zA-Z][_a-zA-Z]*)'): And(str, len)
             })},
             {Regex(r'(stage\(.+\))'): And(len, [Or(
                 # optional environment variables in a stage
                 {'env': And(len, {
-                    Regex(r'^([a-zA-Z][_a-zA-Z]*)$'): And(str, len)
+                    Regex(r'([a-zA-Z][_a-zA-Z]*)'): And(str, len)
                 })},
                 # optional tasks
                 {Regex(r'((tasks\(parallel\)|matrix\(tasks\)|tasks))'): And(len, [
                     # optional environment variables
                     {Optional('env'): And(len, {
-                        Regex(r'^([a-zA-Z][_a-zA-Z]*)$'): And(str, len)
+                        Regex(r'([a-zA-Z][_a-zA-Z]*)'): And(str, len)
                     })},
                     # optional shell task
                     {Optional('shell'): {
                         'script': And(str, len),
                         Optional('title'): And(str, len),
-                        Optional('tags'): And([And(str, len)], len)
+                        Optional('tags'): And([And(str, len)], len),
+                        Optional('with'): And(len, [object])
                     }},
                     # optional Docker container task
                     {Optional('docker(container)'): {
@@ -83,7 +84,8 @@ class Validator(object):
                         Optional('mount', default=False): bool,
                         Optional('background', default=False): bool,
                         Optional('remove', default=True): bool,
-                        Optional('tags'): And([And(str, len)], len)
+                        Optional('tags'): And([And(str, len)], len),
+                        Optional('with'): And(len, [object])
                     }}
                 ])}  # end of stage
             )])},

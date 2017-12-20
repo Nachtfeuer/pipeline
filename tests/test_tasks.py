@@ -125,7 +125,7 @@ class TestTasks(unittest.TestCase):
         """Testing worker used by class Tasks for parallel execution."""
         data = {'creator': Bash.__name__,
                 'entry': {'script': '''echo "{{model.mode}}:{{env.message}}"'''},
-                'env': {'message': 'hello'}, 'model': {'mode': 'test'}}
+                'env': {'message': 'hello'}, 'model': {'mode': 'test'}, 'item': None}
         result = worker(data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
         assert_that(result['success'], equal_to(True))

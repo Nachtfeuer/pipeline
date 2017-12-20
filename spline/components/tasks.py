@@ -31,8 +31,10 @@ import multiprocessing
 from contextlib import closing
 from .bash import Bash
 from .docker import Container
+from .config import ShellConfig
 from ..tools.logger import Logger
 from ..tools.event import Event
+from ..tools.adapter import Adapter
 
 
 def get_creator_by_name(name):
@@ -43,7 +45,10 @@ def get_creator_by_name(name):
 def worker(data):
     """Running on shell via multiprocessing."""
     creator = get_creator_by_name(data['creator'])
-    shell = creator(data['entry'], data['model'], data['env'])
+    shell = creator(data['entry'],
+                    ShellConfig(script=data['entry']['script'],
+                                title=data['entry']['title'] if 'title' in data['entry'] else '',
+                                model=data['model'], env=data['env'], item=data['item']))
     output = []
     for line in shell.process():
         output.append(line)
@@ -68,6 +73,17 @@ class Tasks(object):
         env.update(self.pipeline.data.env_list[2].copy())
         return env
 
+    def prepare_shell_data(self, shells, key, entry):
+        """Prepare one shell or docker task."""
+        if self.can_process_shell(entry):
+            for item in entry['with'] if 'with' in entry else ['']:
+                shells.append({
+                    'creator': Bash.__name__ if key == "shell" else Container.__name__,
+                    'entry': entry,
+                    'model': self.pipeline.model,
+                    'env': self.get_merged_env(),
+                    'item': item})
+
     def process(self, tasks):
         """Processing a group of tasks."""
         self.logger.info("Processing group of tasks")
@@ -78,32 +94,27 @@ class Tasks(object):
 
         output = []
         shells = []
-        for entry in tasks:
-            key = list(entry.keys())[0]
+        for task_entry in tasks:
+            key, entry = list(task_entry.items())[0]
             if key == "env":
-                result = self.process_shells(shells)
-                output += result['output']
-                if not result['success']:
+                result = Adapter(self.process_shells(shells))
+                output += result.output
+                if not result.success:
                     return {'success': False, 'output': output}
                 shells = []
 
-                self.pipeline.data.env_list[2].update(entry[key])
+                self.pipeline.data.env_list[2].update(entry)
                 self.logger.debug("Updating environment at level 2 with %s",
                                   self.pipeline.data.env_list[2])
                 continue
 
             if key in ["shell", "docker(container)"]:
-                if self.can_process_shell(entry[key]):
-                    shells.append({
-                        'creator': Bash.__name__ if key == "shell" else Container.__name__,
-                        'entry': entry[key],
-                        'model': self.pipeline.model,
-                        'env': self.get_merged_env()})
+                self.prepare_shell_data(shells, key, entry)
                 continue
 
-        result = self.process_shells(shells)
-        output += result['output']
-        if not result['success']:
+        result = Adapter(self.process_shells(shells))
+        output += result.output
+        if not result.success:
             return {'success': False, 'output': output}
 
         self.event.succeeded()
@@ -114,9 +125,9 @@ class Tasks(object):
         output = []
         success = True
         with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
-            for result in pool.map(worker, [shell for shell in shells]):
-                output += result['output']
-                if not result['success']:
+            for result in [Adapter(entry) for entry in pool.map(worker, [shell for shell in shells])]:
+                output += result.output
+                if not result.success:
                     success = False
         if success:
             self.logger.info("Parallel Processing Bash code: finished")
@@ -132,10 +143,12 @@ class Tasks(object):
         """Processing a list of shells one after the other."""
         output = []
         for shell in shells:
-            result = self.process_shell(
-                get_creator_by_name(shell['creator']), shell['entry'], shell['model'], shell['env'])
-            output += result['output']
-            if not result['success']:
+            entry = shell['entry']
+            config = ShellConfig(script=entry['script'], title=entry['title'] if 'title' in entry else '',
+                                 model=shell['model'], env=shell['env'], item=shell['item'])
+            result = Adapter(self.process_shell(get_creator_by_name(shell['creator']), entry, config))
+            output += result.output
+            if not result.success:
                 return {'success': False, 'output': output}
         return {'success': True, 'output': output}
 
@@ -160,12 +173,12 @@ class Tasks(object):
 
         return count > 0
 
-    def process_shell(self, creator, entry, model, env):
+    def process_shell(self, creator, entry, config):
         """Processing a shell entry."""
         self.logger.info("Processing Bash code: start")
 
         output = []
-        shell = creator(entry, model, env)
+        shell = creator(entry, config)
         for line in shell.process():
             output.append(line)
             self.logger.info(" | %s", line)
@@ -174,7 +187,7 @@ class Tasks(object):
             self.logger.info("Processing Bash code: finished")
             return {'success': True, 'output': output}
 
-        for line in self.run_cleanup(env, shell.exit_code):
+        for line in self.run_cleanup(config.env, shell.exit_code):
             output.append(line)
 
         self.logger.error("Pipeline has failed: leaving as soon as possible!")
@@ -187,7 +200,8 @@ class Tasks(object):
         if self.pipeline.data.hooks and len(self.pipeline.data.hooks.cleanup) > 0:
             env.update({'PIPELINE_RESULT': 'FAILURE'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
-            cleanup_shell = Bash(self.pipeline.data.hooks.cleanup, '', self.pipeline.model, env)
+            config = ShellConfig(script=self.pipeline.data.hooks.cleanup, model=self.pipeline.model, env=env)
+            cleanup_shell = Bash(config)
             for line in cleanup_shell.process():
                 output.append(line)
                 self.logger.info(" | %s", line)

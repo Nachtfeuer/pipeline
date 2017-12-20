@@ -82,3 +82,29 @@ executes shells only with given tag. You also can specify a
 comma separted list of tags to allow more shells: **--tags=test,simple**
 
 One usecase might be to isolate a shell for testing purpose.
+
+"With" attribute
+----------------
+Using the **with** attribute you can run same task as often as many entries you provide.
+The entries are representing a list but the item can be any valid yaml structure; in the
+example a dictionary is used:
+
+::
+
+    - shell:
+        script: |
+            echo "{{ item.message }}: start"
+            sleep {{ item.time }}
+            echo "{{ item.message }}: done"
+        with:
+            - message: first
+              time: 3
+            - message: second
+              time: 2
+            - message: third
+              time: 1
+
+Finally all generated tasks (shell or docker container) are added to the
+list of tasks to be processed and it depends on the setup of the **tasks**
+block whether those tasks are executed in **order** or in **parallel**.
+Please have a look and try the example **with.yaml** in the repository.

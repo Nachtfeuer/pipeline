@@ -34,23 +34,26 @@ import tempfile
 from ..tools.filters import render
 from ..tools.logger import Logger
 from ..tools.event import Event
+from .config import ShellConfig
 
 
 class Bash(object):
     """Wrapper for Bash execution."""
 
-    def __init__(self, script, title='', model=None, env=None):
+    def __init__(self, config):
         """Initialize with Bash code and optional environment variables."""
+        assert isinstance(config, ShellConfig)
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.success = False
-        self.script = script
-        self.model = model
+        self.script = config.script
+        self.model = config.model
         self.env = os.environ.copy()
-        self.env.update({} if env is None else env)
+        self.env.update(config.env)
+        self.item = config.item
 
-        if len(title) > 0:
-            self.logger.info(title)
+        if len(config.title) > 0:
+            self.logger.info(config.title)
 
         self.stdout = subprocess.PIPE
         self.stderr = subprocess.STDOUT
@@ -58,10 +61,9 @@ class Bash(object):
         self.exit_code = 0
 
     @staticmethod
-    def creator(shell_parameters, model, env):
+    def creator(_, config):
         """Creator function for creating an instance of a Bash."""
-        title = '' if 'title' not in shell_parameters else shell_parameters['title']
-        return Bash(script=shell_parameters['script'], title=title, model=model, env=env)
+        return Bash(config)
 
     def update_script_filename(self, filename):
         """Writing current script path and filename into environment variables."""
@@ -73,7 +75,7 @@ class Bash(object):
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
 
         self.update_script_filename(temp.name)
-        rendered_script = render(script, model=self.model, env=self.env)
+        rendered_script = render(script, model=self.model, env=self.env, item=self.item)
 
         if os.path.isfile(rendered_script):
             content = str(open(rendered_script).read())

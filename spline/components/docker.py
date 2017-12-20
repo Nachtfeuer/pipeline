@@ -29,6 +29,7 @@
 # pylint: disable=useless-super-delegation
 import os
 from .bash import Bash
+from .config import ShellConfig
 
 
 class Container(Bash):
@@ -61,9 +62,10 @@ else
 fi
 """
 
-    def __init__(self, script, title='', model=None, env=None):
+    def __init__(self, config):
         """Initialize with Bash code and optional environment variables."""
-        super(Container, self).__init__(script, title, model, env)
+        assert isinstance(config, ShellConfig)
+        super(Container, self).__init__(config)
 
     def update_script_filename(self, filename):
         """Writing current script path and filename into environment variables."""
@@ -72,19 +74,19 @@ fi
         self.env.update({'PIPELINE_BASH_FILE': filename})
 
     @staticmethod
-    def creator(shell_parameters, model, env):
+    def creator(entry, config):
         """Creator function for creating an instance of a Bash."""
-        title = '' if 'title' not in shell_parameters else shell_parameters['title']
-        image = 'centos:7' if 'image' not in shell_parameters else shell_parameters['image']
-        remove = True if 'remove' not in shell_parameters else shell_parameters['remove']
-        background = False if 'background' not in shell_parameters else shell_parameters['background']
-        mount = False if 'mount' not in shell_parameters else shell_parameters['mount']
+        image = 'centos:7' if 'image' not in entry else entry['image']
+        remove = True if 'remove' not in entry else entry['remove']
+        background = False if 'background' not in entry else entry['background']
+        mount = False if 'mount' not in entry else entry['mount']
 
         wrapped_script = Container.TEMPLATE % {
             'image': image,
             'remove': str(remove).lower(),
             'background': str(background).lower(),
             'mount': str(mount).lower(),
-            'script': shell_parameters['script']
+            'script': config.script
         }
-        return Container(script=wrapped_script, title=title, model=model, env=env)
+        config.script = wrapped_script
+        return Container(config)

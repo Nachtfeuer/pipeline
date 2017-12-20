@@ -1,0 +1,27 @@
+pipeline:
+    - stage(Example):
+        - tasks(ordered):
+            - shell:
+                script: echo "{{ item }}"
+                with:
+                    - hello
+                    - world
+            - docker(container):
+                script: echo "{{ item }}"
+                with:
+                    - hello
+                    - world
+
+        - tasks(parallel):
+            - shell:
+                script: |
+                    echo "{{ item.message }}: start"
+                    sleep {{ item.time }}
+                    echo "{{ item.message }}: done"
+                with:
+                    - message: first
+                      time: 3
+                    - message: second
+                      time: 2
+                    - message: third
+                      time: 1

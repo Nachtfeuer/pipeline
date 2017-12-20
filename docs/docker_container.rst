@@ -103,3 +103,7 @@ and removes the file afterwards.
 content to the host the caller might fail on removing that files and folders because
 of missing permissions. That's why the user id and group id is always passed to the
 container allowing you to adjust the permissions correctly.
+
+"With" attribute
+----------------
+It's exactly the same as for `shell <shell.rst>`_ - please read the details there.

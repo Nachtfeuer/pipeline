@@ -21,15 +21,41 @@ class TestValidation(unittest.TestCase):
         ]}
         assert_that(Validator.validate(definition), is_not(equal_to(None)))
 
+    def test_invalid(self):
+        """Testing fail."""
+        definition = {'pipeline': []}
+        assert_that(Validator.validate(definition), equal_to(None))
+
     def test_shell_complete(self):
-        """Testing validation of a minimal pipeline."""
+        """Testing validation of shell task."""
         definition = {'pipeline': [
             {'stage(test)': [
                 {'tasks': [
                     {'shell': {
                         'title': 'print out hello world!',
                         'script': 'echo "hello world"',
-                        'tags': ['test']
+                        'tags': ['test'],
+                        'with': [1, "hello", 3.1415926535]
+                    }}
+                ]}
+            ]}
+        ]}
+        assert_that(Validator.validate(definition), is_not(equal_to(None)))
+
+    def test_docker_container_complete(self):
+        """Testing validation of a Docker container task."""
+        definition = {'pipeline': [
+            {'stage(test)': [
+                {'tasks': [
+                    {'docker(container)': {
+                        'title': 'print out hello world!',
+                        'image': 'centos:7',
+                        'mount': True,
+                        'remove': True,
+                        'background': False,
+                        'script': 'echo "hello world"',
+                        'tags': ['test'],
+                        'with': [1, "hello", 3.1415926535]
                     }}
                 ]}
             ]}

@@ -18,7 +18,8 @@ When you have a pipeline definition (example: pipeline.yaml) then you can run it
 
 
 Some simple examples you can see in the example folder of
-the project repository.
+the project repository and also spline itself provides
+that file (exception: Docker tests are skipped).
 
 The minimum structure of a pipeline definition file should look
 like following:
@@ -60,3 +61,25 @@ Development
     # OR tox -e py35 OR tox -e py36 (see tox.ini)
     tox -e py27
 
+For the purpose to test a specific Python version that does not
+exist on your system you can choose one of following commands:
+
+::
+
+    spline --definition=pipeline.yaml --matrix-tags=py27
+    spline --definition=pipeline.yaml --matrix-tags=py33
+    spline --definition=pipeline.yaml --matrix-tags=py34
+    spline --definition=pipeline.yaml --matrix-tags=py35
+    spline --definition=pipeline.yaml --matrix-tags=py36
+
+If you leave away those tags it will run for all Python versions.
+A special note on Python 3.6.x: I have provided two ways to deal
+with it:
+
+  - *init_py36_compile*: A concrete package is downloaded and built.
+    You have to rename it to *init_py36* to use it (rename the other).
+  - *init_py36*: It currently download ready made CentOS 7 packages;
+    you save time with it.
+
+The *init_py36* is the name that is constructed via the matrix so ensure
+you have the one you prefer.

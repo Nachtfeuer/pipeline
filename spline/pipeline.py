@@ -60,6 +60,17 @@ class Pipeline(object):
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
 
+    def cleanup(self):
+        """Run cleanup script of pipeline when hook is configured."""
+        if self.data.hooks and len(self.data.hooks.cleanup) > 0:
+            env = self.data.env_list[0].copy()
+            env.update({'PIPELINE_RESULT': 'SUCCESS'})
+            env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
+            config = ShellConfig(script=self.data.hooks.cleanup, model=self.model, env=env)
+            cleanup_shell = Bash(config)
+            for line in cleanup_shell.process():
+                yield line
+
     def run(self):
         """Processing the whole pipeline definition."""
         output = []
@@ -78,15 +89,9 @@ class Pipeline(object):
                 if not result['success']:
                     return {'success': False, 'output': output}
 
-        if self.data.hooks and len(self.data.hooks.cleanup) > 0:
-            env = self.data.env_list[0].copy()
-            env.update({'PIPELINE_RESULT': 'SUCCESS'})
-            env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
-            config = ShellConfig(script=self.data.hooks.cleanup, model=self.model, env=env)
-            cleanup_shell = Bash(config)
-            for line in cleanup_shell.process():
-                output.append(line)
-                self.logger.info(" | %s", line)
+        for line in self.cleanup():
+            output.append(line)
+            self.logger.info(" | %s", line)
 
         self.event.succeeded()
         return {'success': True, 'output': output}

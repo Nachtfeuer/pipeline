@@ -86,10 +86,7 @@ class Tasks(object):
 
     def process(self, tasks):
         """Processing a group of tasks."""
-        self.logger.info("Processing group of tasks")
-        if self.parallel:
-            self.logger.info("Run tasks in parallel")
-
+        self.logger.info("Processing group of tasks (parallel=%s)", self.parallel)
         self.pipeline.data.env_list[2] = {}
 
         output = []
@@ -99,26 +96,23 @@ class Tasks(object):
             if key == "env":
                 result = Adapter(self.process_shells(shells))
                 output += result.output
-                if not result.success:
-                    return {'success': False, 'output': output}
                 shells = []
+                if not result.success:
+                    break
 
                 self.pipeline.data.env_list[2].update(entry)
                 self.logger.debug("Updating environment at level 2 with %s",
                                   self.pipeline.data.env_list[2])
-                continue
 
-            if key in ["shell", "docker(container)"]:
+            elif key in ["shell", "docker(container)"]:
                 self.prepare_shell_data(shells, key, entry)
-                continue
 
         result = Adapter(self.process_shells(shells))
         output += result.output
-        if not result.success:
-            return {'success': False, 'output': output}
+        if result.success:
+            self.event.succeeded()
 
-        self.event.succeeded()
-        return {'success': True, 'output': output}
+        return {'success': result.success, 'output': output}
 
     def process_shells_parallel(self, shells):
         """Processing a list of shells parallel."""
@@ -154,11 +148,12 @@ class Tasks(object):
 
     def process_shells(self, shells):
         """Processing a list of shells."""
+        result = {'success': True, 'output': []}
         if self.parallel and len(shells) > 1:
-            return self.process_shells_parallel(shells)
-        if len(shells) > 0:
-            return self.process_shells_ordered(shells)
-        return {'success': True, 'output': []}
+            result = self.process_shells_parallel(shells)
+        elif len(shells) > 0:
+            result = self.process_shells_ordered(shells)
+        return result
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""

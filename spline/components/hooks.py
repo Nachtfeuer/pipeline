@@ -31,6 +31,10 @@
 class Hooks(object):
     """Pipeline hooks."""
 
-    def __init__(self):
+    def __init__(self, document=None):
         """Initialize hooks."""
         self.cleanup = ""
+
+        if document is not None and 'hooks' in document:
+            if 'cleanup' in document['hooks'] and 'script' in document['hooks']['cleanup']:
+                self.cleanup = document['hooks']['cleanup']['script']

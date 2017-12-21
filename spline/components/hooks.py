@@ -36,5 +36,6 @@ class Hooks(object):
         self.cleanup = ""
 
         if document is not None and 'hooks' in document:
+
             if 'cleanup' in document['hooks'] and 'script' in document['hooks']['cleanup']:
                 self.cleanup = document['hooks']['cleanup']['script']

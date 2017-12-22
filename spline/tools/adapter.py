@@ -45,16 +45,16 @@ class Adapter(object):
 
     def __getattr__(self, key):
         """Organizing walking of dictionaries via direct field access."""
+        value = None
         if key in self.data:
             value = self.data[key]
             if isinstance(value, dict):
-                return Adapter(value)
-            return value
+                value = Adapter(value)
         else:
-            value = getattr(self.data, key)
-            if callable(value):
-                return value
-        return None
+            attr = getattr(self.data, key)
+            if callable(attr):
+                value = attr
+        return value
 
     def __str__(self):
         """string representation of the underlying object."""

@@ -86,11 +86,20 @@ class Validator(object):
                         Optional('remove', default=True): bool,
                         Optional('tags'): And([And(str, len)], len),
                         Optional('with'): And(len, [object])
+                    }},
+                    # optional Docker image task
+                    {Optional('docker(image)'): {
+                        'script': And(str, len),
+                        'name': And(str, len),
+                        'tag': And(str, len),
+                        Optional('unique', default=True): bool,
+                        Optional('tags'): And([And(str, len)], len),
+                        Optional('with'): And(len, [object])
                     }}
-                ])}  # end of stage
-            )])},
+                ])}  # end of tasks
+            )])},  # end of stage
         )])  # end of pipeline
-    }
+    }  # end of schema
 
     @staticmethod
     def validate(data):

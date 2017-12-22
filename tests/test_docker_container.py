@@ -1,11 +1,14 @@
 """Testing of class Container."""
 # pylint: disable=no-self-use, invalid-name
+import os
 import unittest
 from hamcrest import assert_that, equal_to, matches_regexp
 from spline.components.docker import Container
 from spline.components.config import ShellConfig
 
 
+@unittest.skipIf('INSIDE_DOCKER' in os.environ and os.environ['INSIDE_DOCKER'] == 'yes',
+                 "Docker based tests cannot run inside Docker")
 class TestContainer(unittest.TestCase):
     """Testing of class Container (docker)."""
 

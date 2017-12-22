@@ -1,0 +1,107 @@
+matrix:
+  - name: Python 2.7
+    env: {PYTHON_VERSION: py27}
+    tags: ['py27']
+  - name: Python 3.3
+    env: {PYTHON_VERSION: py33}
+    tags: ['py33']
+  - name: Python 3.4
+    env: {PYTHON_VERSION: py34}
+    tags: ['py34']
+  - name: Python 3.5
+    env: {PYTHON_VERSION: py35}
+    tags: ['py35']
+  - name: Python 3.6
+    env: {PYTHON_VERSION: py36}
+    tags: ['py36']
+
+model:
+  templates:
+    init_py27: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install python27
+      scl enable python27 "bash -c \"pip install setuptools --upgrade\""
+      scl enable python27 "bash -c \"pip install tox\""
+      scl enable python27 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py33: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install python33
+      scl enable python33 "bash -c \"easy_install pip\""
+      scl enable python33 "bash -c \"pip install pip --upgrade\""
+      scl enable python33 "bash -c \"pip install setuptools --upgrade\""
+      scl enable python33 "bash -c \"pip install tox\""
+      scl enable python33 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py34: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install rh-python34
+      scl enable rh-python34 "bash -c \"pip install pip --upgrade\""
+      scl enable rh-python34 "bash -c \"pip install setuptools --upgrade\""
+      scl enable rh-python34 "bash -c \"pip install tox\""
+      scl enable rh-python34 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py35: |
+      yum -y install centos-release-scl yum-utils git
+      yum-config-manager --enable rhel-server-rhscl-7-rpms
+      yum -y install rh-python35
+      scl enable rh-python35 "bash -c \"pip install pip --upgrade\""
+      scl enable rh-python35 "bash -c \"pip install setuptools --upgrade\""
+      scl enable rh-python35 "bash -c \"pip install tox\""
+      scl enable rh-python35 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
+
+    init_py36_compile: |
+      yum -y install wget gcc make openssl-devel git
+      wget -q https://www.python.org/ftp/python/3.6.4/Python-3.6.4.tar.xz
+      tar -xf $(ls Python*.tar.xz)
+      cd Python*
+      ./configure
+      make && make altinstall
+      ln -s /usr/local/bin/pip3.6 /usr/local/bin/pip
+      pip install pip --upgrade
+      pip install setuptools --upgrade
+      pip install tox
+      {{ env.PIPELINE_BASH_FILE }} RUN
+
+    init_py36: |
+        # read here: https://janikarhunen.fi/how-to-install-python-3-6-1-on-centos-7.html
+        yum -y install yum-utils git
+        yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+        yum -y install python36u python36u-pip
+        pip3.6 install tox
+        {{ env.PIPELINE_BASH_FILE }} RUN
+
+pipeline:
+  - env:
+     INSIDE_DOCKER: "yes"
+     MIN_COVERAGE: "89"
+
+  - stage(Build):
+    - tasks(ordered):
+      - docker(container):
+          mount: yes
+          script: |
+            case $1 in
+              INIT)
+                {{ model.templates['init_'+env.PYTHON_VERSION]|render(env=env) }}
+                ;;
+              RUN)
+                mkdir /build
+
+                # copying all files under version into the container
+                pushd /mnt/host
+                tar cvzf /build/spline.tar.gz $(git ls-files)
+                popd
+
+                pushd /build
+                # unpacking the copied sources files
+                tar xvzf spline.tar.gz
+                rm -f spline.tar.gz
+                # running the build
+                tox -e {{ env.PYTHON_VERSION }}
+                popd
+                ;;
+            esac

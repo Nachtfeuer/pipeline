@@ -1,0 +1,9 @@
+# for visibility in logging
+echo "docker build -t {{ name }}:{{ tag }} < {{ dockerfile }}"
+# trying to build docker image
+docker build -t {{ name }}:{{ tag }} - < {{ dockerfile }}
+docker_error=$?
+# cleanup
+rm -f {{ dockerfile }}
+# give back result
+exit ${docker_error}

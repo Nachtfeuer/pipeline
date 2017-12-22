@@ -1,0 +1,24 @@
+if [ $# -eq 0 ]; then
+    BACKGROUND_MODE=-i
+    MOUNT=
+
+    if [ "{{ container.background }}" == "true" ]; then
+        BACKGROUND_MODE=-d
+    fi
+
+    if [ "{{ container.mount }}" == "true" ]; then
+        MOUNT="-v $PWD:/mnt/host"
+    fi
+
+    docker run --rm={{ container.remove }} \
+        -v $(dirname ${PIPELINE_BASH_FILE_ORIGINAL}):/root/scripts ${MOUNT} \
+        -e UID=$(id -u) -e GID=$(id -g) {% raw %}{{ env|docker_environment }}{% endraw %} \
+        --label="pipeline=${PIPELINE_PID}" \
+        --label="pipeline-stage=${PIPELINE_STAGE}" \
+        --label="creator=$$" \
+        --label="context=pipeline" \
+        ${BACKGROUND_MODE}  {{ container.image }} \
+        ${PIPELINE_BASH_FILE} INIT
+else
+    {{ container.script }}
+fi

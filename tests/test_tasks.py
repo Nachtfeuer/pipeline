@@ -4,7 +4,6 @@ import unittest
 from hamcrest import assert_that, equal_to
 
 from spline.components.tasks import Tasks, worker
-from spline.components.bash import Bash
 from spline.components.hooks import Hooks
 from spline.pipeline import PipelineData
 
@@ -123,7 +122,7 @@ class TestTasks(unittest.TestCase):
 
     def test_worker(self):
         """Testing worker used by class Tasks for parallel execution."""
-        data = {'creator': Bash.__name__,
+        data = {'creator': 'shell',
                 'entry': {'script': '''echo "{{model.mode}}:{{env.message}}"'''},
                 'env': {'message': 'hello'}, 'model': {'mode': 'test'}, 'item': None}
         result = worker(data)

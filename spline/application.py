@@ -75,6 +75,14 @@ class Application(object):
         self.logger.info("Schema validation for '%s' succeeded", self.definition)
         return document
 
+    @staticmethod
+    def find_matrix(document):
+        """Find matrix in document."""
+        return document['matrix'] if 'matrix' in document \
+            else document['matrix(ordered)'] if 'matrix(ordered)' in document \
+            else document['matrix(parallel)'] if 'matrix(parallel)' in document \
+            else None
+
     def run(self):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -89,15 +97,8 @@ class Application(object):
             return
 
         model = {} if 'model' not in document else document['model']
-        matrix = document['matrix'] if 'matrix' in document \
-            else document['matrix(ordered)'] if 'matrix(ordered)' in document \
-            else document['matrix(parallel)'] if 'matrix(parallel)' in document \
-            else None
-
-        hooks = Hooks()
-        if 'hooks' in document:
-            if 'cleanup' in document['hooks']:
-                hooks.cleanup = document['hooks']['cleanup']['script']
+        matrix = Application.find_matrix(document)
+        hooks = Hooks(document)
 
         if matrix is None:
             pipeline = Pipeline(document['pipeline'], model=model, tags=self.tag_list, hooks=hooks)

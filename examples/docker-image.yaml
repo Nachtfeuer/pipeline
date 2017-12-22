@@ -1,0 +1,18 @@
+model:
+  templates:
+    dockerfiles:
+      py36: |
+        FROM centos:7
+        RUN yum -y install yum-utils git
+        RUN yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+        RUN yum -y install python36u python36u-pip
+        RUN pip3.6 install tox
+
+pipeline:
+  - stage(Example):
+    - tasks:
+      - docker(image):
+          name: python
+          tag: "3.6"
+          unique: no
+          script: "{{ model.templates.dockerfiles.py36 }}"

@@ -21,5 +21,6 @@ Welcome to spline's documentation!
    env
    tasks
    docker_container
+   docker_image
    hooks
    event_logging

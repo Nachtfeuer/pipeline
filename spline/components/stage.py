@@ -56,7 +56,7 @@ class Stage(object):
                 continue
 
             # if not "env" then it must be "tasks" (schema):
-            tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key))
+            tasks = Tasks(self.pipeline, re.match(r"tasks\(parallel\)", key) is not None)
             result = tasks.process(entry[key])
             for line in result['output']:
                 output.append(line)

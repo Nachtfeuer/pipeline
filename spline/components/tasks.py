@@ -30,7 +30,7 @@
 import multiprocessing
 from contextlib import closing
 from .bash import Bash
-from .docker import Container
+from .docker import Container, Image
 from .config import ShellConfig
 from ..tools.logger import Logger
 from ..tools.event import Event
@@ -39,7 +39,8 @@ from ..tools.adapter import Adapter
 
 def get_creator_by_name(name):
     """Get creator function by name."""
-    return {'Container': Container.creator, 'Bash': Bash.creator}[name]
+    return {'docker(container)': Container.creator,
+            'shell': Bash.creator, 'docker(image)': Image.creator}[name]
 
 
 def worker(data):
@@ -76,9 +77,10 @@ class Tasks(object):
     def prepare_shell_data(self, shells, key, entry):
         """Prepare one shell or docker task."""
         if self.can_process_shell(entry):
+
             for item in entry['with'] if 'with' in entry else ['']:
                 shells.append({
-                    'creator': Bash.__name__ if key == "shell" else Container.__name__,
+                    'creator': key,
                     'entry': entry,
                     'model': self.pipeline.model,
                     'env': self.get_merged_env(),
@@ -104,7 +106,7 @@ class Tasks(object):
                 self.logger.debug("Updating environment at level 2 with %s",
                                   self.pipeline.data.env_list[2])
 
-            elif key in ["shell", "docker(container)"]:
+            elif key in ['shell', 'docker(container)', 'docker(image)']:
                 self.prepare_shell_data(shells, key, entry)
 
         result = Adapter(self.process_shells(shells))

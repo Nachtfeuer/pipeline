@@ -1,9 +1,9 @@
 """
-   Generic Docker container handling.
+   Generic Docker image and container handling.
 
 .. module:: docker
     :platform: Unix
-    :synopsis: Generic Docker container handling.
+    :synopsis: Generic Docker image and  container handling.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
    =======
@@ -28,39 +28,14 @@
 """
 # pylint: disable=useless-super-delegation
 import os
+import tempfile
 from .bash import Bash
 from .config import ShellConfig
+from ..tools.filters import render
 
 
 class Container(Bash):
     """Run Docker container and custom Bash code with one script."""
-
-    TEMPLATE = """
-if [ $# -eq 0 ]; then
-    BACKGROUND_MODE=-i
-    MOUNT=
-
-    if [ "%(background)s" == "true" ]; then
-        BACKGROUND_MODE=-d
-    fi
-
-    if [ "%(mount)s" == "true" ]; then
-        MOUNT="-v $PWD:/mnt/host"
-    fi
-
-    docker run --rm=%(remove)s \
-        -v $(dirname ${PIPELINE_BASH_FILE_ORIGINAL}):/root/scripts ${MOUNT} \
-        -e UID=$(id -u) -e GID=$(id -g) {{ env|docker_environment }} \
-        --label="pipeline=${PIPELINE_PID}" \
-        --label="pipeline-stage=${PIPELINE_STAGE}" \
-        --label="creator=$$" \
-        --label="context=pipeline" \
-        ${BACKGROUND_MODE} %(image)s \
-        ${PIPELINE_BASH_FILE} INIT
-else
-    %(script)s
-fi
-"""
 
     def __init__(self, config):
         """Initialize with Bash code and optional environment variables."""
@@ -76,17 +51,43 @@ fi
     @staticmethod
     def creator(entry, config):
         """Creator function for creating an instance of a Bash."""
-        image = 'centos:7' if 'image' not in entry else entry['image']
-        remove = True if 'remove' not in entry else entry['remove']
-        background = False if 'background' not in entry else entry['background']
-        mount = False if 'mount' not in entry else entry['mount']
-
-        wrapped_script = Container.TEMPLATE % {
-            'image': image,
-            'remove': str(remove).lower(),
-            'background': str(background).lower(),
-            'mount': str(mount).lower(),
+        template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-container.sh.j2')
+        template = open(template_file).read()
+        wrapped_script = render(template, container={
+            'image': 'centos:7' if 'image' not in entry else entry['image'],
+            'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
+            'background': False if 'background' not in entry else str(entry['background']).lower(),
+            'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
             'script': config.script
-        }
+        })
+
         config.script = wrapped_script
         return Container(config)
+
+
+class Image(Bash):
+    """Create Docker image and custom Bash code with one script."""
+
+    def __init__(self, config):
+        """Initialize with Bash code (do not call it directly)."""
+        assert isinstance(config, ShellConfig)
+        super(Image, self).__init__(config)
+
+    @staticmethod
+    def creator(entry, config):
+        """Creator function for creating an instance of a Docker image script."""
+        # writing Dockerfile
+        dockerfile = render(config.script, model=config.model, env=config.env)
+
+        temp = tempfile.NamedTemporaryFile(
+            prefix="dockerfile-", mode='w+t', delete=False)
+        temp.writelines(dockerfile)
+        temp.close()
+
+        # rendering the Bash script for generating the Docker image
+        name = entry['name'] + "-%s" % os.getpid() if entry['unique'] else entry['name']
+        template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-image.sh.j2')
+        template = open(template_file).read()
+        config.script = render(template, name=name, tag=entry['tag'], dockerfile=temp.name)
+
+        return Image(config)

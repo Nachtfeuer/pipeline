@@ -13,7 +13,7 @@ class FakePipeline(object):
 
     def __init__(self, tags=None, hooks=None):
         """Initialization of fake pipeline."""
-        self.data = PipelineData(self, tags, hooks)
+        self.data = PipelineData(tags, hooks)
         self.model = {}
 
 

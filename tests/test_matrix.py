@@ -3,7 +3,7 @@
 import unittest
 from hamcrest import assert_that, equal_to
 
-from spline.matrix import Matrix, matrix_worker
+from spline.matrix import Matrix, MatrixProcessData, matrix_worker
 
 
 class TestMatrix(unittest.TestCase):
@@ -16,8 +16,11 @@ class TestMatrix(unittest.TestCase):
             'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
                       {'shell': {'script': '''echo tasks1:hello2'''}}]}]}]
 
+        process_data = MatrixProcessData()
+        process_data.pipeline = pipeline_definition
+
         matrix = Matrix(matrix_definition, matrix_tags=[], parallel=False)
-        result = matrix.process(pipeline_definition, model={}, tags=[], hooks=None)
+        result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(True))
@@ -35,8 +38,11 @@ class TestMatrix(unittest.TestCase):
         pipeline_definition = [{'stage(test)': [{
             'tasks': [{'shell': {'script': '''echo $message'''}}]}]}]
 
+        process_data = MatrixProcessData()
+        process_data.pipeline = pipeline_definition
+
         matrix = Matrix(matrix_definition, matrix_tags=['group-a'], parallel=False)
-        result = matrix.process(pipeline_definition, model={}, tags=[], hooks=None)
+        result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(True))
@@ -54,8 +60,11 @@ class TestMatrix(unittest.TestCase):
         pipeline_definition = [{'stage(test)': [{
             'tasks': [{'shell': {'script': '''echo $message'''}}]}]}]
 
+        process_data = MatrixProcessData()
+        process_data.pipeline = pipeline_definition
+
         matrix = Matrix(matrix_definition, matrix_tags=['group-a'], parallel=True)
-        result = matrix.process(pipeline_definition, model={}, tags=[], hooks=None)
+        result = matrix.process(process_data)
         output = sorted([line for line in result['output'] if line.find("hello") >= 0])
 
         assert_that(result['success'], equal_to(True))
@@ -72,8 +81,11 @@ class TestMatrix(unittest.TestCase):
         pipeline_definition = [{'stage(test)': [{
             'tasks': [{'shell': {'script': '''exit 123'''}}]}]}]
 
+        process_data = MatrixProcessData()
+        process_data.pipeline = pipeline_definition
+
         matrix = Matrix(matrix_definition, matrix_tags=[], parallel=False)
-        result = matrix.process(pipeline_definition, model={}, tags=[], hooks=None)
+        result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(False))
@@ -88,8 +100,11 @@ class TestMatrix(unittest.TestCase):
         pipeline_definition = [{'stage(test)': [{
             'tasks': [{'shell': {'script': '''exit 123'''}}]}]}]
 
+        process_data = MatrixProcessData()
+        process_data.pipeline = pipeline_definition
+
         matrix = Matrix(matrix_definition, matrix_tags=[], parallel=True)
-        result = matrix.process(pipeline_definition, model={}, tags=[], hooks=None)
+        result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(False))

@@ -26,7 +26,6 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-# pylint: disable=too-many-arguments
 import os
 import re
 
@@ -40,10 +39,9 @@ from .tools.event import Event
 class PipelineData(object):
     """Class for keeping pipeline data."""
 
-    def __init__(self, pipeline, tags=None, hooks=None):
+    def __init__(self, tags=None, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pid = str(os.getpid())
-        self.pipeline = pipeline
         self.env_list = [{'PIPELINE_PID': self.pid}, {}, {}]
         self.tags = [] if tags is None else tags
         self.hooks = hooks
@@ -52,13 +50,23 @@ class PipelineData(object):
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, pipeline, model=None, env=None, tags=None, hooks=None):
+    def __init__(self, model=None, env=None, tags=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.event = Event.create(__name__)
         self.model = {} if not isinstance(model, dict) else model
-        self.data = PipelineData(pipeline, [] if tags is None else tags, hooks)
+        self.data = PipelineData([] if tags is None else tags, None)
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
+
+    @property
+    def hooks(self):
+        """Get hooks."""
+        return self.data.hooks
+
+    @hooks.setter
+    def hooks(self, value):
+        """Set hooks."""
+        self.data.hooks = value
 
     def cleanup(self):
         """Run cleanup script of pipeline when hook is configured."""
@@ -71,10 +79,10 @@ class Pipeline(object):
             for line in cleanup_shell.process():
                 yield line
 
-    def run(self):
+    def process(self, pipeline):
         """Processing the whole pipeline definition."""
         output = []
-        for entry in self.data.pipeline:
+        for entry in pipeline:
             key = list(entry.keys())[0]
             if key == "env":
                 self.data.env_list[0].update(entry[key])

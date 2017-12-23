@@ -17,8 +17,9 @@ class TestPipeline(unittest.TestCase):
                       {'shell': {'script': '''echo tasks1:hello2'''}}]}]}]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
-        pipeline = Pipeline(definition, hooks=hooks)
-        result = pipeline.run()
+        pipeline = Pipeline()
+        pipeline.hooks = hooks
+        result = pipeline.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(True))
@@ -36,8 +37,9 @@ class TestPipeline(unittest.TestCase):
         ]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
-        pipeline = Pipeline(definition, hooks=hooks)
-        result = pipeline.run()
+        pipeline = Pipeline()
+        pipeline.hooks = hooks
+        result = pipeline.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(True))
@@ -54,8 +56,9 @@ class TestPipeline(unittest.TestCase):
                       {'shell': {'script': '''echo tasks1:hello3'''}}]}]}]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
-        pipeline = Pipeline(definition, hooks=hooks)
-        result = pipeline.run()
+        pipeline = Pipeline()
+        pipeline.hooks = hooks
+        result = pipeline.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(False))

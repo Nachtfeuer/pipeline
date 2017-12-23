@@ -40,9 +40,61 @@ def matrix_worker(data):
     matrix = data['matrix']
     Logger.get_logger(__name__ + '.worker').info(
         "Processing pipeline for matrix entry '%s'", matrix['name'])
-    pipeline = Pipeline(data['pipeline'], model=data['model'], env=matrix['env'],
-                        tags=data['tags'], hooks=data['hooks'])
-    return pipeline.run()
+    pipeline = Pipeline(model=data['model'], env=matrix['env'],
+                        tags=data['tags'])
+    pipeline.hooks = data['hooks']
+    return pipeline.process(data['pipeline'])
+
+
+class MatrixProcessData(object):
+    """Matrix process parameter."""
+
+    def __init__(self):
+        """Initializing defaults."""
+        self.__pipeline = {}
+        self.__model = {}
+        self.__task_filter = []
+        self.__hooks = None
+
+    @property
+    def pipeline(self):
+        """Get pipeline definition."""
+        return self.__pipeline
+
+    @pipeline.setter
+    def pipeline(self, value):
+        """Set pipeline definition."""
+        self.__pipeline = value
+
+    @property
+    def model(self):
+        """Get model data."""
+        return self.__model
+
+    @model.setter
+    def model(self, value):
+        """Set model data."""
+        self.__model = value
+
+    @property
+    def task_filter(self):
+        """Get task filter (tags)."""
+        return self.__task_filter
+
+    @task_filter.setter
+    def task_filter(self, value):
+        """Set task filter."""
+        self.__task_filter = value
+
+    @property
+    def hooks(self):
+        """Get hooks."""
+        return self.__hooks
+
+    @hooks.setter
+    def hooks(self, value):
+        """Set hooks."""
+        self.__hooks = value
 
 
 class Matrix(object):
@@ -69,24 +121,26 @@ class Matrix(object):
 
         return count > 0
 
-    def run_matrix_ordered(self, pipeline_definition, model, tags, hooks):
+    def run_matrix_ordered(self, process_data):
         """Running pipelines one after the other."""
         output = []
         for entry in self.matrix:
             if self.can_process_matrix(entry):
                 self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
-                pipeline = Pipeline(pipeline_definition, model=model, env=entry['env'],
-                                    tags=tags, hooks=hooks)
-                result = pipeline.run()
+                pipeline = Pipeline(model=process_data.model, env=entry['env'],
+                                    tags=process_data.task_filter)
+                pipeline.hooks = process_data.hooks
+                result = pipeline.process(process_data.pipeline)
                 output += result['output']
                 if not result['success']:
                     return {'success': False, 'output': output}
         return {'success': True, 'output': output}
 
-    def run_matrix_in_parallel(self, pipeline_definition, model, tags, hooks):
+    def run_matrix_in_parallel(self, process_data):
         """Running pipelines in parallel."""
-        worker_data = [{'matrix': entry, 'pipeline': pipeline_definition, 'model': model,
-                        'tags': tags, 'hooks': hooks} for entry in self.matrix
+        worker_data = [{'matrix': entry, 'pipeline': process_data.pipeline,
+                        'model': process_data.model, 'tags': process_data.task_filter,
+                        'hooks': process_data.hooks} for entry in self.matrix
                        if self.can_process_matrix(entry)]
         output = []
         success = True
@@ -97,8 +151,8 @@ class Matrix(object):
                     success = False
         return {'success': success, 'output': output}
 
-    def process(self, pipeline, model, tags, hooks):
+    def process(self, process_data):
         """Process the pipeline per matrix item."""
         if self.parallel:
-            return self.run_matrix_in_parallel(pipeline, model, tags, hooks)
-        return self.run_matrix_ordered(pipeline, model, tags, hooks)
+            return self.run_matrix_in_parallel(process_data)
+        return self.run_matrix_ordered(process_data)

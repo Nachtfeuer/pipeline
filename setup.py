@@ -23,14 +23,22 @@ DAMAGES OR OTHER LIABILITY,
 WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import os
 from setuptools import setup
 from spline.version import VERSION
 
 
+def get_long_description():
+    """Reading long description from a file."""
+    file_path = os.path.join(os.path.dirname(__file__), 'spline.rst')
+    print(file_path)
+    return open(file_path).read()
+
+
 setup(name='spline',
       version=VERSION,
-      description='(s)hell oriented (p)ipe(line) tool (CI/CD)',
-      long_description="(s)hell oriented (p)ipe(line) tool using yaml definition file (CI/CD)",
+      description='(s)hell oriented (p)ipe(line) tool for ci/cd',
+      long_description=get_long_description(),
       author='Thomas Lehmann',
       author_email='thomas.lehmann.private@gmail.com',
       license="MIT",

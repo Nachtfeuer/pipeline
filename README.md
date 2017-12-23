@@ -1,4 +1,4 @@
-# Welcome to the pipeline tool
+# Welcome to spline - the pipeline tool
 
 [![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
 [![PyPI version](https://img.shields.io/pypi/v/spline.svg)](https://pypi.python.org/pypi/spline)
@@ -15,6 +15,7 @@
 **Table Of Content**:  
 [Motivation](docs/motivation.rst)  
 [Quickstart](docs/quickstart.rst)  
+[Example](docs/example.rst)  
 [Matrix](docs/matrix.rst)  
 [The Model](docs/model.rst)  
 [The Pipeline](docs/pipeline.rst)  
@@ -32,15 +33,15 @@
  - automatic schema validation for yaml file
  - matrix based pipeline with tags
  - parallel pipelines (matrix)
- - pipeline stages (names groups)
+ - parallel tasks execution
+ - pipeline stages (named groups)
  - shell script execution: inline and file
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
  - support for model data (a dictionary of anything you need)
  - cleanup hook
  - filtered execution via tags
- - parallel tasks execution
  - supporting Jinja templating in Bash scripts (also nested inside model)
- - support for Docker containers
+ - support for Docker containers and Docker images
  - execution time on each level: pipeline, stage, tasks and shell (event logging)
  - documentation here and also at read the docs
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).

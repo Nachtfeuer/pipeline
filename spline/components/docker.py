@@ -29,17 +29,19 @@
 # pylint: disable=useless-super-delegation
 import os
 import tempfile
+
+from contracts import contract
+
 from .bash import Bash
-from .config import ShellConfig
 from ..tools.filters import render
 
 
 class Container(Bash):
     """Run Docker container and custom Bash code with one script."""
 
+    @contract(config='is_shell_config')
     def __init__(self, config):
         """Initialize with Bash code and optional environment variables."""
-        assert isinstance(config, ShellConfig)
         super(Container, self).__init__(config)
 
     def update_script_filename(self, filename):
@@ -49,6 +51,7 @@ class Container(Bash):
         self.env.update({'PIPELINE_BASH_FILE': filename})
 
     @staticmethod
+    @contract(config='is_shell_config')
     def creator(entry, config):
         """Creator function for creating an instance of a Bash."""
         template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-container.sh.j2')
@@ -68,12 +71,13 @@ class Container(Bash):
 class Image(Bash):
     """Create Docker image and custom Bash code with one script."""
 
+    @contract(config='is_shell_config')
     def __init__(self, config):
         """Initialize with Bash code (do not call it directly)."""
-        assert isinstance(config, ShellConfig)
         super(Image, self).__init__(config)
 
     @staticmethod
+    @contract(config='is_shell_config')
     def creator(entry, config):
         """Creator function for creating an instance of a Docker image script."""
         # writing Dockerfile

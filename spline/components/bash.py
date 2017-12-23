@@ -29,8 +29,11 @@
 # pylint: disable=too-many-instance-attributes
 import os
 import shlex
-import subprocess
+import subprocess  # nosec
 import tempfile
+
+from contracts import contract, new_contract
+
 from ..tools.filters import render
 from ..tools.logger import Logger
 from ..tools.event import Event
@@ -40,9 +43,11 @@ from .config import ShellConfig
 class Bash(object):
     """Wrapper for Bash execution."""
 
+    new_contract('is_shell_config', lambda obj: isinstance(obj, ShellConfig))
+
+    @contract(config='is_shell_config')
     def __init__(self, config):
         """Initialize with Bash code and optional environment variables."""
-        assert isinstance(config, ShellConfig)
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.success = False
@@ -61,6 +66,7 @@ class Bash(object):
         self.exit_code = 0
 
     @staticmethod
+    @contract(config='is_shell_config')
     def creator(_, config):
         """Creator function for creating an instance of a Bash."""
         return Bash(config)
@@ -84,7 +90,7 @@ class Bash(object):
             temp.writelines("#!/bin/bash\n" + rendered_script)
         temp.close()
         # make Bash script executable
-        os.chmod(temp.name, 777)
+        os.chmod(temp.name, 777)  # nosec
         return temp.name
 
     def process(self):
@@ -95,7 +101,7 @@ class Bash(object):
 
             process = subprocess.Popen(shlex.split("bash %s" % temp_filename),
                                        stdout=self.stdout, stderr=self.stderr,
-                                       shell=self.shell, env=self.env)
+                                       shell=self.shell, env=self.env)  # nosec
             for line in iter(process.stdout.readline, ' '):
                 if not line:
                     break

@@ -1,10 +1,14 @@
 # Welcome to the pipeline tool
 
 [![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
-[![PyPI version](https://badge.fury.io/py/spline.png)](https://badge.fury.io/py/spline)
+[![PyPI version](https://img.shields.io/pypi/v/spline.svg)](https://pypi.python.org/pypi/spline)
+[![PyPI format](https://img.shields.io/pypi/format/spline.svg)](https://pypi.python.org/pypi/spline)
+[![PyPI versions](https://img.shields.io/pypi/pyversions/spline.svg)](https://pypi.python.org/pypi/spline)
+[![PyPI license](https://img.shields.io/pypi/l/spline.svg)](https://pypi.python.org/pypi/spline)
 [![Read The Docs](https://readthedocs.org/projects/spline/badge/?version=latest)](http://spline.readthedocs.io/en/latest/?badge=latest)
 [![Coverage Status](https://coveralls.io/repos/github/Nachtfeuer/pipeline/badge.svg?branch=master&service=github)](https://coveralls.io/github/Nachtfeuer/pipeline?branch=master)
 [![BCH compliance](https://bettercodehub.com/edge/badge/Nachtfeuer/pipeline?branch=master)](https://bettercodehub.com/)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/96262e26f41546b684e88f40a9c0176d)](https://www.codacy.com/app/thomas.lehmann.private/pipeline?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Nachtfeuer/pipeline&amp;utm_campaign=Badge_Grade)
 [![Known Vulnerabilities](https://snyk.io/test/github/nachtfeuer/pipeline/badge.svg)](https://snyk.io/test/github/nachtfeuer/pipeline)
 
 
@@ -47,3 +51,4 @@
  - https://github.com/bats-core/bats-core
  - https://pypi.python.org/pypi/PyHamcrest
  - http://nose.readthedocs.io/en/latest/
+ - https://pypi.python.org/pypi/bandit

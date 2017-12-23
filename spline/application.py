@@ -89,7 +89,7 @@ class Application(object):
         self.logger.info("Running on platform %s", platform.platform())
         self.logger.info("Processing pipeline definition '%s'", self.definition)
 
-        document = yaml.load(open(self.definition).read())
+        document = yaml.safe_load(open(self.definition).read())
 
         document = self.validate_document(document)
         if self.validate_only:

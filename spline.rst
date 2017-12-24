@@ -42,7 +42,7 @@ run same pipeline in Travis CI (and such tools).
 as command line on your machine. Also you can run matrix builds or
 you filter for certain tasks of your interest. The pipeline for the
 spline tool itself supporting a lot Python version can be defined
-in one file with roughly 100 lines of yaml code only. Integration into
+in one file with roughly 150 lines of yaml code only. Integration into
 Jenkinsfile and/or Travis CI isn't that hard anymore.
 
 

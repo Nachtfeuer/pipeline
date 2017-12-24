@@ -71,6 +71,8 @@ exist on your system you can choose one of following commands:
     spline --definition=pipeline.yaml --matrix-tags=py34
     spline --definition=pipeline.yaml --matrix-tags=py35
     spline --definition=pipeline.yaml --matrix-tags=py36
+    spline --definition=pipeline.yaml --matrix-tags=pypy
+    spline --definition=pipeline.yaml --matrix-tags=pypy3
 
 If you leave away those tags it will run for all Python versions.
 A special note on Python 3.6.x: I have provided two ways to deal

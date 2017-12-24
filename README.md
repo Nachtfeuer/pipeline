@@ -29,7 +29,7 @@
 [Links](#links)  
 
 **Features**:
- - Python support for 2.7.x, 3.3.x 3.4.x, 3.5.x and 3.6.x
+ - Python support for 2.7.x, 3.3.x 3.4.x, 3.5.x, 3.6.x, PyPy and PyPy3
  - automatic schema validation for yaml file
  - matrix based pipeline with tags
  - parallel pipelines (matrix)

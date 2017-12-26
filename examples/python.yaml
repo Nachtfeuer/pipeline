@@ -1,0 +1,15 @@
+model:
+  message: 'hello world'
+
+pipeline:
+  - stage(Example):
+    - tasks(ordered):
+      - python:
+          script: |
+            import sys
+            print(sys.version.replace("\n", ""))
+            print("{{ model.message }}{{ item }}!")
+          with:
+            - 1
+            - 2
+            - 3

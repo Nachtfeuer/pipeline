@@ -81,7 +81,7 @@ class Image(Bash):
     def creator(entry, config):
         """Creator function for creating an instance of a Docker image script."""
         # writing Dockerfile
-        dockerfile = render(config.script, model=config.model, env=config.env)
+        dockerfile = render(config.script, model=config.model, env=config.env, item=config.item)
 
         temp = tempfile.NamedTemporaryFile(
             prefix="dockerfile-", mode='w+t', delete=False)

@@ -2,7 +2,7 @@
    Represent the main entry point for the pipeline tool.
 
 .. module:: application
-    :platform: Unix, Windows
+    :platform: Unix
     :synopsis: Represent the main entry point for the pipeline tool.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
 
@@ -26,7 +26,7 @@
    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
-# pylint: disable=too-many-arguments, too-many-instance-attributes
+# pylint: too-many-instance-attributes
 import sys
 import platform
 import os
@@ -35,24 +35,24 @@ import logging
 import click
 import yaml
 
-from .matrix import Matrix
+from .matrix import Matrix, MatrixProcessData
 from .pipeline import Pipeline
 from .components.hooks import Hooks
 from .tools.logger import Logger
 from .tools.event import Event
+from .tools.adapter import Adapter
 from .validation import Validator
 
 
 class Application(object):
     """Pipeline application."""
 
-    def __init__(self, definition, matrix_tags, tags, validate_only, logging_config):
+    def __init__(self, matrix_tags, tags, logging_config):
         """Initialize application with definition and tags."""
         self.event = Event.create(__name__)
-        self.definition = definition
         self.matrix_tag_list = [] if len(matrix_tags) == 0 else matrix_tags.split(",")
         self.tag_list = [] if len(tags) == 0 else tags.split(",")
-        self.validate_only = validate_only
+        self.validate_only = False
         self.logging_level = logging.DEBUG
         self.logging_config = logging_config
         self.setup_logging()
@@ -66,13 +66,13 @@ class Application(object):
             logging_format = "%(asctime)-15s - %(name)s - %(message)s"
             Logger.configure_default(logging_format, self.logging_level)
 
-    def validate_document(self, document):
+    def validate_document(self, definition):
         """Validate given pipeline document."""
-        document = Validator().validate(document)
+        document = Validator().validate(yaml.safe_load(open(definition).read()))
         if document is None:
-            self.logger.info("Schema validation for '%s' has failed", self.definition)
+            self.logger.info("Schema validation for '%s' has failed", definition)
             sys.exit(1)
-        self.logger.info("Schema validation for '%s' succeeded", self.definition)
+        self.logger.info("Schema validation for '%s' succeeded", definition)
         return document
 
     @staticmethod
@@ -83,31 +83,39 @@ class Application(object):
             else document['matrix(parallel)'] if 'matrix(parallel)' in document \
             else None
 
-    def run(self):
+    def run_matrix(self, matrix_definition, document):
+        """Running pipeline via a matrix."""
+        matrix = Matrix(matrix_definition, self.matrix_tag_list, 'matrix(parallel)' in document)
+
+        process_data = MatrixProcessData()
+        process_data.pipeline = document['pipeline']
+        process_data.model = {} if 'model' not in document else document['model']
+        process_data.task_filter = self.tag_list
+        process_data.hooks = Hooks(document)
+
+        return matrix.process(process_data)
+
+    def run(self, definition):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
         self.logger.info("Running on platform %s", platform.platform())
-        self.logger.info("Processing pipeline definition '%s'", self.definition)
+        self.logger.info("Processing pipeline definition '%s'", definition)
 
-        document = yaml.load(open(self.definition).read())
-
-        document = self.validate_document(document)
+        document = self.validate_document(definition)
         if self.validate_only:
             self.logger.info("Stopping after validation as requested!")
             return
 
-        model = {} if 'model' not in document else document['model']
         matrix = Application.find_matrix(document)
-        hooks = Hooks(document)
-
         if matrix is None:
-            pipeline = Pipeline(document['pipeline'], model=model, tags=self.tag_list, hooks=hooks)
-            result = pipeline.run()
+            model = {} if 'model' not in document else document['model']
+            pipeline = Pipeline(model=model, tags=self.tag_list)
+            pipeline.hooks = Hooks(document)
+            result = pipeline.process(document['pipeline'])
             if not result['success']:
                 sys.exit(1)
         else:
-            matrix = Matrix(matrix, self.matrix_tag_list, 'matrix(parallel)' in document)
-            result = matrix.process(document['pipeline'], model, self.tag_list, hooks)
+            result = self.run_matrix(matrix, document)
             if not result['success']:
                 sys.exit(1)
 
@@ -129,11 +137,13 @@ class Application(object):
               help="Path and filename of logging configuration")
 @click.option('--event-logging', is_flag=True, default=False,
               help="When enabled then it does log event details")
-def main(definition="", matrix_tags="", tags="", validate_only=False, logging_config="", event_logging=False):
+def main(**kwargs):
     """The Pipeline tool."""
-    Event.configure(is_logging_enabled=event_logging)
-    application = Application(definition, matrix_tags, tags, validate_only, logging_config)
-    application.run()
+    options = Adapter(kwargs)
+    Event.configure(is_logging_enabled=options.event_logging)
+    application = Application(options.matrix_tags, options.tags, options.logging_config)
+    application.validate_only = options.validate_only
+    application.run(options.definition)
 
 
 if __name__ == "__main__":

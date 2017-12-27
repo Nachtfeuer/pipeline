@@ -95,6 +95,13 @@ class Validator(object):
                         Optional('unique', default=True): bool,
                         Optional('tags'): And([And(str, len)], len),
                         Optional('with'): And(len, [object])
+                    }},
+                    # optional Python script
+                    {Optional('python'): {
+                        'script': And(str, len),
+                        Optional('title'): And(str, len),
+                        Optional('tags'): And([And(str, len)], len),
+                        Optional('with'): And(len, [object])
                     }}
                 ])}  # end of tasks
             )])},  # end of stage

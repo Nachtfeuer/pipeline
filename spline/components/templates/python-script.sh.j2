@@ -1,0 +1,5 @@
+python -u {{ script }}
+python_error=$?
+# cleanup
+rm -f {{ script }}
+exit ${pytho_error}

@@ -13,27 +13,29 @@ class FakePipeline(object):
 
     def __init__(self, tags=None, hooks=None):
         """Initialization of fake pipeline."""
-        self.data = PipelineData(self, tags, hooks)
+        self.data = PipelineData(tags, hooks)
         self.model = {}
 
 
 class TestTasks(unittest.TestCase):
     """Testing of class Tasks."""
 
-    def test_two_tasks_ordered(self):
+    def test_tasks_ordered(self):
         """Testing with two task only (ordered)."""
         pipeline = FakePipeline()
         tasks = Tasks(pipeline, parallel=False)
 
         definition = [{'shell': {'script': '''echo hello1'''}},
-                      {'shell': {'script': '''echo hello2'''}}]
+                      {'shell': {'script': '''echo hello2'''}},
+                      {'python': {'script': '''print("hello3")'''}}]
         result = tasks.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(True))
-        assert_that(len(output), equal_to(2))
+        assert_that(len(output), equal_to(3))
         assert_that(output[0], equal_to('hello1'))
         assert_that(output[1], equal_to('hello2'))
+        assert_that(output[2], equal_to('hello3'))
 
     def test_two_tasks_parallel(self):
         """Testing with two task only (parallel)."""
@@ -83,6 +85,24 @@ class TestTasks(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('cleanup 123'))
         assert_that(output[1], equal_to('hello'))
+
+    def test_failed_two_blocks(self):
+        """Testing cleanup when a task has failed (ordered with two blocks)."""
+        hooks = Hooks()
+        hooks.cleanup = '''echo cleanup hello'''
+        pipeline = FakePipeline(hooks=hooks)
+        tasks = Tasks(pipeline, parallel=False)
+
+        definition = [{'shell': {'script': '''exit 123'''}},
+                      {'shell': {'script': '''echo hello1'''}},
+                      {'env': {'block': 'two'}},
+                      {'shell': {'script': '''echo hello2'''}}]
+        result = tasks.process(definition)
+        output = [line for line in result['output'] if line.find("hello") >= 0]
+
+        assert_that(result['success'], equal_to(False))
+        assert_that(len(output), equal_to(1))
+        assert_that(output[0], equal_to('cleanup hello'))
 
     def test_tags_ordered(self):
         """Testing for filtering of tags."""

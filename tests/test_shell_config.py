@@ -1,4 +1,4 @@
-"""Testing of module validation."""
+"""Testing of module config."""
 # pylint: disable=no-self-use, invalid-name, redundant-unittest-assert
 import unittest
 from hamcrest import assert_that, equal_to, contains_string

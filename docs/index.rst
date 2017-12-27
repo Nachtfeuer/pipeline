@@ -17,6 +17,7 @@ Welcome to spline's documentation!
    matrix
    stages
    shell
+   python
    model
    env
    tasks

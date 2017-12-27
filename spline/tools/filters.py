@@ -41,8 +41,12 @@ def render(value, **kwargs):
     >>> rendered_text = render("{{ model.template|render(model=model) }}", model=model)
     >>> rendered_text == 'hello world 2!'
     True
+
+    The pipeline process is all about Bash code (inside and outside Docker) and
+    autoescaping wouldn't help. Usually the pipeline runs in a isolated environment
+    and there should not be any injection from outside; that's why: nosec.
     """
-    environment = Environment()
+    environment = Environment(autoescape=False)  # nosec
     environment.filters['render'] = render
     environment.filters['docker_environment'] = docker_environment
     template = environment.from_string(value)

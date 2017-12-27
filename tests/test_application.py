@@ -1,5 +1,6 @@
 """Testing of module adapter."""
 # pylint: disable=no-self-use, invalid-name
+import os
 import unittest
 from mock import patch
 from hamcrest import assert_that, equal_to
@@ -11,15 +12,13 @@ class TestApplication(unittest.TestCase):
 
     def test_init(self):
         """Testing c'tor only."""
-        definition = "pipeline.yaml"
         tags = 'prepare,build'
         matrix_tags = "py27,py35"
-        application = Application(definition=definition, matrix_tags=matrix_tags,
-                                  tags=tags, validate_only=True, logging_config='')
-        assert_that(application.definition, equal_to('pipeline.yaml'))
+        application = Application(matrix_tags=matrix_tags,
+                                  tags=tags, logging_config='')
         assert_that(application.tag_list, equal_to(['prepare', 'build']))
         assert_that(application.matrix_tag_list, equal_to(['py27', 'py35']))
-        assert_that(application.validate_only, equal_to(True))
+        assert_that(application.validate_only, equal_to(False))
         assert_that(application.logging_config, equal_to(''))
 
     def test_find_matrix(self):
@@ -34,18 +33,42 @@ class TestApplication(unittest.TestCase):
 
     def test_invalidate_document(self):
         """Testing invalid document."""
-        application = Application(definition='pipeline.yaml', matrix_tags='',
-                                  tags='', validate_only=True, logging_config='')
+        application = Application(matrix_tags='', tags='', logging_config='')
         with patch('sys.exit') as mocked_exit:
-            application.validate_document({})
+            path = os.path.dirname(__file__)
+            application.validate_document(os.path.join(path, "data/invalid.yaml"))
             mocked_exit.assert_called_once_with(1)
 
     def test_validate_document(self):
         """Testing valid document."""
-        document = {'pipeline': [{'stage(Test)': [{'tasks': [{'shell': {'script': 'echo "hello"'}}]}]}]}
-        application = Application(definition='pipeline.yaml', matrix_tags='',
-                                  tags='', validate_only=True, logging_config='')
+        application = Application(matrix_tags='', tags='', logging_config='')
+        application.validate_only = True
         with patch('sys.exit') as mocked_exit:
-            document = application.validate_document(document)
+            path = os.path.dirname(__file__)
+            document = application.validate_document(os.path.join(path, "data/simple.yaml"))
             mocked_exit.assert_not_called()
             assert_that(isinstance(document, dict), equal_to(True))
+
+    def test_run_matrix(self):
+        """Testing method Application.run_matrix."""
+        mdef = [{'name': 'test1', 'env': {'message': 'hello 1'}},
+                {'name': 'test2', 'env': {'message': 'hello 2'}}]
+        pdef = {
+            'pipeline': [{
+                'stage(Test)': [{
+                    'tasks': [{
+                        'shell': {'script': 'echo "{{ env.message }}"'}
+                    }]
+                }]
+            }]
+        }
+
+        application = Application(matrix_tags='', tags='', logging_config='')
+        application.validate_only = True
+        result = application.run_matrix(mdef, pdef)
+
+        assert_that(result['success'], equal_to(True))
+        output = [line for line in result['output'] if line.find('hello') >= 0]
+        assert_that(len(output), equal_to(2))
+        assert_that(output[0], equal_to('hello 1'))
+        assert_that(output[1], equal_to('hello 2'))

@@ -14,6 +14,12 @@ matrix:
   - name: Python 3.6
     env: {PYTHON_VERSION: py36}
     tags: ['py36']
+  - name: PyPy (Python 2.7.x compatible)
+    env: {PYTHON_VERSION: pypy}
+    tags: ['pypy']
+  - name: PyPy3 (Python 3.5.x compatible)
+    env: {PYTHON_VERSION: pypy3}
+    tags: ['pypy3']
 
 model:
   templates:
@@ -67,12 +73,48 @@ model:
       {{ env.PIPELINE_BASH_FILE }} RUN
 
     init_py36: |
-        # read here: https://janikarhunen.fi/how-to-install-python-3-6-1-on-centos-7.html
-        yum -y install yum-utils git
-        yum -y install https://centos7.iuscommunity.org/ius-release.rpm
-        yum -y install python36u python36u-pip
-        pip3.6 install tox
-        {{ env.PIPELINE_BASH_FILE }} RUN
+      # read here: https://janikarhunen.fi/how-to-install-python-3-6-1-on-centos-7.html
+      yum -y install yum-utils git
+      yum -y install https://centos7.iuscommunity.org/ius-release.rpm
+      yum -y install python36u python36u-pip
+      pip3.6 install tox
+      {{ env.PIPELINE_BASH_FILE }} RUN
+
+    init_pypy: |
+      yum -y install wget bzip2 git
+      echo "Downloading pypy (Python 2.7 compatible) ..."
+      wget -q https://bitbucket.org/squeaky/portable-pypy/downloads/pypy-5.9-linux_x86_64-portable.tar.bz2
+      echo "unpacking pypy (Python 2.7 compatible) to /opt ..."
+      tar -xvjf $(ls pypy*.tar.bz2) -C /opt > /dev/null
+      ln -s /opt/$(ls /opt|grep pypy) /opt/pypy
+      ln -s /opt/pypy/bin/pypy /usr/local/bin/pypy
+      ln -s /opt/pypy/bin/virtualenv-pypy /usr/local/bin/virtualenv
+      pypy -m ensurepip
+      ln -s /opt/pypy/bin/pip2 /usr/local/bin/pip
+      pip install pip --upgrade
+      pip install setuptools --upgrade
+      pip install tox
+      ln -s /opt/pypy/bin/tox /usr/local/bin/tox
+      export PATH=$PATH:/opt/pypy/bin
+      {{ env.PIPELINE_BASH_FILE }} RUN
+
+    init_pypy3: |
+      yum -y install wget bzip2 git
+      echo "Downloading pypy (Python 3.5 compatible) ..."
+      wget -q https://bitbucket.org/squeaky/portable-pypy/downloads/pypy3.5-5.9-beta-linux_x86_64-portable.tar.bz2
+      echo "Unpacking pypy (Python 3.5 compatible) to /opt ..."
+      tar -xvjf $(ls pypy3*.tar.bz2) -C /opt > /dev/null
+      ln -s /opt/$(ls /opt|grep pypy) /opt/pypy
+      ln -s /opt/pypy/bin/pypy /usr/local/bin/pypy
+      ln -s /opt/pypy/bin/virtualenv-pypy /usr/local/bin/virtualenv
+      pypy -m ensurepip
+      ln -s /opt/pypy/bin/pip3 /usr/local/bin/pip
+      pip install pip --upgrade
+      pip install setuptools --upgrade
+      pip install tox
+      ln -s /opt/pypy/bin/tox /usr/local/bin/tox
+      export PATH=$PATH:/opt/pypy/bin
+      {{ env.PIPELINE_BASH_FILE }} RUN
 
 pipeline:
   - env:

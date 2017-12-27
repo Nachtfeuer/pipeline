@@ -10,7 +10,7 @@ rm -f .coverage
 rm -f coverage.xml
 rm -rf coverage
 rm -f tests.xml
-rm -f `find . -name "*.pyc"`
+rm -f $(find . -name "*.pyc")
 rm -f ccm.xml
 rm -rf venv
 rm -rf .tox

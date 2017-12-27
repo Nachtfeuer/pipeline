@@ -18,3 +18,4 @@ pykwalify == 1.6.0
 sphinx_rtd_theme == 0.2.4
 schema == 0.6.6
 pycontracts == 1.8.0
+bandit == 1.0.1

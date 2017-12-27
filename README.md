@@ -53,3 +53,4 @@
  - https://pypi.python.org/pypi/PyHamcrest
  - http://nose.readthedocs.io/en/latest/
  - https://pypi.python.org/pypi/bandit
+ - https://www.contributor-covenant.org/

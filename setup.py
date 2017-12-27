@@ -47,7 +47,8 @@ setup(name='spline',
       scripts=['scripts/spline'],
       package_data={'spline': [
           'components/templates/docker-container.sh.j2',
-          'components/templates/docker-image.sh.j2']},
+          'components/templates/docker-image.sh.j2',
+          'components/templates/python-script.sh.j2']},
       keywords="pipeline tool ci/cd bash docker",
       url="https://github.com/Nachtfeuer/pipeline",
       classifiers=[

@@ -59,6 +59,13 @@ class Event(object):
         """Create event with optional additional information."""
         return Event(context, datetime.now(), **kwargs)
 
+    def delegate(self, success, **kwargs):
+        """Delegate success/failure to the right method."""
+        if success:
+            self.succeeded(**kwargs)
+        else:
+            self.failed(**kwargs)
+
     def failed(self, **kwargs):
         """Finish event as failed with optional additional information."""
         self.finished = datetime.now()

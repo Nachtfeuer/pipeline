@@ -95,8 +95,7 @@ class Tasks(object):
         self.logger.info("Processing group of tasks (parallel=%s)", self.parallel)
         self.pipeline.data.env_list[2] = {}
 
-        output = []
-        shells = []
+        output, shells = [], []
         result = Adapter({'success': True, 'output': []})
         for task_entry in tasks:
             key, entry = list(task_entry.items())[0]
@@ -108,8 +107,6 @@ class Tasks(object):
                     break
 
                 self.pipeline.data.env_list[2].update(entry)
-                self.logger.debug("Updating environment at level 2 with %s",
-                                  self.pipeline.data.env_list[2])
 
             elif key in ['shell', 'docker(container)', 'docker(image)', 'python']:
                 self.prepare_shell_data(shells, key, entry)
@@ -117,8 +114,7 @@ class Tasks(object):
         if result.success:
             result = Adapter(self.process_shells(shells))
             output += result.output
-            if result.success:
-                self.event.succeeded()
+            self.event.delegate(result.success)
 
         return {'success': result.success, 'output': output}
 

@@ -97,6 +97,7 @@ class Tasks(object):
 
         output = []
         shells = []
+        result = Adapter({'success': True, 'output': []})
         for task_entry in tasks:
             key, entry = list(task_entry.items())[0]
             if key == "env":
@@ -113,10 +114,11 @@ class Tasks(object):
             elif key in ['shell', 'docker(container)', 'docker(image)', 'python']:
                 self.prepare_shell_data(shells, key, entry)
 
-        result = Adapter(self.process_shells(shells))
-        output += result.output
         if result.success:
-            self.event.succeeded()
+            result = Adapter(self.process_shells(shells))
+            output += result.output
+            if result.success:
+                self.event.succeeded()
 
         return {'success': result.success, 'output': output}
 

@@ -31,6 +31,7 @@ import sys
 import platform
 import os
 import logging
+import multiprocessing
 
 import click
 import yaml
@@ -102,6 +103,7 @@ class Application(object):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
         self.logger.info("Running on platform %s", platform.platform())
+        self.logger.info("Current cpu count is %d", multiprocessing.cpu_count())
         self.logger.info("Processing pipeline definition '%s'", definition)
 
         document = self.validate_document(definition)

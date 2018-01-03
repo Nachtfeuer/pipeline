@@ -1,0 +1,9 @@
+pipeline:
+    - stage(Example):
+        - tasks(ordered):
+            - shell:
+                script: |
+                    echo -e "\e[31mRed World\e[0m"
+                    echo -e "\e[33mOrange World\e[0m"
+                    echo -e "\e[34mBlue World\e[0m"
+                    echo -e "\e[35mMagenta World\e[0m"

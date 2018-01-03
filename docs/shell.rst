@@ -108,3 +108,16 @@ Finally all generated tasks (shell or docker container) are added to the
 list of tasks to be processed and it depends on the setup of the **tasks**
 block whether those tasks are executed in **order** or in **parallel**.
 Please have a look and try the example **with.yaml** in the repository.
+
+Colors
+------
+Colors are working fine!
+
+::
+
+    - shell:
+        script: |
+            echo -e "\e[31mRed World\e[0m"
+            echo -e "\e[33mOrange World\e[0m"
+            echo -e "\e[34mBlue World\e[0m"
+            echo -e "\e[35mMagenta World\e[0m"

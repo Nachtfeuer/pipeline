@@ -82,16 +82,22 @@ class Image(Bash):
         """Creator function for creating an instance of a Docker image script."""
         # writing Dockerfile
         dockerfile = render(config.script, model=config.model, env=config.env, item=config.item)
+        filename = "dockerfile.dry.run.see.comment"
 
-        temp = tempfile.NamedTemporaryFile(
-            prefix="dockerfile-", mode='w+t', delete=False)
-        temp.writelines(dockerfile)
-        temp.close()
+        if not config.dry_run:
+            temp = tempfile.NamedTemporaryFile(
+                prefix="dockerfile-", mode='w+t', delete=False)
+            temp.writelines(dockerfile)
+            temp.close()
+            filename = temp.name
+            dockerfile = ''
 
         # rendering the Bash script for generating the Docker image
         name = entry['name'] + "-%s" % os.getpid() if entry['unique'] else entry['name']
         template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-image.sh.j2')
         template = open(template_file).read()
-        config.script = render(template, name=name, tag=entry['tag'], dockerfile=temp.name)
+        config.script = render(template, name=name, tag=entry['tag'],
+                               dockerfile_content=dockerfile,
+                               dockerfile_filename=filename)
 
         return Image(config)

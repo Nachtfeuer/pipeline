@@ -25,3 +25,4 @@ Welcome to spline's documentation!
    docker_image
    hooks
    event_logging
+   options

@@ -153,3 +153,22 @@ class TestTasks(unittest.TestCase):
         assert_that(result['success'], equal_to(True))
         assert_that(len(output), equal_to(1))
         assert_that(output[0], equal_to('test:hello'))
+
+    def test_dry_run(self):
+        """Testing dry run mode."""
+        pipeline = FakePipeline()
+        pipeline.options.dry_run = True
+        tasks = Tasks(pipeline, parallel=True)
+
+        definition = [{'shell': {'script': '''echo hello1'''}},
+                      {'shell': {'script': '''echo hello2'''}}]
+        result = tasks.process(definition)
+        output = [line for line in result['output'] if len(line.strip()) > 0]
+
+        assert_that(result['success'], equal_to(True))
+        assert_that(len(output), equal_to(4))
+        assert_that(tasks.parallel, equal_to(False))
+        assert_that(output[0], equal_to('''#!/bin/bash'''))
+        assert_that(output[1], equal_to('''echo hello1'''))
+        assert_that(output[2], equal_to('''#!/bin/bash'''))
+        assert_that(output[3], equal_to('''echo hello2'''))

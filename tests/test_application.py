@@ -5,6 +5,7 @@ import unittest
 from mock import patch
 from hamcrest import assert_that, equal_to
 from spline.application import Application
+from spline.components.config import ApplicationOptions
 
 
 class TestApplication(unittest.TestCase):
@@ -14,12 +15,12 @@ class TestApplication(unittest.TestCase):
         """Testing c'tor only."""
         tags = 'prepare,build'
         matrix_tags = "py27,py35"
-        application = Application(matrix_tags=matrix_tags,
-                                  tags=tags, logging_config='')
-        assert_that(application.tag_list, equal_to(['prepare', 'build']))
-        assert_that(application.matrix_tag_list, equal_to(['py27', 'py35']))
-        assert_that(application.validate_only, equal_to(False))
-        assert_that(application.logging_config, equal_to(''))
+        options = ApplicationOptions(definition='fake.yaml', matrix_tags=matrix_tags, tags=tags)
+        application = Application(options)
+        assert_that(application.options.tags, equal_to(['prepare', 'build']))
+        assert_that(application.options.matrix_tags, equal_to(['py27', 'py35']))
+        assert_that(application.options.validate_only, equal_to(False))
+        assert_that(application.options.logging_config, equal_to(''))
 
     def test_find_matrix(self):
         """Testing functin Application.find_matrix."""
@@ -33,7 +34,7 @@ class TestApplication(unittest.TestCase):
 
     def test_invalidate_document(self):
         """Testing invalid document."""
-        application = Application(matrix_tags='', tags='', logging_config='')
+        application = Application(ApplicationOptions(definition='data/invalid.yaml'))
         with patch('sys.exit') as mocked_exit:
             path = os.path.dirname(__file__)
             application.validate_document(os.path.join(path, "data/invalid.yaml"))
@@ -41,7 +42,7 @@ class TestApplication(unittest.TestCase):
 
     def test_validate_document(self):
         """Testing valid document."""
-        application = Application(matrix_tags='', tags='', logging_config='')
+        application = Application(ApplicationOptions(definition='data/simple.yaml'))
         application.validate_only = True
         with patch('sys.exit') as mocked_exit:
             path = os.path.dirname(__file__)
@@ -63,8 +64,7 @@ class TestApplication(unittest.TestCase):
             }]
         }
 
-        application = Application(matrix_tags='', tags='', logging_config='')
-        application.validate_only = True
+        application = Application(ApplicationOptions(definition='fake.yaml'))
         result = application.run_matrix(mdef, pdef)
 
         assert_that(result['success'], equal_to(True))

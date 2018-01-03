@@ -51,7 +51,8 @@ def worker(data):
     shell = creator(data['entry'],
                     ShellConfig(script=data['entry']['script'],
                                 title=data['entry']['title'] if 'title' in data['entry'] else '',
-                                model=data['model'], env=data['env'], item=data['item']))
+                                model=data['model'], env=data['env'], item=data['item'],
+                                dry_run=data['dry_run']))
     output = []
     for line in shell.process():
         output.append(line)
@@ -66,7 +67,7 @@ class Tasks(object):
         """Initializing with referenz to pipeline main object."""
         self.event = Event.create(__name__)
         self.pipeline = pipeline
-        self.parallel = parallel
+        self.parallel = parallel if not pipeline.options.dry_run else False
         self.logger = Logger.get_logger(__name__)
 
     def get_merged_env(self):
@@ -88,16 +89,23 @@ class Tasks(object):
                     'entry': entry,
                     'model': self.pipeline.model,
                     'env': self.get_merged_env(),
-                    'item': item})
+                    'item': item,
+                    'dry_run': self.pipeline.options.dry_run})
 
-    def process(self, tasks):
+    def get_parallel_mode(self):
+        """Logging helper for visualizing parallel state."""
+        if self.pipeline.options.dry_run:
+            return "disabled"
+        return "yes" if self.parallel else "no"
+
+    def process(self, document):
         """Processing a group of tasks."""
-        self.logger.info("Processing group of tasks (parallel=%s)", self.parallel)
+        self.logger.info("Processing group of tasks (parallel=%s)", self.get_parallel_mode())
         self.pipeline.data.env_list[2] = {}
 
         output, shells = [], []
         result = Adapter({'success': True, 'output': []})
-        for task_entry in tasks:
+        for task_entry in document:
             key, entry = list(task_entry.items())[0]
             if key == "env":
                 result = Adapter(self.process_shells(shells))
@@ -143,7 +151,8 @@ class Tasks(object):
         for shell in shells:
             entry = shell['entry']
             config = ShellConfig(script=entry['script'], title=entry['title'] if 'title' in entry else '',
-                                 model=shell['model'], env=shell['env'], item=shell['item'])
+                                 model=shell['model'], env=shell['env'], item=shell['item'],
+                                 dry_run=shell['dry_run'])
             result = Adapter(self.process_shell(get_creator_by_name(shell['creator']), entry, config))
             output += result.output
             if not result.success:
@@ -161,12 +170,12 @@ class Tasks(object):
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
-        if len(self.pipeline.data.tags) == 0:
+        if len(self.pipeline.options.tags) == 0:
             return True
 
         count = 0
         if 'tags' in entry:
-            for tag in self.pipeline.data.tags:
+            for tag in self.pipeline.options.tags:
                 if tag in entry['tags']:
                     count += 1
 
@@ -199,7 +208,9 @@ class Tasks(object):
         if self.pipeline.data.hooks and len(self.pipeline.data.hooks.cleanup) > 0:
             env.update({'PIPELINE_RESULT': 'FAILURE'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
-            config = ShellConfig(script=self.pipeline.data.hooks.cleanup, model=self.pipeline.model, env=env)
+            config = ShellConfig(script=self.pipeline.data.hooks.cleanup,
+                                 model=self.pipeline.model, env=env,
+                                 dry_run=self.pipeline.options.dry_run)
             cleanup_shell = Bash(config)
             for line in cleanup_shell.process():
                 output.append(line)

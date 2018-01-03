@@ -5,16 +5,18 @@ from hamcrest import assert_that, equal_to
 
 from spline.components.tasks import Tasks, worker
 from spline.components.hooks import Hooks
+from spline.components.config import ApplicationOptions
 from spline.pipeline import PipelineData
 
 
 class FakePipeline(object):
     """Fake pipeline class for tests."""
 
-    def __init__(self, tags=None, hooks=None):
+    def __init__(self, hooks=None):
         """Initialization of fake pipeline."""
-        self.data = PipelineData(tags, hooks)
+        self.data = PipelineData(hooks)
         self.model = {}
+        self.options = ApplicationOptions(definition='fake.yaml')
 
 
 class TestTasks(unittest.TestCase):
@@ -25,10 +27,10 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline()
         tasks = Tasks(pipeline, parallel=False)
 
-        definition = [{'shell': {'script': '''echo hello1'''}},
-                      {'shell': {'script': '''echo hello2'''}},
-                      {'python': {'script': '''print("hello3")'''}}]
-        result = tasks.process(definition)
+        document = [{'shell': {'script': '''echo hello1'''}},
+                    {'shell': {'script': '''echo hello2'''}},
+                    {'python': {'script': '''print("hello3")'''}}]
+        result = tasks.process(document)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
         assert_that(result['success'], equal_to(True))
@@ -112,13 +114,13 @@ class TestTasks(unittest.TestCase):
         definition = [{'shell': {'script': '''echo hello1''', 'tags': ['first']}},
                       {'shell': {'script': '''echo hello2''', 'tags': ['second']}}]
 
-        pipeline.data.tags = ['first']
+        pipeline.options.tags = ['first']
         result = tasks.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
         assert_that(len(output), equal_to(1))
         assert_that(output[0], equal_to('hello1'))
 
-        pipeline.data.tags = ['second']
+        pipeline.options.tags = ['second']
         result = tasks.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
         assert_that(len(output), equal_to(1))
@@ -144,7 +146,8 @@ class TestTasks(unittest.TestCase):
         """Testing worker used by class Tasks for parallel execution."""
         data = {'creator': 'shell',
                 'entry': {'script': '''echo "{{model.mode}}:{{env.message}}"'''},
-                'env': {'message': 'hello'}, 'model': {'mode': 'test'}, 'item': None}
+                'env': {'message': 'hello'}, 'model': {'mode': 'test'}, 'item': None,
+                'dry_run': False}
         result = worker(data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
         assert_that(result['success'], equal_to(True))

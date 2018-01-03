@@ -39,22 +39,22 @@ from .tools.event import Event
 class PipelineData(object):
     """Class for keeping pipeline data."""
 
-    def __init__(self, tags=None, hooks=None):
+    def __init__(self, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pid = str(os.getpid())
         self.env_list = [{'PIPELINE_PID': self.pid}, {}, {}]
-        self.tags = [] if tags is None else tags
         self.hooks = hooks
 
 
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, model=None, env=None, tags=None):
+    def __init__(self, model=None, env=None, options=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.event = Event.create(__name__)
+        self.options = options
         self.model = {} if not isinstance(model, dict) else model
-        self.data = PipelineData([] if tags is None else tags, None)
+        self.data = PipelineData()
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
 

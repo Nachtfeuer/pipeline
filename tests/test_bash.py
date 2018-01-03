@@ -1,5 +1,5 @@
 """Testing of class Bash."""
-# pylint: disable=no-self-use, invalid-name
+# pylint: disable=no-self-use, invalid-name, too-many-public-methods
 import os
 import unittest
 from mock import patch
@@ -75,6 +75,14 @@ class TestBash(unittest.TestCase):
             assert_that(output[0], equal_to('Exception: popen has failed'))
             assert_that(bash.exit_code, equal_to(1))
 
+    def test_render_error(self):
+        """Testing error in jinja2 rendering."""
+        bash = Bash(ShellConfig(script='''echo "{{ foo.bar }}"'''))
+        output = [line for line in bash.process() if len(line) > 0]
+        assert_that(len(output), equal_to(0))
+        assert_that(bash.success, equal_to(False))
+        assert_that(bash.exit_code, equal_to(0))
+
     def test_nested_templ_using_model(self):
         """Testing using model data via Jinja templating."""
         bash = Bash(ShellConfig(script='''echo "foo={{ model.template|render(model=model) }}"''',
@@ -94,3 +102,11 @@ class TestBash(unittest.TestCase):
         output = [line for line in bash.process() if line.lower().find("script") > 0]
         assert_that(len(output), equal_to(1))
         assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=/tmp/pipeline-script-.*.sh'))
+
+    def test_dry_run(self):
+        """Testing simple bash script in dry run mode."""
+        bash = Bash(ShellConfig(script='''echo "hello"''', dry_run=True))
+        output = [line for line in bash.process() if len(line) > 0]
+        assert_that(len(output), equal_to(2))
+        assert_that(output[0], equal_to('''#!/bin/bash'''))
+        assert_that(output[1], equal_to('''echo "hello"'''))

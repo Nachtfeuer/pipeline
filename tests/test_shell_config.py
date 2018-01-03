@@ -16,16 +16,18 @@ class TestShellConfig(unittest.TestCase):
         assert_that(config.model, equal_to({}))
         assert_that(config.env, equal_to({}))
         assert_that(config.item, equal_to(None))
+        assert_that(config.dry_run, equal_to(False))
 
     def test_complete_valid(self):
         """Testing to provide mandatory and all optional parameters."""
         config = ShellConfig(script='echo "hello world"', title='test', model={'foo': 123},
-                             env={'bar': "xyz"}, item='hello')
+                             env={'bar': "xyz"}, item='hello', dry_run=True)
         assert_that(config.script, equal_to('echo "hello world"'))
         assert_that(config.title, equal_to('test'))
         assert_that(config.model, equal_to({'foo': 123}))
         assert_that(config.env, equal_to({'bar': "xyz"}))
         assert_that(config.item, equal_to('hello'))
+        assert_that(config.dry_run, equal_to(True))
 
     def test_missing_mandatory(self):
         """Testing invalid parameter."""

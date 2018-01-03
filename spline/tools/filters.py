@@ -27,6 +27,8 @@
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 from jinja2 import Environment
+from jinja2.exceptions import TemplateSyntaxError, UndefinedError
+from .logger import Logger
 
 
 def render(value, **kwargs):
@@ -46,11 +48,17 @@ def render(value, **kwargs):
     autoescaping wouldn't help. Usually the pipeline runs in a isolated environment
     and there should not be any injection from outside; that's why: nosec.
     """
-    environment = Environment(autoescape=False)  # nosec
-    environment.filters['render'] = render
-    environment.filters['docker_environment'] = docker_environment
-    template = environment.from_string(value)
-    return template.render(**kwargs)
+    try:
+        environment = Environment(autoescape=False)  # nosec
+        environment.filters['render'] = render
+        environment.filters['docker_environment'] = docker_environment
+        template = environment.from_string(value)
+        return template.render(**kwargs)
+    except UndefinedError as exception:
+        Logger.get_logger(__name__).error("render(undefined): %s", exception)
+    except TemplateSyntaxError as exception:
+        Logger.get_logger(__name__).error("render(syntax error): %s", exception)
+    return None
 
 
 def docker_environment(env):

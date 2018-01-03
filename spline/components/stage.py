@@ -1,7 +1,7 @@
 """
    Stage is a named group in a pipeline.
 
-.. module:: hooks
+.. module:: stage
     :platform: Unix, Windows
     :synopsis: Stage is a named group in a pipeline.
 .. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>

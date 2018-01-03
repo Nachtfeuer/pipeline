@@ -3,6 +3,7 @@
 import unittest
 from hamcrest import assert_that, equal_to
 
+from spline.components.config import ApplicationOptions
 from spline.matrix import Matrix, MatrixProcessData, matrix_worker
 
 
@@ -18,8 +19,9 @@ class TestMatrix(unittest.TestCase):
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
+        process_data.options = ApplicationOptions(definition='fake.yaml')
 
-        matrix = Matrix(matrix_definition, matrix_tags=[], parallel=False)
+        matrix = Matrix(matrix_definition, parallel=False)
         result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -40,8 +42,9 @@ class TestMatrix(unittest.TestCase):
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
+        process_data.options = ApplicationOptions(definition='fake.yaml', matrix_tags='group-a')
 
-        matrix = Matrix(matrix_definition, matrix_tags=['group-a'], parallel=False)
+        matrix = Matrix(matrix_definition, parallel=False)
         result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -62,8 +65,9 @@ class TestMatrix(unittest.TestCase):
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
+        process_data.options = ApplicationOptions(definition='fake.yaml', matrix_tags='group-a')
 
-        matrix = Matrix(matrix_definition, matrix_tags=['group-a'], parallel=True)
+        matrix = Matrix(matrix_definition, parallel=True)
         result = matrix.process(process_data)
         output = sorted([line for line in result['output'] if line.find("hello") >= 0])
 
@@ -83,8 +87,9 @@ class TestMatrix(unittest.TestCase):
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
+        process_data.options = ApplicationOptions(definition='fake.yaml')
 
-        matrix = Matrix(matrix_definition, matrix_tags=[], parallel=False)
+        matrix = Matrix(matrix_definition, parallel=False)
         result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -102,8 +107,9 @@ class TestMatrix(unittest.TestCase):
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
+        process_data.options = ApplicationOptions(definition='fake.yaml')
 
-        matrix = Matrix(matrix_definition, matrix_tags=[], parallel=True)
+        matrix = Matrix(matrix_definition, parallel=True)
         result = matrix.process(process_data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -119,7 +125,7 @@ class TestMatrix(unittest.TestCase):
             'matrix': {'name': 'one', 'env': {'message': 'hello1'}},
             'pipeline': pipeline_definition,
             'model': {},
-            'tags': [],
+            'options': ApplicationOptions(definition='fake.yaml'),
             'hooks': None
         })
 

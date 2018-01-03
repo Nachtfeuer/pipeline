@@ -27,7 +27,7 @@
    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import logging
-from schema import Schema, SchemaError, And, Optional
+from schema import Schema, SchemaError, And, Or, Optional
 from ..tools.adapter import Adapter
 
 
@@ -39,7 +39,8 @@ class ShellConfig(object):
         Optional('title', default=''): str,
         Optional('model', default={}): {Optional(And(str, len)): object},
         Optional('env', default={}): {Optional(And(str, len)): And(str, len)},
-        Optional('item', default=None): object
+        Optional('item', default=None): object,
+        Optional('dry_run', default=False): bool
     }
 
     def __init__(self, **kwargs):
@@ -51,6 +52,36 @@ class ShellConfig(object):
             self.model = arguments.model.data
             self.env = arguments.env.data
             self.item = arguments.item
+            self.dry_run = arguments.dry_run
+        except SchemaError as exception:
+            logging.getLogger(__name__).error(exception)
+            raise RuntimeError(str(exception))
+
+
+class ApplicationOptions(object):
+    """Application wide configuation (usually via command line options)."""
+
+    SCHEMA = {
+        'definition': And(str, len),
+        Optional('matrix_tags', default=''): Or(type(''), type(u'')),
+        Optional('tags', default=''): Or(type(''), type(u'')),
+        Optional('validate_only', default=False): bool,
+        Optional('dry_run', default=False): bool,
+        Optional('event_logging', default=False): bool,
+        Optional('logging_config', default=''): Or(type(''), type(u''))
+    }
+
+    def __init__(self, **kwargs):
+        """Initializing and validating fields."""
+        try:
+            arguments = Adapter(Schema(ApplicationOptions.SCHEMA).validate(kwargs))
+            self.definition = arguments.definition
+            self.matrix_tags = [entry for entry in arguments.matrix_tags.split(',') if len(entry) > 0]
+            self.tags = [entry for entry in arguments.tags.split(',') if len(entry) > 0]
+            self.validate_only = arguments.validate_only
+            self.dry_run = arguments.dry_run
+            self.event_logging = arguments.event_logging
+            self.logging_config = arguments.logging_config
         except SchemaError as exception:
             logging.getLogger(__name__).error(exception)
             raise RuntimeError(str(exception))

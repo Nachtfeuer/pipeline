@@ -19,3 +19,10 @@ class TestFilters(unittest.TestCase):
         model = {"message": "hello world!", "template": "{{ model.message }}"}
         given = render("{{ model.template|render(model=model) }}", model=model)
         assert_that(given, equal_to('hello world!'))
+
+    def test_render_failed(self):
+        """Testing failure in rendering."""
+        # undefined variable 'env' (UndefinedError exception)
+        assert_that(render('{{ env.missing }}'), equal_to(None))
+        # syntax error (TemplateSyntaxError exception)
+        assert_that(render('{% for %}'), equal_to(None))

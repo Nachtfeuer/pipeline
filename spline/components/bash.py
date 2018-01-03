@@ -50,9 +50,10 @@ class Bash(object):
         """Initialize with Bash code and optional environment variables."""
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
-        self.success = False
+        self.success = True
         self.script = config.script
         self.model = config.model
+        self.dry_run = config.dry_run
         self.env = os.environ.copy()
         self.env.update(config.env)
         self.item = config.item
@@ -82,6 +83,11 @@ class Bash(object):
 
         self.update_script_filename(temp.name)
         rendered_script = render(script, model=self.model, env=self.env, item=self.item)
+        if rendered_script is None:
+            self.success = False
+            temp.close()
+            os.remove(temp.name)
+            return None
 
         if os.path.isfile(rendered_script):
             content = str(open(rendered_script).read())
@@ -93,15 +99,14 @@ class Bash(object):
         os.chmod(temp.name, 777)  # nosec
         return temp.name
 
-    def process(self):
+    def process_script(self, filename):
         """Running the Bash code."""
         try:
-            temp_filename = self.create_file_for(self.script)
-            self.logger.info("Running script %s", temp_filename)
+            process = subprocess.Popen(
+                shlex.split("bash %s" % filename),
+                stdout=self.stdout, stderr=self.stderr,
+                shell=self.shell, env=self.env)  # nosec
 
-            process = subprocess.Popen(shlex.split("bash %s" % temp_filename),
-                                       stdout=self.stdout, stderr=self.stderr,
-                                       shell=self.shell, env=self.env)  # nosec
             for line in iter(process.stdout.readline, ' '):
                 if not line:
                     break
@@ -116,11 +121,24 @@ class Bash(object):
         except OSError as exception:
             self.exit_code = 1
             yield str(exception)
-        finally:
+
+    def process(self):
+        """Running the Bash code."""
+        temp_filename = self.create_file_for(self.script)
+        if temp_filename is not None:
+            if self.dry_run:
+                self.logger.info("Dry run mode for script %s", temp_filename)
+                for line in open(temp_filename):
+                    yield line[0:-1] if line[-1] == '\n' else line
+            else:
+                self.logger.info("Running script %s", temp_filename)
+                for line in self.process_script(temp_filename):
+                    yield line
+
             # removing script
             os.remove(temp_filename)
 
-            if self.exit_code == 0:
-                self.event.succeeded()
-            else:
-                self.event.failed(exit_code=self.exit_code)
+        if self.exit_code == 0:
+            self.event.succeeded()
+        else:
+            self.event.failed(exit_code=self.exit_code)

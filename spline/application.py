@@ -38,32 +38,35 @@ import yaml
 from .matrix import Matrix, MatrixProcessData
 from .pipeline import Pipeline
 from .components.hooks import Hooks
+from .components.config import ApplicationOptions
 from .tools.logger import Logger
 from .tools.event import Event
-from .tools.adapter import Adapter
 from .validation import Validator
 
 
 class Application(object):
     """Pipeline application."""
 
-    def __init__(self, matrix_tags, tags, logging_config):
-        """Initialize application with definition and tags."""
+    def __init__(self, options):
+        """Initialize application with command line options."""
         self.event = Event.create(__name__)
-        self.matrix_tag_list = [] if len(matrix_tags) == 0 else matrix_tags.split(",")
-        self.tag_list = [] if len(tags) == 0 else tags.split(",")
-        self.validate_only = False
+        self.options = options
         self.logging_level = logging.DEBUG
-        self.logging_config = logging_config
         self.setup_logging()
         self.logger = Logger.get_logger(__name__)
 
     def setup_logging(self):
         """Setup of application logging."""
-        if len(self.logging_config) > 0 and os.path.isfile(self.logging_config):
-            Logger.configure_by_file(self.logging_config)
+        is_custom_logging = len(self.options.logging_config) > 0
+        is_custom_logging = is_custom_logging and os.path.isfile(self.options.logging_config)
+        is_custom_logging = is_custom_logging and not self.options.dry_run
+
+        if is_custom_logging:
+            Logger.configure_by_file(self.options.logging_config)
         else:
             logging_format = "%(asctime)-15s - %(name)s - %(message)s"
+            if self.options.dry_run:
+                logging_format = "%(name)s - %(message)s"
             Logger.configure_default(logging_format, self.logging_level)
 
     def validate_document(self, definition):
@@ -85,12 +88,12 @@ class Application(object):
 
     def run_matrix(self, matrix_definition, document):
         """Running pipeline via a matrix."""
-        matrix = Matrix(matrix_definition, self.matrix_tag_list, 'matrix(parallel)' in document)
+        matrix = Matrix(matrix_definition, 'matrix(parallel)' in document)
 
         process_data = MatrixProcessData()
+        process_data.options = self.options
         process_data.pipeline = document['pipeline']
         process_data.model = {} if 'model' not in document else document['model']
-        process_data.task_filter = self.tag_list
         process_data.hooks = Hooks(document)
 
         return matrix.process(process_data)
@@ -102,14 +105,14 @@ class Application(object):
         self.logger.info("Processing pipeline definition '%s'", definition)
 
         document = self.validate_document(definition)
-        if self.validate_only:
+        if self.options.validate_only:
             self.logger.info("Stopping after validation as requested!")
             return
 
         matrix = Application.find_matrix(document)
         if matrix is None:
             model = {} if 'model' not in document else document['model']
-            pipeline = Pipeline(model=model, tags=self.tag_list)
+            pipeline = Pipeline(model=model, options=self.options)
             pipeline.hooks = Hooks(document)
             result = pipeline.process(document['pipeline'])
             if not result['success']:
@@ -126,23 +129,22 @@ class Application(object):
 @click.option('--definition', type=click.Path(exists=True, file_okay=True, dir_okay=False),
               required=True, help="Pipeline definition in yaml format")
 @click.option('--tags', type=click.STRING, default='',
-              help="Comma separated list of tags for filtering individual tasks (shells)")
+              help="Comma separated list of tags for filtering individual tasks")
 @click.option('--matrix-tags', type=click.STRING, default='',
               help="Comma separated list of tags for filtering individual matrix runs")
-@click.option('--tags', type=click.STRING, default='',
-              help="Comma separated list of tags")
 @click.option('--validate-only', is_flag=True, default=False,
               help="When used validates given pipeline definition only")
 @click.option('--logging-config', default="", type=click.STRING,
               help="Path and filename of logging configuration")
 @click.option('--event-logging', is_flag=True, default=False,
               help="When enabled then it does log event details")
+@click.option('--dry-run', is_flag=True, default=False,
+              help="When enabled then no Bash script is executed but shown")
 def main(**kwargs):
     """The Pipeline tool."""
-    options = Adapter(kwargs)
+    options = ApplicationOptions(**kwargs)
     Event.configure(is_logging_enabled=options.event_logging)
-    application = Application(options.matrix_tags, options.tags, options.logging_config)
-    application.validate_only = options.validate_only
+    application = Application(options)
     application.run(options.definition)
 
 

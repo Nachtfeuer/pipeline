@@ -6,15 +6,17 @@ from hamcrest import assert_that, equal_to
 from spline.pipeline import PipelineData
 from spline.components.stage import Stage
 from spline.components.hooks import Hooks
+from spline.components.config import ApplicationOptions
 
 
 class FakePipeline(object):
     """Fake pipeline class for tests."""
 
-    def __init__(self, tags=None, hooks=None):
+    def __init__(self, hooks=None):
         """Initialization of fake pipeline."""
-        self.data = PipelineData(tags, hooks)
+        self.data = PipelineData(hooks)
         self.model = {}
+        self.options = ApplicationOptions(definition='fake.yaml')
 
 
 class TestStage(unittest.TestCase):

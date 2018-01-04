@@ -1,30 +1,24 @@
 """
-   Represent the main entry point for the pipeline tool.
+Represent the main entry point for the pipeline tool.
 
-.. module:: application
-    :platform: Unix
-    :synopsis: Represent the main entry point for the pipeline tool.
-.. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
+License::
 
-   =======
-   License
-   =======
-   Copyright (c) 2017 Thomas Lehmann
+    Copyright (c) 2017 Thomas Lehmann
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this
-   software and associated documentation files (the "Software"), to deal in the Software
-   without restriction, including without limitation the rights to use, copy, modify, merge,
-   publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-   to whom the Software is furnished to do so, subject to the following conditions:
-   The above copyright notice and this permission notice shall be included in all copies
-   or substantial portions of the Software.
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-   DAMAGES OR OTHER LIABILITY,
-   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+    software and associated documentation files (the "Software"), to deal in the Software
+    without restriction, including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+    to whom the Software is furnished to do so, subject to the following conditions:
+    The above copyright notice and this permission notice shall be included in all copies
+    or substantial portions of the Software.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 # pylint: too-many-instance-attributes
 import sys
@@ -49,7 +43,12 @@ class Application(object):
     """Pipeline application."""
 
     def __init__(self, options):
-        """Initialize application with command line options."""
+        """
+        Initialize application with command line options.
+
+        @type options: ApplicationOptions
+        @param options: given command line options.
+        """
         self.event = Event.create(__name__)
         self.options = options
         self.logging_level = logging.DEBUG
@@ -71,7 +70,20 @@ class Application(object):
             Logger.configure_default(logging_format, self.logging_level)
 
     def validate_document(self, definition):
-        """Validate given pipeline document."""
+        """
+        Validate given pipeline document.
+
+        The method is trying to load, parse and validate the spline document.
+        The validator verifies the Python structure B{not} the file format.
+
+        @type definition: str
+        @param definition: path and filename of a yaml file containing a valid spline definition.
+        @rtype: dict
+        @return: loaded and validated spline document.
+
+        @attention: if validation fails the application does exit!
+        @see: spline.validation.Validator
+        """
         document = Validator().validate(yaml.safe_load(open(definition).read()))
         if document is None:
             self.logger.info("Schema validation for '%s' has failed", definition)
@@ -81,14 +93,33 @@ class Application(object):
 
     @staticmethod
     def find_matrix(document):
-        """Find matrix in document."""
+        """
+        Find X{matrix} in document.
+
+        The spline syntax allows following definitions:
+         - I{'matrix'} - ordered execution of each pipeline (short form)
+         - I{'matrix(ordered)'} - ordered execution of each pipeline (more readable form)
+         - I{'matrix(parallel)'} - parallel execution of each pipeline
+
+        @type document: dict
+        @param document: validated spline document loaded from a yaml file.
+        @rtype: list
+        @return: matrix as a part of the spline document or an empty list if not given.
+        """
         return document['matrix'] if 'matrix' in document \
             else document['matrix(ordered)'] if 'matrix(ordered)' in document \
             else document['matrix(parallel)'] if 'matrix(parallel)' in document \
-            else None
+            else []
 
     def run_matrix(self, matrix_definition, document):
-        """Running pipeline via a matrix."""
+        """
+        Running pipeline via a matrix.
+
+        @type matrix_definition: dict
+        @param matrix_definition: one concrete matrix item.
+        @type document: dict
+        @param document: spline document (complete) as loaded from yaml file.
+        """
         matrix = Matrix(matrix_definition, 'matrix(parallel)' in document)
 
         process_data = MatrixProcessData()
@@ -112,7 +143,7 @@ class Application(object):
             return
 
         matrix = Application.find_matrix(document)
-        if matrix is None:
+        if len(matrix) == 0:
             model = {} if 'model' not in document else document['model']
             pipeline = Pipeline(model=model, options=self.options)
             pipeline.hooks = Hooks(document)

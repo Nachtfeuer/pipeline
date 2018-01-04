@@ -24,7 +24,7 @@ class TestApplication(unittest.TestCase):
 
     def test_find_matrix(self):
         """Testing functin Application.find_matrix."""
-        assert_that(Application.find_matrix({}), equal_to(None))
+        assert_that(Application.find_matrix({}), equal_to([]))
         document = {'matrix': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
         assert_that(Application.find_matrix(document), equal_to(document['matrix']))
         document = {'matrix(ordered)': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}

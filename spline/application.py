@@ -173,6 +173,8 @@ class Application(object):
               help="When enabled then it does log event details")
 @click.option('--dry-run', is_flag=True, default=False,
               help="When enabled then no Bash script is executed but shown")
+@click.option('--debug', is_flag=True, default=False,
+              help="When enabled then using 'set -x' for debugging Bash scripts")
 def main(**kwargs):
     """The Pipeline tool."""
     options = ApplicationOptions(**kwargs)

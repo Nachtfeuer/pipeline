@@ -19,3 +19,4 @@ schema == 0.6.6
 pycontracts == 1.8.0
 bandit == 1.0.1
 epydoc
+ddt == 1.1.1

@@ -2,9 +2,11 @@
 # pylint: disable=no-self-use, invalid-name, redundant-unittest-assert
 import unittest
 from hamcrest import assert_that, equal_to, contains_string
+from ddt import ddt, data
 from spline.components.config import ShellConfig
 
 
+@ddt
 class TestShellConfig(unittest.TestCase):
     """Testing of class ShellConfig."""
 
@@ -17,17 +19,21 @@ class TestShellConfig(unittest.TestCase):
         assert_that(config.env, equal_to({}))
         assert_that(config.item, equal_to(None))
         assert_that(config.dry_run, equal_to(False))
+        assert_that(config.debug, equal_to(False))
 
-    def test_complete_valid(self):
+    @data({'dry_run': True}, {'debug': True}, {'dry_run': True}, {'item': 'hello'},
+          {'env': {'message': 'hello'}}, {'model': {'foo': 123}}, {'title': 'test'})
+    def test_individual_valid(self, kwargs):
         """Testing to provide mandatory and all optional parameters."""
-        config = ShellConfig(script='echo "hello world"', title='test', model={'foo': 123},
-                             env={'bar': "xyz"}, item='hello', dry_run=True)
-        assert_that(config.script, equal_to('echo "hello world"'))
-        assert_that(config.title, equal_to('test'))
-        assert_that(config.model, equal_to({'foo': 123}))
-        assert_that(config.env, equal_to({'bar': "xyz"}))
-        assert_that(config.item, equal_to('hello'))
-        assert_that(config.dry_run, equal_to(True))
+        # defaults
+        final_kwargs = {'script': 'echo "hello world"', 'title': '', 'debug': False,
+                        'dry_run': False, 'item': None, 'env': {}, 'model': {}}
+        final_kwargs.update(kwargs)
+
+        config = ShellConfig(**final_kwargs)
+        for key, value in final_kwargs.items():
+            assert_that(key in config.__dict__, equal_to(True))
+            assert_that(config.__dict__[key], equal_to(value))
 
     def test_missing_mandatory(self):
         """Testing invalid parameter."""

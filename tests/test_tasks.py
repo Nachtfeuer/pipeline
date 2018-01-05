@@ -147,7 +147,7 @@ class TestTasks(unittest.TestCase):
         data = {'creator': 'shell',
                 'entry': {'script': '''echo "{{model.mode}}:{{env.message}}"'''},
                 'env': {'message': 'hello'}, 'model': {'mode': 'test'}, 'item': None,
-                'dry_run': False}
+                'dry_run': False, 'debug': False}
         result = worker(data)
         output = [line for line in result['output'] if line.find("hello") >= 0]
         assert_that(result['success'], equal_to(True))

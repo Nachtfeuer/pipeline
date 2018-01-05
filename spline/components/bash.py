@@ -45,13 +45,10 @@ class Bash(object):
         """
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
+        self.config = config
         self.success = True
-        self.script = config.script
-        self.model = config.model
-        self.dry_run = config.dry_run
         self.env = os.environ.copy()
         self.env.update(config.env)
-        self.item = config.item
 
         if len(config.title) > 0:
             self.logger.info(config.title)
@@ -94,7 +91,7 @@ class Bash(object):
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
 
         self.update_script_filename(temp.name)
-        rendered_script = render(script, model=self.model, env=self.env, item=self.item)
+        rendered_script = render(script, model=self.config.model, env=self.env, item=self.config.item)
         if rendered_script is None:
             self.success = False
             temp.close()
@@ -107,7 +104,7 @@ class Bash(object):
             content = str(open(rendered_script).read())
             temp.writelines(content)
         else:
-            temp.write(u'#!/bin/bash\n')
+            temp.write(u"#!/bin/bash\n%s" % ("set -x\n" if self.config.debug else ''))
             temp.write(to_file_map[sys.version_info.major](rendered_script))
         temp.close()
         # make Bash script executable
@@ -139,9 +136,9 @@ class Bash(object):
 
     def process(self):
         """Running the Bash code."""
-        temp_filename = self.create_file_for(self.script)
+        temp_filename = self.create_file_for(self.config.script)
         if temp_filename is not None:
-            if self.dry_run:
+            if self.config.dry_run:
                 self.logger.info("Dry run mode for script %s", temp_filename)
                 for line in open(temp_filename):
                     yield line[0:-1] if line[-1] == '\n' else line

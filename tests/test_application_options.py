@@ -18,6 +18,7 @@ class TestApplicationOptions(unittest.TestCase):
         assert_that(options.event_logging, equal_to(False))
         assert_that(options.validate_only, equal_to(False))
         assert_that(options.dry_run, equal_to(False))
+        assert_that(options.debug, equal_to(False))
 
     def test_missing_mandatory(self):
         """Testing missing mandatory parameter."""

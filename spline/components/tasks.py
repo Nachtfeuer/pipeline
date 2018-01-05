@@ -46,7 +46,7 @@ def worker(data):
                     ShellConfig(script=data['entry']['script'],
                                 title=data['entry']['title'] if 'title' in data['entry'] else '',
                                 model=data['model'], env=data['env'], item=data['item'],
-                                dry_run=data['dry_run']))
+                                dry_run=data['dry_run'], debug=data['debug']))
     output = []
     for line in shell.process():
         output.append(line)
@@ -84,7 +84,8 @@ class Tasks(object):
                     'model': self.pipeline.model,
                     'env': self.get_merged_env(),
                     'item': item,
-                    'dry_run': self.pipeline.options.dry_run})
+                    'dry_run': self.pipeline.options.dry_run,
+                    'debug': self.pipeline.options.debug})
 
     def get_parallel_mode(self):
         """Logging helper for visualizing parallel state."""
@@ -146,7 +147,7 @@ class Tasks(object):
             entry = shell['entry']
             config = ShellConfig(script=entry['script'], title=entry['title'] if 'title' in entry else '',
                                  model=shell['model'], env=shell['env'], item=shell['item'],
-                                 dry_run=shell['dry_run'])
+                                 dry_run=shell['dry_run'], debug=shell['debug'])
             result = Adapter(self.process_shell(get_creator_by_name(shell['creator']), entry, config))
             output += result.output
             if not result.success:
@@ -204,7 +205,8 @@ class Tasks(object):
             env.update({'PIPELINE_SHELL_EXIT_CODE': str(exit_code)})
             config = ShellConfig(script=self.pipeline.data.hooks.cleanup,
                                  model=self.pipeline.model, env=env,
-                                 dry_run=self.pipeline.options.dry_run)
+                                 dry_run=self.pipeline.options.dry_run,
+                                 debug=self.pipeline.options.debug)
             cleanup_shell = Bash(config)
             for line in cleanup_shell.process():
                 output.append(line)

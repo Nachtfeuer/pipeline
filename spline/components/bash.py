@@ -21,6 +21,7 @@ License::
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 # pylint: disable=too-many-instance-attributes
+import sys
 import os
 import shlex
 import subprocess  # nosec
@@ -100,11 +101,14 @@ class Bash(object):
             os.remove(temp.name)
             return None
 
-        if os.path.isfile(rendered_script):
+        to_file_map = {2: lambda s: s.encode('utf-8'), 3: lambda s: s}
+
+        if all(ord(ch) < 128 for ch in rendered_script) and os.path.isfile(rendered_script):
             content = str(open(rendered_script).read())
             temp.writelines(content)
         else:
-            temp.writelines("#!/bin/bash\n" + rendered_script)
+            temp.write(u'#!/bin/bash\n')
+            temp.write(to_file_map[sys.version_info.major](rendered_script))
         temp.close()
         # make Bash script executable
         os.chmod(temp.name, 777)  # nosec
@@ -121,7 +125,7 @@ class Bash(object):
             for line in iter(process.stdout.readline, ' '):
                 if not line:
                     break
-                yield line.decode('ascii')[0:-1]
+                yield line[0:-1].decode('utf-8')
             process.wait()
             self.exit_code = process.returncode
             self.success = (process.returncode == 0)

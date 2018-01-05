@@ -29,7 +29,7 @@ class ShellConfig(object):
     """Config data for Bash based objects."""
 
     SCHEMA = {
-        'script': And(str, len),
+        'script': And(Or(type(' '), type(u' ')), len),
         Optional('title', default=''): str,
         Optional('model', default={}): {Optional(And(str, len)): object},
         Optional('env', default={}): {Optional(And(str, len)): And(str, len)},

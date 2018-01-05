@@ -65,7 +65,7 @@ class Validator(object):
                     })},
                     # optional shell task
                     {Optional('shell'): {
-                        'script': And(str, len),
+                        'script': And(Or(type(' '), type(u' ')), len),
                         Optional('title'): And(str, len),
                         Optional('tags'): And([And(str, len)], len),
                         Optional('with'): And(len, [object])

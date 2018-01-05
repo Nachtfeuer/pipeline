@@ -26,3 +26,4 @@ Welcome to spline's documentation!
    hooks
    event_logging
    options
+   unicode

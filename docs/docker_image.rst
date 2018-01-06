@@ -66,4 +66,7 @@ However Jinja2 templating is supported:
           unique: no
           script: "{{ model.templates.dockerfiles.py36 }}"
 
+**Please note**: you also can use jinja templaring in the tag.
+
+
 The compete example - as already mentioned - in the examples folder.

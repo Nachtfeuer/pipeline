@@ -5,6 +5,7 @@ from hamcrest import assert_that, equal_to
 
 from spline.pipeline import Pipeline
 from spline.components.hooks import Hooks
+from spline.components.config import ApplicationOptions
 
 
 class TestPipeline(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestPipeline(unittest.TestCase):
                       {'shell': {'script': '''echo tasks1:hello2'''}}]}]}]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
-        pipeline = Pipeline()
+        pipeline = Pipeline(options=ApplicationOptions(definition='fake.yaml'))
         pipeline.hooks = hooks
         result = pipeline.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
@@ -37,7 +38,7 @@ class TestPipeline(unittest.TestCase):
         ]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
-        pipeline = Pipeline()
+        pipeline = Pipeline(options=ApplicationOptions(definition='fake.yaml'))
         pipeline.hooks = hooks
         result = pipeline.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
@@ -56,7 +57,7 @@ class TestPipeline(unittest.TestCase):
                       {'shell': {'script': '''echo tasks1:hello3'''}}]}]}]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
-        pipeline = Pipeline()
+        pipeline = Pipeline(options=ApplicationOptions(definition='fake.yaml'))
         pipeline.hooks = hooks
         result = pipeline.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]

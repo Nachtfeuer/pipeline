@@ -1,30 +1,24 @@
 """
-   Matrix handles multiple pipelines (ordered or in parallel).
+Matrix handles multiple pipelines (ordered or in parallel).
 
-.. module:: tasks
-    :platform: Unix
-    :synopsis: Matrix handles multiple pipelines (ordered or in parallel).
-.. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
+License::
 
-   =======
-   License
-   =======
-   Copyright (c) 2017 Thomas Lehmann
+    Copyright (c) 2017 Thomas Lehmann
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this
-   software and associated documentation files (the "Software"), to deal in the Software
-   without restriction, including without limitation the rights to use, copy, modify, merge,
-   publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-   to whom the Software is furnished to do so, subject to the following conditions:
-   The above copyright notice and this permission notice shall be included in all copies
-   or substantial portions of the Software.
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-   DAMAGES OR OTHER LIABILITY,
-   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+    software and associated documentation files (the "Software"), to deal in the Software
+    without restriction, including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+    to whom the Software is furnished to do so, subject to the following conditions:
+    The above copyright notice and this permission notice shall be included in all copies
+    or substantial portions of the Software.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 # pylint: disable=no-member
 import multiprocessing
@@ -40,8 +34,7 @@ def matrix_worker(data):
     matrix = data['matrix']
     Logger.get_logger(__name__ + '.worker').info(
         "Processing pipeline for matrix entry '%s'", matrix['name'])
-    pipeline = Pipeline(model=data['model'], env=matrix['env'],
-                        tags=data['tags'])
+    pipeline = Pipeline(model=data['model'], env=matrix['env'], options=data['options'])
     pipeline.hooks = data['hooks']
     return pipeline.process(data['pipeline'])
 
@@ -53,7 +46,7 @@ class MatrixProcessData(object):
         """Initializing defaults."""
         self.__pipeline = {}
         self.__model = {}
-        self.__task_filter = []
+        self.__options = None
         self.__hooks = None
 
     @property
@@ -77,14 +70,14 @@ class MatrixProcessData(object):
         self.__model = value
 
     @property
-    def task_filter(self):
-        """Get task filter (tags)."""
-        return self.__task_filter
+    def options(self):
+        """Get application options."""
+        return self.__options
 
-    @task_filter.setter
-    def task_filter(self, value):
-        """Set task filter."""
-        self.__task_filter = value
+    @options.setter
+    def options(self, value):
+        """Set application options."""
+        self.__options = value
 
     @property
     def hooks(self):
@@ -100,22 +93,22 @@ class MatrixProcessData(object):
 class Matrix(object):
     """Matrix handles multiple pipelines (ordered or in parallel)."""
 
-    def __init__(self, matrix, matrix_tags, parallel=False):
+    def __init__(self, matrix, parallel=False):
         """Initialize pipeline with matrix data, a model and the pipeline."""
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.matrix = matrix
-        self.matrix_tags = matrix_tags
         self.parallel = parallel
 
-    def can_process_matrix(self, entry):
+    @staticmethod
+    def can_process_matrix(entry, matrix_tags):
         """:return: True when matrix entry can be processed."""
-        if len(self.matrix_tags) == 0:
+        if len(matrix_tags) == 0:
             return True
 
         count = 0
         if 'tags' in entry:
-            for tag in self.matrix_tags:
+            for tag in matrix_tags:
                 if tag in entry['tags']:
                     count += 1
 
@@ -125,10 +118,10 @@ class Matrix(object):
         """Running pipelines one after the other."""
         output = []
         for entry in self.matrix:
-            if self.can_process_matrix(entry):
+            if Matrix.can_process_matrix(entry, process_data.options.matrix_tags):
                 self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
                 pipeline = Pipeline(model=process_data.model, env=entry['env'],
-                                    tags=process_data.task_filter)
+                                    options=process_data.options)
                 pipeline.hooks = process_data.hooks
                 result = pipeline.process(process_data.pipeline)
                 output += result['output']
@@ -139,9 +132,9 @@ class Matrix(object):
     def run_matrix_in_parallel(self, process_data):
         """Running pipelines in parallel."""
         worker_data = [{'matrix': entry, 'pipeline': process_data.pipeline,
-                        'model': process_data.model, 'tags': process_data.task_filter,
+                        'model': process_data.model, 'options': process_data.options,
                         'hooks': process_data.hooks} for entry in self.matrix
-                       if self.can_process_matrix(entry)]
+                       if Matrix.can_process_matrix(entry, process_data.options.matrix_tags)]
         output = []
         success = True
         with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
@@ -153,6 +146,6 @@ class Matrix(object):
 
     def process(self, process_data):
         """Process the pipeline per matrix item."""
-        if self.parallel:
+        if self.parallel and not process_data.options.dry_run:
             return self.run_matrix_in_parallel(process_data)
         return self.run_matrix_ordered(process_data)

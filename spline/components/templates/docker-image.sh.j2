@@ -1,7 +1,15 @@
+{% if dockerfile_content|length -%}
+# Dockerfile:
+# >>
+{% for line in dockerfile_content.split('\n') -%}
+# {{ line }}
+{% endfor -%}
+# <<
+{% endif -%}
 # for visibility in logging
-echo "docker build -t {{ name }}:{{ tag }} < {{ dockerfile }}"
+echo "docker build -t {{ name }}:{{ tag }} < {{ dockerfile_filename }}"
 # trying to build docker image
-docker build -t {{ name }}:{{ tag }} - < {{ dockerfile }}
+docker build -t {{ name }}:{{ tag }} - < {{ dockerfile_filename }}
 docker_error=$?
 # cleanup
 rm -f {{ dockerfile }}

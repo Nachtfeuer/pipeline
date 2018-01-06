@@ -1,30 +1,24 @@
 """
-   Pipeline is list of stages.
+Pipeline is list of stages.
 
-.. module:: pipeline
-    :platform: Unix
-    :synopsis: Pipeline is list of stages.
-.. moduleauthor:: Thomas Lehmann <thomas.lehmann.private@gmail.com>
+License::
 
-   =======
-   License
-   =======
-   Copyright (c) 2017 Thomas Lehmann
+    Copyright (c) 2017 Thomas Lehmann
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy of this
-   software and associated documentation files (the "Software"), to deal in the Software
-   without restriction, including without limitation the rights to use, copy, modify, merge,
-   publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-   to whom the Software is furnished to do so, subject to the following conditions:
-   The above copyright notice and this permission notice shall be included in all copies
-   or substantial portions of the Software.
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-   INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-   IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-   DAMAGES OR OTHER LIABILITY,
-   WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+    Permission is hereby granted, free of charge, to any person obtaining a copy of this
+    software and associated documentation files (the "Software"), to deal in the Software
+    without restriction, including without limitation the rights to use, copy, modify, merge,
+    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+    to whom the Software is furnished to do so, subject to the following conditions:
+    The above copyright notice and this permission notice shall be included in all copies
+    or substantial portions of the Software.
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+    DAMAGES OR OTHER LIABILITY,
+    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import os
 import re
@@ -39,22 +33,22 @@ from .tools.event import Event
 class PipelineData(object):
     """Class for keeping pipeline data."""
 
-    def __init__(self, tags=None, hooks=None):
+    def __init__(self, hooks=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.pid = str(os.getpid())
         self.env_list = [{'PIPELINE_PID': self.pid}, {}, {}]
-        self.tags = [] if tags is None else tags
         self.hooks = hooks
 
 
 class Pipeline(object):
     """Class for processing a pipeline definition."""
 
-    def __init__(self, model=None, env=None, tags=None):
+    def __init__(self, model=None, env=None, options=None):
         """Initializing pipeline with definition (loaded from a yaml file)."""
         self.event = Event.create(__name__)
+        self.options = options
         self.model = {} if not isinstance(model, dict) else model
-        self.data = PipelineData([] if tags is None else tags, None)
+        self.data = PipelineData()
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
 
@@ -74,7 +68,8 @@ class Pipeline(object):
             env = self.data.env_list[0].copy()
             env.update({'PIPELINE_RESULT': 'SUCCESS'})
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
-            config = ShellConfig(script=self.data.hooks.cleanup, model=self.model, env=env)
+            config = ShellConfig(script=self.data.hooks.cleanup, model=self.model,
+                                 env=env, dry_run=self.options.dry_run)
             cleanup_shell = Bash(config)
             for line in cleanup_shell.process():
                 yield line

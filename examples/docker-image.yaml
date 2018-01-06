@@ -1,3 +1,11 @@
+matrix:
+  - name: Python 3.6
+    env: {PYTHON_VERSION: py36, TAG: "3.6"}
+    tags: ['py36']
+  - name: Python 3.7
+    env: {PYTHON_VERSION: py37, TAG: "3.7"}
+    tags: ['py37']
+
 model:
   templates:
     dockerfiles:
@@ -8,11 +16,22 @@ model:
         RUN yum -y install python36u python36u-pip
         RUN pip3.6 install tox
 
+      py37: |
+        FROM centos:7
+        RUN yum -y install wget gcc make openssl-devel libffi-devel git
+        RUN wget -q https://www.python.org/ftp/python/3.7.0/Python-3.7.0a2.tar.xz
+        RUN tar -xf $(ls Python*.tar.xz)
+        RUN cd Python*;./configure;make && make altinstall
+        RUN ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
+        RUN pip install pip --upgrade
+        RUN pip install setuptools --upgrade
+        RUN pip install tox
+
 pipeline:
   - stage(Example):
     - tasks:
       - docker(image):
           name: python
-          tag: "3.6"
+          tag: "{{ env.TAG }}"
           unique: no
-          script: "{{ model.templates.dockerfiles.py36 }}"
+          script: "{{ model.templates.dockerfiles[env.PYTHON_VERSION] }}"

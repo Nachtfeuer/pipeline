@@ -14,6 +14,9 @@ matrix:
   - name: Python 3.6
     env: {PYTHON_VERSION: py36}
     tags: ['py36']
+  - name: Python 3.7
+    env: {PYTHON_VERSION: py37}
+    tags: ['py37']
   - name: PyPy (Python 2.7.x compatible)
     env: {PYTHON_VERSION: pypy}
     tags: ['pypy']
@@ -80,6 +83,19 @@ model:
       pip3.6 install tox
       {{ env.PIPELINE_BASH_FILE }} RUN
 
+    init_py37: |
+      yum -y install wget gcc make openssl-devel libffi-devel git
+      wget -q https://www.python.org/ftp/python/3.7.0/Python-3.7.0a2.tar.xz
+      tar -xf $(ls Python*.tar.xz)
+      cd Python*
+      ./configure
+      make && make altinstall
+      ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
+      pip install pip --upgrade
+      pip install setuptools --upgrade
+      pip install tox
+      {{ env.PIPELINE_BASH_FILE }} RUN
+
     init_pypy: |
       yum -y install wget bzip2 git
       echo "Downloading pypy (Python 2.7 compatible) ..."
@@ -144,6 +160,8 @@ pipeline:
                 rm -f spline.tar.gz
                 # running the build
                 tox -e {{ env.PYTHON_VERSION }}
+                tox_error=$?
                 popd
+                exit ${tox_error}
                 ;;
             esac

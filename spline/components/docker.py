@@ -82,9 +82,10 @@ class Image(Bash):
 
         # rendering the Bash script for generating the Docker image
         name = entry['name'] + "-%s" % os.getpid() if entry['unique'] else entry['name']
+        tag = render(entry['tag'], model=config.model, env=config.env, item=config.item)
         template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-image.sh.j2')
         template = open(template_file).read()
-        config.script = render(template, name=name, tag=entry['tag'],
+        config.script = render(template, name=name, tag=tag,
                                dockerfile_content=dockerfile,
                                dockerfile_filename=filename)
 

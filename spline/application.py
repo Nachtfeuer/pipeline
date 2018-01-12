@@ -97,9 +97,9 @@ class Application(object):
         Find X{matrix} in document.
 
         The spline syntax allows following definitions:
-         - I{'matrix'} - ordered execution of each pipeline (short form)
-         - I{'matrix(ordered)'} - ordered execution of each pipeline (more readable form)
-         - I{'matrix(parallel)'} - parallel execution of each pipeline
+         - B{'matrix'} - ordered execution of each pipeline (short form)
+         - B{'matrix(ordered)'} - ordered execution of each pipeline (more readable form)
+         - B{'matrix(parallel)'} - parallel execution of each pipeline
 
         @type document: dict
         @param document: validated spline document loaded from a yaml file.
@@ -175,6 +175,8 @@ class Application(object):
               help="When enabled then no Bash script is executed but shown")
 @click.option('--debug', is_flag=True, default=False,
               help="When enabled then using 'set -x' for debugging Bash scripts")
+@click.option('--report', default='off', type=click.Choice(['off', 'json', 'html']),
+              help="Adjusting report and format (default: off)")
 def main(**kwargs):
     """The Pipeline tool."""
     options = ApplicationOptions(**kwargs)

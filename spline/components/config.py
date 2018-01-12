@@ -66,7 +66,9 @@ class ApplicationOptions(object):
         Optional('dry_run', default=False): bool,
         Optional('event_logging', default=False): bool,
         Optional('logging_config', default=''): Or(type(''), type(u'')),
-        Optional('debug', default=False): bool
+        Optional('debug', default=False): bool,
+        Optional('report', default='off'):
+            And(str, lambda s: s in ['off', 'json', 'html'])
     }
 
     def __init__(self, **kwargs):
@@ -86,6 +88,7 @@ class ApplicationOptions(object):
             self.event_logging = arguments.event_logging
             self.logging_config = arguments.logging_config
             self.debug = arguments.debug
+            self.report = arguments.report
         except SchemaError as exception:
             logging.getLogger(__name__).error(exception)
             raise RuntimeError(str(exception))

@@ -29,6 +29,11 @@ def render(value, **kwargs):
     """
     Use Jinja2 rendering for given text an key key/values.
 
+    Args:
+        value (str): the template to be rendered.
+        kwargs (dict): named parameters representing available variables
+                       inside the template.
+
     >>> model = {"message": "hello world 1!"}
     >>> rendered_text = render("{{model.message}}", model=model)
     >>> rendered_text == 'hello world 1!'

@@ -1,5 +1,5 @@
 """Manage report data."""
-# Copyright (c) 2017 Thomas Lehmann
+# Copyright (c) 2018 Thomas Lehmann
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
 # software and associated documentation files (the "Software"), to deal in the Software
@@ -49,18 +49,20 @@ class CollectorUpdate(object):
     {'step': 'compile'}
     """
 
-    SCHEMA = {
-        'stage': And(str, len),
-        'timestamp': int,
-        'status': And(str, lambda s: s in ['started', 'succeed', 'failed']),
-        # optional matrix
-        Optional('matrix', default='default'): And(str, len),
-        # optional information
-        Optional('information', default={}): And(len, {
-            Regex(r'([a-z][_a-z]*)'): object
+    @staticmethod
+    def schema_complete():
+        """Schema for data in CollectorUpdate."""
+        return Schema({
+            'stage': And(str, len),
+            'timestamp': int,
+            'status': And(str, lambda s: s in ['started', 'succeeded', 'failed']),
+            # optional matrix
+            Optional('matrix', default='default'): And(str, len),
+            # optional information
+            Optional('information', default={}): {
+                Optional(Regex(r'([a-z][_a-z]*)')): object
+            }
         })
-    }
-    """Schema for data in CollectorUpdate."""
 
     def __init__(self, **kwargs):
         """
@@ -73,7 +75,7 @@ class CollectorUpdate(object):
             RuntimeError: when validation of parameters has failed.
         """
         try:
-            arguments = Adapter(Schema(CollectorUpdate.SCHEMA).validate(kwargs))
+            arguments = Adapter(CollectorUpdate.schema_complete().validate(kwargs))
             self.matrix = arguments.matrix
             self.stage = arguments.stage
             self.timestamp = arguments.timestamp
@@ -111,19 +113,19 @@ class CollectorStage(object):
         """Schema for event items."""
         return {
             'timestamp': And(int, lambda n: n > 0),
-            Optional('information', default={}): And(len, {
-                Regex(r'([a-z][_a-z]*)'): object
-            })
+            Optional('information', default={}): {
+                Optional(Regex(r'([a-z][_a-z]*)')): object
+            }
         }
 
     @staticmethod
     def schema_compete():
         """Schema for data in CollectorStage."""
-        return {
+        return Schema({
             'stage': And(str, len),
             'status': And(str, lambda s: s in ['started', 'succeeded', 'failed']),
             Optional('events', default=[]): And(len, [CollectorStage.schema_event_items()])
-        }
+        })
 
     def __init__(self, **kwargs):
         """
@@ -136,7 +138,7 @@ class CollectorStage(object):
             RuntimeError: when validation of parameters has failed.
         """
         try:
-            arguments = Adapter(Schema(CollectorStage.schema_compete()).validate(kwargs))
+            arguments = Adapter(CollectorStage.schema_compete().validate(kwargs))
             self.stage = arguments.stage
             self.status = arguments.status
             self.events = arguments.events
@@ -243,6 +245,7 @@ class Collector(object):
 
         if len(result) > 0:
             stage = result[0]
+            stage.status = item.status
             stage.add(item.timestamp, item.information)
         else:
             stage = CollectorStage(stage=item.stage, status=item.status)

@@ -16,3 +16,4 @@ rm -rf venv
 rm -rf .tox
 rm -rf .eggs
 rm -rf pipeline.egg-info
+rm -f .coverage.*

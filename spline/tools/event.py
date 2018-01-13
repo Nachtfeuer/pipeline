@@ -20,8 +20,10 @@ License::
     WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
+import time
 from datetime import datetime
 from .logger import Logger
+from .report import Collector, CollectorUpdate
 
 
 class Event(object):
@@ -37,6 +39,7 @@ class Event(object):
         self.status = 'started'
         self.information = {}
         self.information.update(kwargs)
+        self.update_report_collector(int(time.mktime(self.created.timetuple())))
 
         if Event.is_logging_enabled:
             self.logger = Logger.get_logger(context + ".event")
@@ -66,6 +69,7 @@ class Event(object):
         self.status = 'failed'
         self.information.update(kwargs)
         self.logger.info("Failed - took %f seconds.", self.duration())
+        self.update_report_collector(int(time.mktime(self.finished.timetuple())))
 
     def succeeded(self, **kwargs):
         """Finish event as succeeded with optional additional information."""
@@ -73,7 +77,19 @@ class Event(object):
         self.status = 'succeeded'
         self.information.update(kwargs)
         self.logger.info("Succeeded - took %f seconds.", self.duration())
+        self.update_report_collector(int(time.mktime(self.finished.timetuple())))
 
     def duration(self):
         """Calculate event duration."""
         return (self.finished - self.created).total_seconds()
+
+    def update_report_collector(self, timestamp):
+        """Updating report collector for pipeline details."""
+        if 'stage' in self.information:
+            Collector().update(CollectorUpdate(
+                matrix=self.information['matrix'] if 'marix' in self.information else 'default',
+                stage=self.information['stage'],
+                status=self.status,
+                timestamp=timestamp,
+                information=self.information
+            ))

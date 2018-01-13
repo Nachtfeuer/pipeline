@@ -106,20 +106,24 @@ class CollectorStage(object):
     {'step': 'compile'}
     """
 
-    EVENT_ITEM = {
-        'timestamp': And(int, lambda n: n > 0),
-        Optional('information', default={}): And(len, {
-            Regex(r'([a-z][_a-z]*)'): object
-        })
-    }
-    """Schema for event items."""
+    @staticmethod
+    def schema_event_items():
+        """Schema for event items."""
+        return {
+            'timestamp': And(int, lambda n: n > 0),
+            Optional('information', default={}): And(len, {
+                Regex(r'([a-z][_a-z]*)'): object
+            })
+        }
 
-    SCHEMA = {
-        'stage': And(str, len),
-        'status': And(str, lambda s: s in ['started', 'succeeded', 'failed']),
-        Optional('events', default=[]): And(len, [EVENT_ITEM])
-    }
-    """Schema for data in CollectorStage."""
+    @staticmethod
+    def schema_compete():
+        """Schema for data in CollectorStage."""
+        return {
+            'stage': And(str, len),
+            'status': And(str, lambda s: s in ['started', 'succeeded', 'failed']),
+            Optional('events', default=[]): And(len, [CollectorStage.schema_event_items()])
+        }
 
     def __init__(self, **kwargs):
         """
@@ -132,7 +136,7 @@ class CollectorStage(object):
             RuntimeError: when validation of parameters has failed.
         """
         try:
-            arguments = Adapter(Schema(CollectorStage.SCHEMA).validate(kwargs))
+            arguments = Adapter(Schema(CollectorStage.schema_compete()).validate(kwargs))
             self.stage = arguments.stage
             self.status = arguments.status
             self.events = arguments.events
@@ -152,7 +156,7 @@ class CollectorStage(object):
             RuntimeError: when validation of parameters has failed.
         """
         try:
-            item = Schema(CollectorStage.EVENT_ITEM).validate({
+            item = Schema(CollectorStage.schema_event_items()).validate({
                 'timestamp': timestamp, 'information': information
             })
             self.events.append(item)

@@ -135,7 +135,7 @@ model:
 pipeline:
   - env:
      INSIDE_DOCKER: "yes"
-     MIN_COVERAGE: "89"
+     MIN_COVERAGE: "92"
 
   - stage(Build):
     - tasks(ordered):

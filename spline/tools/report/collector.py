@@ -15,12 +15,14 @@
 # DAMAGES OR OTHER LIABILITY,
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+import os
 import logging
 from schema import Schema, SchemaError, And, Optional, Regex
 
-from .adapter import Adapter
-from .decorators import singleton
-from .query import Select
+from spline.tools.report.generator import generate
+from spline.tools.adapter import Adapter
+from spline.tools.decorators import singleton
+from spline.tools.query import Select
 
 
 class CollectorUpdate(object):
@@ -119,7 +121,7 @@ class CollectorStage(object):
         }
 
     @staticmethod
-    def schema_compete():
+    def schema_complete():
         """Schema for data in CollectorStage."""
         return Schema({
             'stage': And(str, len),
@@ -138,7 +140,7 @@ class CollectorStage(object):
             RuntimeError: when validation of parameters has failed.
         """
         try:
-            arguments = Adapter(CollectorStage.schema_compete().validate(kwargs))
+            arguments = Adapter(CollectorStage.schema_complete().validate(kwargs))
             self.stage = arguments.stage
             self.status = arguments.status
             self.events = arguments.events
@@ -173,7 +175,7 @@ class Collector(object):
     Central collection of pipeline process data.
 
     Attributes:
-        data (dict): the key is the matrix name and each value is a list of stages.
+        data (dict): the key is the matrix name and each value represents a list of stages.
     """
 
     def __init__(self):
@@ -187,6 +189,19 @@ class Collector(object):
         class to update the collector.
         """
         self.data = {}
+        self.document = {}
+
+    def configure(self, document):
+        """
+        Provide the spline document.
+
+        The template(s) can use the document to extract information
+        like matrixes and stages.
+
+        Args:
+            document (dict): spline document
+        """
+        self.document = document
 
     def count_matrixes(self):
         """
@@ -251,3 +266,6 @@ class Collector(object):
             stage = CollectorStage(stage=item.stage, status=item.status)
             stage.add(item.timestamp, item.information)
             self.data[item.matrix].append(stage)
+
+        # writing the report
+        generate(self, 'html', os.getcwd())

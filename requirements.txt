@@ -19,6 +19,8 @@ bandit == 1.0.1
 # documentation dependencies
 sphinx == 1.6.5
 sphinxcontrib-napoleon == 0.6.1
+sphinxcontrib-inheritance == 0.9.0
+sphinxcontrib-blockdiag == 1.5.5
 sphinx_rtd_theme == 0.2.4
 epydoc
 

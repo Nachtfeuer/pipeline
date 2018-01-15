@@ -5,10 +5,10 @@ from logging import Logger
 from hamcrest import assert_that, equal_to
 from spline.tools.event import Event
 from spline.tools.logger import NoLogger
-from spline.tools.report import Collector
+from spline.tools.report.collector import Collector
 
 
-class TestHooks(unittest.TestCase):
+class TestEvent(unittest.TestCase):
     """Testing of class Event."""
 
     def test_succeed(self):

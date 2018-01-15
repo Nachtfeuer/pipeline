@@ -28,9 +28,9 @@ import subprocess  # nosec
 import tempfile
 
 
-from ..tools.filters import render
-from ..tools.logger import Logger
-from ..tools.event import Event
+from spline.tools.filters import render
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 class Bash(object):

@@ -4,7 +4,7 @@ import unittest
 import time
 
 from hamcrest import assert_that, equal_to
-from spline.tools.report import CollectorUpdate
+from spline.tools.report.collector import CollectorUpdate
 
 
 class TestReportCollectorUpdate(unittest.TestCase):

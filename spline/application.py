@@ -1,25 +1,20 @@
-"""
-Represent the main entry point for the pipeline tool.
-
-License::
-
-    Copyright (c) 2017 Thomas Lehmann
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this
-    software and associated documentation files (the "Software"), to deal in the Software
-    without restriction, including without limitation the rights to use, copy, modify, merge,
-    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-    to whom the Software is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-    DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-"""
+"""Represent the main entry point for the pipeline tool."""
+# Copyright (c) 2017 Thomas Lehmann
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+# to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies
+# or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: too-many-instance-attributes
 import sys
 import platform
@@ -30,13 +25,14 @@ import multiprocessing
 import click
 import yaml
 
-from .matrix import Matrix, MatrixProcessData
-from .pipeline import Pipeline
-from .components.hooks import Hooks
-from .components.config import ApplicationOptions
-from .tools.logger import Logger
-from .tools.event import Event
-from .validation import Validator
+from spline.matrix import Matrix, MatrixProcessData
+from spline.pipeline import Pipeline
+from spline.components.hooks import Hooks
+from spline.components.config import ApplicationOptions
+from spline.tools.logger import Logger
+from spline.tools.event import Event
+from spline.tools.report.collector import Collector
+from spline.validation import Validator
 
 
 class Application(object):
@@ -46,8 +42,8 @@ class Application(object):
         """
         Initialize application with command line options.
 
-        @type options: ApplicationOptions
-        @param options: given command line options.
+        Args:
+            options (ApplicationOptions): given command line options.
         """
         self.event = Event.create(__name__)
         self.options = options
@@ -76,13 +72,17 @@ class Application(object):
         The method is trying to load, parse and validate the spline document.
         The validator verifies the Python structure B{not} the file format.
 
-        @type definition: str
-        @param definition: path and filename of a yaml file containing a valid spline definition.
-        @rtype: dict
-        @return: loaded and validated spline document.
+        Args:
+            definition (str): path and filename of a yaml file containing a valid spline definition.
 
-        @attention: if validation fails the application does exit!
-        @see: spline.validation.Validator
+        Returns:
+            dict: loaded and validated spline document.
+
+        Note:
+            if validation fails the application does exit!
+
+        See Also:
+            spline.validation.Validator
         """
         document = Validator().validate(yaml.safe_load(open(definition).read()))
         if document is None:
@@ -141,6 +141,8 @@ class Application(object):
         if self.options.validate_only:
             self.logger.info("Stopping after validation as requested!")
             return
+
+        Collector().configure(document)
 
         matrix = Application.find_matrix(document)
         if len(matrix) == 0:

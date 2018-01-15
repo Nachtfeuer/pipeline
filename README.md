@@ -45,6 +45,7 @@
  - execution time on each level: pipeline, stage, tasks and shell (event logging)
  - documentation here and also at read the docs
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
+ - dry run support
 
 ## <a name="links">Interesting Links</a>
 

@@ -21,9 +21,9 @@ License::
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import re
-from .tasks import Tasks
-from ..tools.logger import Logger
-from ..tools.event import Event
+from spline.components.tasks import Tasks
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 class Stage(object):

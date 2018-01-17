@@ -22,7 +22,7 @@ License::
 """
 from jinja2 import Environment
 from jinja2.exceptions import TemplateSyntaxError, UndefinedError
-from .logger import Logger
+from spline.tools.logger import Logger
 
 
 def render(value, **kwargs):

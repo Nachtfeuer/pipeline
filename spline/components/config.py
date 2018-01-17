@@ -19,7 +19,7 @@
 # pylint: disable=too-many-instance-attributes
 import logging
 from schema import Schema, SchemaError, And, Or, Optional
-from ..tools.adapter import Adapter
+from spline.tools.adapter import Adapter
 
 
 class ShellConfig(object):

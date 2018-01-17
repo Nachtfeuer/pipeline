@@ -23,13 +23,13 @@ License::
 # pylint: disable=no-member
 import multiprocessing
 from contextlib import closing
-from .bash import Bash
-from .docker import Container, Image
-from .script import Script
-from .config import ShellConfig
-from ..tools.logger import Logger
-from ..tools.event import Event
-from ..tools.adapter import Adapter
+from spline.components.bash import Bash
+from spline.components.docker import Container, Image
+from spline.components.script import Script
+from spline.components.config import ShellConfig
+from spline.tools.logger import Logger
+from spline.tools.event import Event
+from spline.tools.adapter import Adapter
 
 
 def get_creator_by_name(name):

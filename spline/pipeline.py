@@ -18,11 +18,11 @@
 import os
 import re
 
-from .components.bash import Bash
-from .components.stage import Stage
-from .components.config import ShellConfig
-from .tools.logger import Logger
-from .tools.event import Event
+from spline.components.bash import Bash
+from spline.components.stage import Stage
+from spline.components.config import ShellConfig
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 class PipelineData(object):

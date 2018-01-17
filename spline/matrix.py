@@ -24,9 +24,9 @@ License::
 import multiprocessing
 from contextlib import closing
 
-from .pipeline import Pipeline
-from .tools.logger import Logger
-from .tools.event import Event
+from spline.pipeline import Pipeline
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 def matrix_worker(data):

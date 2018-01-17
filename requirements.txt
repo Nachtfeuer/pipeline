@@ -1,7 +1,4 @@
 # unittests dependencies
-pytest
-pytest-cov
-pytest-randomly
 mock == 2.0.0
 pyhamcrest
 coverage

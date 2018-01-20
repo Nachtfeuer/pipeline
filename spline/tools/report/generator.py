@@ -20,28 +20,27 @@ from spline.tools.filters import render
 from spline.tools.logger import Logger
 
 
-def generate_html(data, document):
+def generate_html(store):
     """
     Generating HTML report.
 
     Args:
-        data (dict): represents the current data of the report data collector.
-        document (dict): spline document (loaded from the yaml file)
+        store (Store): report data.
 
     Returns:
         str: rendered HTML template.
     """
     html_template_file = os.path.join(os.path.dirname(__file__), 'templates/report.html.j2')
     html_template = open(html_template_file).read()
-    return render(html_template, data=data, document=document)
+    return render(html_template, store=store)
 
 
-def generate(collector, report_format, path):
+def generate(store, report_format, path):
     """
     Generate file in defined format representing the report of pipeline(s).
 
     Args:
-        collector (Collector): report data collector.
+        store (Store): report data.
         report_format (str): currently "html" is supported only.
         path (str): path where to write the report to. Missing sub folders will be created.
     """
@@ -49,7 +48,7 @@ def generate(collector, report_format, path):
     if report_format in ['html']:
         rendered_content = {
             'html': generate_html
-        }[report_format](collector.data, collector.document)
+        }[report_format](store)
 
         if not os.path.isdir(path):
             os.makedirs(path)

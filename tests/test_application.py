@@ -22,16 +22,6 @@ class TestApplication(unittest.TestCase):
         assert_that(application.options.validate_only, equal_to(False))
         assert_that(application.options.logging_config, equal_to(''))
 
-    def test_find_matrix(self):
-        """Testing functin Application.find_matrix."""
-        assert_that(Application.find_matrix({}), equal_to([]))
-        document = {'matrix': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
-        assert_that(Application.find_matrix(document), equal_to(document['matrix']))
-        document = {'matrix(ordered)': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
-        assert_that(Application.find_matrix(document), equal_to(document['matrix(ordered)']))
-        document = {'matrix(parallel)': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
-        assert_that(Application.find_matrix(document), equal_to(document['matrix(parallel)']))
-
     def test_invalidate_document(self):
         """Testing invalid document."""
         application = Application(ApplicationOptions(definition='data/invalid.yaml'))

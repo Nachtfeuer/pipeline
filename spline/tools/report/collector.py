@@ -16,12 +16,12 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
-import logging
+from multiprocessing import Process, Queue
 from schema import Schema, SchemaError, And, Optional, Regex
 
+from spline.tools.logger import Logger
 from spline.tools.report.generator import generate
 from spline.tools.adapter import Adapter
-from spline.tools.decorators import singleton
 from spline.tools.query import Select
 
 
@@ -84,7 +84,7 @@ class CollectorUpdate(object):
             self.status = arguments.status
             self.information = arguments.information.data
         except SchemaError as exception:
-            logging.getLogger(__name__).error(exception)
+            Logger.get_logger(__name__).error(exception)
             raise RuntimeError(str(exception))
 
 
@@ -145,7 +145,7 @@ class CollectorStage(object):
             self.status = arguments.status
             self.events = arguments.events
         except SchemaError as exception:
-            logging.getLogger(__name__).error(exception)
+            Logger.get_logger(__name__).error(exception)
             raise RuntimeError(str(exception))
 
     def add(self, timestamp, information):
@@ -165,12 +165,11 @@ class CollectorStage(object):
             })
             self.events.append(item)
         except SchemaError as exception:
-            logging.getLogger(__name__).error(exception)
+            Logger.get_logger(__name__).error(exception)
             raise RuntimeError(str(exception))
 
 
-@singleton
-class Collector(object):
+class Store(object):
     """
     Central collection of pipeline process data.
 
@@ -239,11 +238,12 @@ class Collector(object):
         Returns:
             CollectorStage: when stage has been found or None.
         """
+        found_stage = None
         if matrix_name in self.data:
             result = Select(self.data[matrix_name]).where(
                 lambda entry: entry.stage == stage_name).build()
-            return result[0] if len(result) > 0 else None
-        return None
+            found_stage = result[0] if len(result) > 0 else None
+        return found_stage
 
     def update(self, item):
         """
@@ -267,5 +267,25 @@ class Collector(object):
             stage.add(item.timestamp, item.information)
             self.data[item.matrix].append(stage)
 
-        # writing the report
-        generate(self, 'html', os.getcwd())
+
+class Collector(Process):  # pylint: disable=too-many-ancestors
+    """Process that does collect updates updating the report data."""
+
+    def __init__(self):
+        """Initialize collector with the store and a queue."""
+        super(Collector, self).__init__()
+        self.store = Store()
+        self.queue = Queue()
+
+    def run(self):
+        """Collector main loop."""
+        while True:
+            data = self.queue.get()
+            if data is None:
+                Logger.get_logger(__name__).info("Stopping collector process ...")
+                break
+
+            # updating the report data
+            self.store.update(data)
+            # writing the report
+            generate(self.store, 'html', os.getcwd())

@@ -2,10 +2,10 @@
 # pylint: disable=no-self-use, invalid-name
 import unittest
 from mock import patch, MagicMock, call
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, greater_than
 
-from spline.tools.report.generator import generate
-from spline.tools.report.collector import Collector
+from spline.tools.report.generator import generate, generate_html
+from spline.tools.report.collector import Store
 
 
 class TestReportGenerator(unittest.TestCase):
@@ -23,7 +23,12 @@ class TestReportGenerator(unittest.TestCase):
                 stream = MagicMock()
                 with patch("spline.tools.report.generator.open") as mocked_open:
                     mocked_open.return_value = stream
-                    assert_that(generate(Collector(), 'html', '/tmp/html'), equal_to(True))
+                    assert_that(generate(Store(), 'html', '/tmp/html'), equal_to(True))
                     mocked_make_dirs.assert_called_once_with('/tmp/html')
                 assert_that(stream.mock_calls[1],
                             equal_to(call.__enter__().write('<html></html>')))
+
+    def test_generate_html(self):
+        """Testing html generation."""
+        html = generate_html(Store())
+        assert_that(html.find('Spline - Pipeline Visualization'), greater_than(0))

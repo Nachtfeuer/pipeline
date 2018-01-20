@@ -34,7 +34,11 @@ def matrix_worker(data):
     matrix = data['matrix']
     Logger.get_logger(__name__ + '.worker').info(
         "Processing pipeline for matrix entry '%s'", matrix['name'])
-    pipeline = Pipeline(model=data['model'], env=matrix['env'], options=data['options'])
+
+    env = matrix['env'].copy()
+    env.update({'PIPELINE_MATRIX': matrix['name']})
+
+    pipeline = Pipeline(model=data['model'], env=env, options=data['options'])
     pipeline.hooks = data['hooks']
     return pipeline.process(data['pipeline'])
 

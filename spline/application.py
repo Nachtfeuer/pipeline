@@ -30,6 +30,7 @@ from spline.pipeline import Pipeline
 from spline.components.hooks import Hooks
 from spline.components.config import ApplicationOptions
 from spline.tools.logger import Logger
+from spline.tools.filters import find_matrix
 from spline.tools.event import Event
 from spline.tools.report.collector import Collector
 from spline.validation import Validator
@@ -91,26 +92,6 @@ class Application(object):
         self.logger.info("Schema validation for '%s' succeeded", definition)
         return document
 
-    @staticmethod
-    def find_matrix(document):
-        """
-        Find X{matrix} in document.
-
-        The spline syntax allows following definitions:
-         - B{'matrix'} - ordered execution of each pipeline (short form)
-         - B{'matrix(ordered)'} - ordered execution of each pipeline (more readable form)
-         - B{'matrix(parallel)'} - parallel execution of each pipeline
-
-        @type document: dict
-        @param document: validated spline document loaded from a yaml file.
-        @rtype: list
-        @return: matrix as a part of the spline document or an empty list if not given.
-        """
-        return document['matrix'] if 'matrix' in document \
-            else document['matrix(ordered)'] if 'matrix(ordered)' in document \
-            else document['matrix(parallel)'] if 'matrix(parallel)' in document \
-            else []
-
     def run_matrix(self, matrix_definition, document):
         """
         Running pipeline via a matrix.
@@ -142,9 +123,8 @@ class Application(object):
             self.logger.info("Stopping after validation as requested!")
             return
 
-        Collector().configure(document)
-
-        matrix = Application.find_matrix(document)
+        collector = Application.create_and_run_collector(document)
+        matrix = find_matrix(document)
         if len(matrix) == 0:
             model = {} if 'model' not in document else document['model']
             pipeline = Pipeline(model=model, options=self.options)
@@ -158,6 +138,18 @@ class Application(object):
                 sys.exit(1)
 
         self.event.succeeded()
+        # shutdown of collector
+        collector.queue.put(None)
+        collector.join()
+
+    @staticmethod
+    def create_and_run_collector(document):
+        """Create and run collector process for report data."""
+        collector = Collector()
+        collector.store.configure(document)
+        Event.configure(collector_queue=collector.queue)
+        collector.start()
+        return collector
 
 
 @click.command()

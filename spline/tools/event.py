@@ -18,13 +18,14 @@
 import time
 from datetime import datetime
 from spline.tools.logger import Logger
-from spline.tools.report.collector import Collector, CollectorUpdate
+from spline.tools.report.collector import CollectorUpdate
 
 
 class Event(object):
     """Event mechanism for pipeline."""
 
     is_logging_enabled = False
+    collector_queue = None
 
     def __init__(self, context, timestamp, **kwargs):
         """Initialize event with optional additional information."""
@@ -42,9 +43,16 @@ class Event(object):
             self.logger = Logger.get_logger(None)
 
     @staticmethod
-    def configure(is_logging_enabled):
+    def configure(**kwargs):
         """Global configuration for event handling."""
-        Event.is_logging_enabled = is_logging_enabled
+        for key in kwargs:
+            if key == 'is_logging_enabled':
+                Event.is_logging_enabled = kwargs[key]
+            elif key == 'collector_queue':
+                Event.collector_queue = kwargs[key]
+            else:
+                Logger.get_logger(__name__).error("Unknown key %s in configure or bad type %s",
+                                                  key, type(kwargs[key]))
 
     @staticmethod
     def create(context, **kwargs):
@@ -80,9 +88,9 @@ class Event(object):
 
     def update_report_collector(self, timestamp):
         """Updating report collector for pipeline details."""
-        if 'stage' in self.information:
-            Collector().update(CollectorUpdate(
-                matrix=self.information['matrix'] if 'marix' in self.information else 'default',
+        if 'stage' in self.information and Event.collector_queue is not None:
+            Event.collector_queue.put(CollectorUpdate(
+                matrix=self.information['matrix'] if 'matrix' in self.information else 'default',
                 stage=self.information['stage'],
                 status=self.status,
                 timestamp=timestamp,

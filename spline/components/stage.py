@@ -31,10 +31,12 @@ class Stage(object):
 
     def __init__(self, pipeline, title):
         """Initializing with reference to pipeline main object."""
-        # providing title of stage and name of matrix to the event
-        self.event = Event.create(__name__, stage=title)
+        matrix = 'default'
         if 'PIPELINE_MATRIX' in pipeline.data.env_list[0]:
-            self.event.information.update({'matrix': pipeline.data.env_list[0]['PIPELINE_MATRIX']})
+            matrix = pipeline.data.env_list[0]['PIPELINE_MATRIX']
+
+        # providing title of stage and name of matrix to the event
+        self.event = Event.create(__name__, matrix=matrix, stage=title)
 
         self.logger = Logger.get_logger(__name__)
         self.pipeline = pipeline

@@ -7,15 +7,29 @@
         <meta name="author" content="Thomas Lehmann">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta http-equiv="refresh" content="5">
-        <titlep>Spline - Pipeline Visualization</title>
+        <title>Spline - Pipeline Visualization</title>
     </head>
 
     <body>
         <table>
-            <th>
-                <td>Matrix</td>
-                GO ON HERE 
-            </th>
+            <!-- table header -->
+            <tr>
+                <th>Matrix</th>
+                {% for stage_name in store.document|find_stages -%}
+                <th>{{ stage_name }}</th>
+                {% endfor %}
+            </tr>
+
+            <!-- table body -->
+            {% for matrix in store.document|find_matrix -%}
+            <tr>
+                <td>{{ matrix.name }}</td>
+                {% for stage_name in store.document|find_stages -%}
+                {%- set stage = store.get_stage(matrix.name, stage_name) -%}
+                <td>{{ stage.status }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
         </table>
     </body>
 </html>

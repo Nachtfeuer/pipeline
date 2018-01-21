@@ -32,3 +32,9 @@ class TestReportGenerator(unittest.TestCase):
         """Testing html generation."""
         html = generate_html(Store())
         assert_that(html.find('Spline - Pipeline Visualization'), greater_than(0))
+
+    def test_failed_rendering(self):
+        """Testing failed rendering."""
+        with patch("spline.tools.report.generator.render") as mocked_render:
+            mocked_render.return_value = None
+            assert_that(generate(Store(), 'html', '/tmp'), equal_to(False))

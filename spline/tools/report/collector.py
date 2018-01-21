@@ -17,6 +17,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 from multiprocessing import Process, Queue
+from datetime import datetime
 from schema import Schema, SchemaError, And, Optional, Regex
 
 from spline.tools.logger import Logger
@@ -167,6 +168,20 @@ class CollectorStage(object):
         except SchemaError as exception:
             Logger.get_logger(__name__).error(exception)
             raise RuntimeError(str(exception))
+
+    def duration(self):
+        """
+        Calculate how long the stage took.
+
+        Returns:
+            float: (current) duration of the stage
+        """
+        duration = 0.0
+        if len(self.events) > 0:
+            first = datetime.fromtimestamp(self.events[0]['timestamp'])
+            last = datetime.fromtimestamp(self.events[-1]['timestamp'])
+            duration = (last - first).total_seconds()
+        return duration
 
 
 class Store(object):

@@ -2,6 +2,7 @@
 # pylint: disable=no-self-use, invalid-name, redundant-unittest-assert
 import unittest
 import time
+from datetime import datetime, timedelta
 
 from hamcrest import assert_that, equal_to
 from spline.tools.report.collector import CollectorStage
@@ -29,6 +30,19 @@ class TestReportCollectorStage(unittest.TestCase):
         assert_that(len(stage_item.events), equal_to(1))
         assert_that(stage_item.events[0]['timestamp'], equal_to(timestamp))
         assert_that(stage_item.events[0]['information'], equal_to(information))
+
+    def test_duration(self):
+        """Testing duration of a stage."""
+        information = {'step': 'compile'}
+        stage_item = CollectorStage(stage='build', status='started')
+
+        stage_item.add(int(time.mktime(datetime.now().timetuple())), information)
+        assert_that(len(stage_item.events), equal_to(1))
+        assert_that(stage_item.duration(), equal_to(0.0))
+
+        stage_item.add(int(time.mktime((datetime.now() + timedelta(seconds=60)).timetuple())), information)
+        assert_that(len(stage_item.events), equal_to(2))
+        assert_that(stage_item.duration(), equal_to(60.0))
 
     def test_missing_mandatory(self):
         """Testing missing mandatory parameter."""

@@ -16,6 +16,9 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
+from datetime import datetime
+
+from spline.version import VERSION
 from spline.tools.filters import render
 from spline.tools.logger import Logger
 
@@ -30,9 +33,15 @@ def generate_html(store):
     Returns:
         str: rendered HTML template.
     """
+    spline = {
+        'version': VERSION,
+        'url': 'https://github.com/Nachtfeuer/pipeline',
+        'generated': datetime.now().strftime("%A, %d. %B %Y - %I:%M:%S %p")
+    }
+
     html_template_file = os.path.join(os.path.dirname(__file__), 'templates/report.html.j2')
     html_template = open(html_template_file).read()
-    return render(html_template, store=store)
+    return render(html_template, spline=spline, store=store)
 
 
 def generate(store, report_format, path):

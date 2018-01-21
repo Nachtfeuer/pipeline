@@ -27,7 +27,7 @@ from spline.tools.event import Event
 
 
 class Stage(object):
-    """Class for representing a name group (title)."""
+    """Class for representing a named group (title)."""
 
     def __init__(self, pipeline, title):
         """Initializing with reference to pipeline main object."""
@@ -61,6 +61,7 @@ class Stage(object):
             for line in result['output']:
                 output.append(line)
             if not result['success']:
+                self.event.failed()
                 return {'success': False, 'output': output}
 
         self.event.succeeded()

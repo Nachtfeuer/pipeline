@@ -111,6 +111,14 @@ class Application(object):
 
         return matrix.process(process_data)
 
+    def shutdown(self, collector, success):
+        """Shutdown of the application."""
+        self.event.delegate(success)
+        collector.queue.put(None)
+        collector.join()
+        if not success:
+            sys.exit(1)
+
     def run(self, definition):
         """Processing the pipeline."""
         self.logger.info("Running with Python %s", sys.version.replace("\n", ""))
@@ -131,16 +139,13 @@ class Application(object):
             pipeline.hooks = Hooks(document)
             result = pipeline.process(document['pipeline'])
             if not result['success']:
-                sys.exit(1)
+                self.shutdown(collector, success=False)
         else:
             result = self.run_matrix(matrix, document)
             if not result['success']:
-                sys.exit(1)
+                self.shutdown(collector, success=False)
 
-        self.event.succeeded()
-        # shutdown of collector
-        collector.queue.put(None)
-        collector.join()
+        self.shutdown(collector, success=True)
 
     @staticmethod
     def create_and_run_collector(document):

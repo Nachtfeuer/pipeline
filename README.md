@@ -52,7 +52,8 @@
  - https://github.com/keleshev/schema
  - https://github.com/bats-core/bats-core
  - https://pypi.python.org/pypi/PyHamcrest
- - http://nose.readthedocs.io/en/latest/
  - https://pypi.python.org/pypi/bandit
  - https://www.contributor-covenant.org/
  - http://ddt.readthedocs.io/en/latest/index.html
+ - http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
+ - https://pymotw.com/2/multiprocessing/communication.html

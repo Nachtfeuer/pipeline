@@ -21,10 +21,31 @@ matrix(parallel):
       - third
 
 pipeline:
-  - stage(example):
+  - stage(Test1):
     - tasks(ordered):
       - shell:
           script: |
             echo "message: $message"
             sleep ${wait_in_seconds}
             echo "sleep ${wait_in_seconds} done."
+
+  - stage(Test2):
+    - tasks(ordered):
+      - shell:
+          script: |
+            echo "message: $message"
+            sleep ${wait_in_seconds}
+            echo "sleep ${wait_in_seconds} done."
+      - shell:
+          script: |
+            if [ "${PIPELINE_MATRIX}" == "two" ]; then
+              exit 1
+            fi
+
+  - stage(Test3):
+    - tasks(ordered):
+      - shell:
+          script: |
+            if [ "${PIPELINE_MATRIX}" == "three" ]; then
+              exit 1
+            fi

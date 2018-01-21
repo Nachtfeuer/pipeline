@@ -91,7 +91,7 @@ class CollectorUpdate(object):
 
 class CollectorStage(object):
     """
-    Represents one item stored in Collector as stage per matrix.
+    Represent one item stored in Collector as stage per matrix.
 
     Attributes:
 
@@ -259,6 +259,21 @@ class Store(object):
                 lambda entry: entry.stage == stage_name).build()
             found_stage = result[0] if len(result) > 0 else None
         return found_stage
+
+    def get_duration(self, matrix_name):
+        """
+        Get duration for a concrete matrix.
+
+        Args:
+            matrix_name (str): name of the Matrix.
+
+        Returns:
+            float: duration of concrete matrix in seconds.
+        """
+        duration = 0.0
+        if matrix_name in self.data:
+            duration = sum([stage.duration() for stage in self.data[matrix_name]])
+        return duration
 
     def update(self, item):
         """

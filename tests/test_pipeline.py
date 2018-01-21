@@ -66,3 +66,4 @@ class TestPipeline(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('tasks1:hello1'))
         assert_that(output[1], equal_to('cleanup hello'))
+        assert_that(pipeline.hooks, equal_to(hooks))

@@ -2,6 +2,7 @@
 # pylint: disable=no-self-use, invalid-name, redundant-unittest-assert
 import unittest
 import time
+from datetime import datetime, timedelta
 
 from hamcrest import assert_that, equal_to
 from spline.tools.report.collector import Store, CollectorUpdate
@@ -80,3 +81,20 @@ class TestReportStore(unittest.TestCase):
         store.configure({'test': 'test'})
         # no magic ... document is used by the templates (that's all)
         assert_that(store.document, equal_to({'test': 'test'}))
+
+    def test_matrix_duration(self):
+        """Testing matrix duration."""
+        timestamp_started = int(time.mktime((datetime.now()).timetuple()))
+        timestamp_succeeded = int(time.mktime((datetime.now() + timedelta(seconds=60)).timetuple()))
+
+        store = Store()
+        assert_that(store.get_duration('default'), equal_to(0))
+
+        item = CollectorUpdate(
+            stage='Build', status='started', timestamp=timestamp_started, information={'language': 'java'})
+        store.update(item)
+        assert_that(store.get_duration('default'), equal_to(0))
+
+        item = CollectorUpdate(stage='Build', status='succeeded', timestamp=timestamp_succeeded)
+        store.update(item)
+        assert_that(store.get_duration('default'), equal_to(60))

@@ -34,7 +34,10 @@
                 <tbody>
                     {% for matrix in store.document|find_matrix -%}
                     <tr>
-                        <td><b>name</b>: {{ matrix.name }}</td>
+                        <td>
+                            <b>name</b>: {{ matrix.name }}<br/>
+                            <b>duration</b>: {{ store.get_duration(matrix.name) }} seconds
+                        </td>
                         {% for stage_name in store.document|find_stages -%}
                         {%- set stage = store.get_stage(matrix.name, stage_name) -%}
                         <td class="{{ "success" if stage.status == "succeeded" else "danger" if stage.status == "failed" else "warning" }}">

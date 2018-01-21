@@ -80,12 +80,12 @@ class Pipeline(object):
                                   self.data.env_list[0])
                 continue
 
-            if key.startswith("stage"):
-                stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
-                result = stage.process(entry[key])
-                output += result['output']
-                if not result['success']:
-                    return {'success': False, 'output': output}
+            # after validation it can't be anything else but a stage:
+            stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
+            result = stage.process(entry[key])
+            output += result['output']
+            if not result['success']:
+                return {'success': False, 'output': output}
 
         for line in self.cleanup():
             output.append(line)

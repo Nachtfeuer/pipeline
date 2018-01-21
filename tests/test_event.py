@@ -33,7 +33,20 @@ class TestEvent(unittest.TestCase):
         event = Event.create(__name__, stage='Build')
         event.succeeded()
         assert_that(event.status, equal_to('succeeded'))
-        assert_that(event.information, equal_to({'stage': 'Build'}))
+        assert_that(len(event.information), equal_to(1))
+        assert_that(event.information['stage'], equal_to('Build'))
+        assert_that(isinstance(event.logger, NoLogger), equal_to(True))
+        # timestamps for creation and for finish
+        assert_that(len(Event.collector_queue), equal_to(0))
+
+    def test_succeeded_with_report(self):
+        """Testing simple event that was successful."""
+        Event.configure(collector_queue=FakeQueue())
+        event = Event.create(__name__, stage='Build', report='html')
+        event.succeeded()
+        assert_that(event.status, equal_to('succeeded'))
+        assert_that(event.information['report'], equal_to('html'))
+        assert_that(event.information['stage'], equal_to('Build'))
         assert_that(isinstance(event.logger, NoLogger), equal_to(True))
         # timestamps for creation and for finish
         assert_that(len(Event.collector_queue), equal_to(2))

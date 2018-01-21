@@ -88,7 +88,11 @@ class Event(object):
 
     def update_report_collector(self, timestamp):
         """Updating report collector for pipeline details."""
-        if 'stage' in self.information and Event.collector_queue is not None:
+        report_enabled = 'report' in self.information and self.information['report'] == 'html'
+        report_enabled = report_enabled and 'stage' in self.information
+        report_enabled = report_enabled and Event.collector_queue is not None
+
+        if report_enabled:
             Event.collector_queue.put(CollectorUpdate(
                 matrix=self.information['matrix'] if 'matrix' in self.information else 'default',
                 stage=self.information['stage'],

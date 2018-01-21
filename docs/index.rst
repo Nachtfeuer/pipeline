@@ -27,3 +27,4 @@ Welcome to spline's documentation!
    event_logging
    options
    unicode
+   report

@@ -174,7 +174,7 @@ class Application(object):
               help="When enabled then no Bash script is executed but shown")
 @click.option('--debug', is_flag=True, default=False,
               help="When enabled then using 'set -x' for debugging Bash scripts")
-@click.option('--report', default='off', type=click.Choice(['off', 'json', 'html']),
+@click.option('--report', default='off', type=click.Choice(['off', 'html']),
               help="Adjusting report and format (default: off)")
 def main(**kwargs):
     """The Pipeline tool."""

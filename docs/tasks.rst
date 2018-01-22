@@ -33,7 +33,8 @@ Python module **multiprocessing** is used.
 
 **Please note**:
  - It's not a good idea to interrupt the pipeline with Ctrl-C
- - (Example:) When you have 4 cpus but more than 4 tasks it might happen
+   because multiprocessing is used.
+ - Example: When you have 4 cpus but more than 4 tasks it might happen
    that the tasks do not finish in time constraints as you expect. It
    seems that one task is assigned to one cpu only at a time.
  - When one task fails the pipeline stops after all tasks has been
@@ -53,3 +54,44 @@ Besides a tasks the list also may contain one or more blocks for environment var
 
 The last block overwrites the previous one; existing variables
 are overwriten, new ones are added.
+
+Variables on tasks
+------------------
+On shells, python scripts and docker container tasks you can specify a variable and
+variables are stored at pipeline level. When a block of parallel tasks start all
+variables before this time are passed to the tasks and while those are running new
+variables cannot be evaluated. But a tasks block also may contain **env** entries
+so you can split parallel tasks in two (or more) blocks. Each new block is able
+to access last stored variables; here a rough example:
+
+::
+
+    - tasks(parallel):
+        # first block
+        - shell:
+            script: echo "hello"
+            variable: one
+        - shell:
+            script: echo "world"
+            variable: two
+
+        - env:
+            message: "a great"
+
+        # second block
+        - shell:
+            script: echo "{{ env.message }} {{ variables.one }} {{ variables.two }}"
+        - shell:
+            script: echo "{{ env.message }} {{ variables.one }}"
+        - shell:
+            script: echo "{{ env.message }} {{ variables.two }}"
+
+The two commented blocks are executed in order because of an **env** entry inbetween
+but all tasks of one block are executed in parallel. When executing it looks like following:
+
+::
+
+    $ spline --definition=examples/variables.yaml 2>&1 | grep "great"
+    2018-01-22 19:49:44,576 - spline.components.tasks.worker -  | a great world
+    2018-01-22 19:49:44,577 - spline.components.tasks.worker -  | a great hello
+    2018-01-22 19:49:44,581 - spline.components.tasks.worker -  | a great hello world

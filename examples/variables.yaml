@@ -1,0 +1,21 @@
+pipeline:
+  - stage(Example):
+    - tasks(parallel):
+        # first block
+        - shell:
+            script: echo "hello"
+            variable: one
+        - shell:
+            script: echo "world"
+            variable: two
+
+        - env:
+            message: "a great"
+
+        # second block
+        - shell:
+            script: echo "{{ env.message }} {{ variables.one }} {{ variables.two }}"
+        - shell:
+            script: echo "{{ env.message }} {{ variables.one }}"
+        - shell:
+            script: echo "{{ env.message }} {{ variables.two }}"

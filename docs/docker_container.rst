@@ -3,7 +3,7 @@ The Docker Container Script
 
 Simple Example
 --------------
-The Docker container block is basically the same as the shell block with the exception
+The Docker container block **is basically the same** as the shell block with the exception
 that a simple wrapper code is injected for Running the Docker container. Assume
 following block as an example:
 

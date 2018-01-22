@@ -46,6 +46,7 @@ class Pipeline(object):
         self.data = PipelineData()
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
+        self.variables = {}
 
     @property
     def hooks(self):

@@ -20,14 +20,16 @@ class TestShellConfig(unittest.TestCase):
         assert_that(config.item, equal_to(None))
         assert_that(config.dry_run, equal_to(False))
         assert_that(config.debug, equal_to(False))
+        assert_that(config.variables, equal_to({}))
 
-    @data({'dry_run': True}, {'debug': True}, {'dry_run': True}, {'item': 'hello'},
-          {'env': {'message': 'hello'}}, {'model': {'foo': 123}}, {'title': 'test'})
+    @data({'dry_run': True}, {'debug': True}, {'dry_run': False}, {'item': 'hello'},
+          {'env': {'message': 'hello'}}, {'model': {'foo': 123}}, {'title': 'test'},
+          {'variables': {'output': 'hello'}})
     def test_individual_valid(self, kwargs):
         """Testing to provide mandatory and all optional parameters."""
         # defaults
         final_kwargs = {'script': 'echo "hello world"', 'title': '', 'debug': False,
-                        'dry_run': False, 'item': None, 'env': {}, 'model': {}}
+                        'dry_run': False, 'item': None, 'env': {}, 'model': {}, 'variables': {}}
         final_kwargs.update(kwargs)
 
         config = ShellConfig(**final_kwargs)

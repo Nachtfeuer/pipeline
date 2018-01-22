@@ -68,7 +68,9 @@ class Validator(object):
                         'script': And(Or(type(' '), type(u' ')), len),
                         Optional('title'): And(str, len),
                         Optional('tags'): And([And(str, len)], len),
-                        Optional('with'): And(len, [object])
+                        Optional('with'): And(len, [object]),
+                        Optional('variable'):
+                            And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)'))
                     }},
                     # optional Docker container task
                     {Optional('docker(container)'): {
@@ -79,7 +81,9 @@ class Validator(object):
                         Optional('background', default=False): bool,
                         Optional('remove', default=True): bool,
                         Optional('tags'): And([And(str, len)], len),
-                        Optional('with'): And(len, [object])
+                        Optional('with'): And(len, [object]),
+                        Optional('variable'):
+                            And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)'))
                     }},
                     # optional Docker image task
                     {Optional('docker(image)'): {
@@ -95,7 +99,9 @@ class Validator(object):
                         'script': And(str, len),
                         Optional('title'): And(str, len),
                         Optional('tags'): And([And(str, len)], len),
-                        Optional('with'): And(len, [object])
+                        Optional('with'): And(len, [object]),
+                        Optional('variable'):
+                            And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)'))
                     }}
                 ])}  # end of tasks
             )])},  # end of stage

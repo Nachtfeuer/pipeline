@@ -43,6 +43,16 @@ are available:
   any valid yaml construct that results in a valid Python data
   hierarchy.
 
+**variables**
+
+  You can specify a field **variable** on each shell and the output of the
+  Bash will be stored under the defined name. However a special note
+  on this: when you define a task block for parallel tasks then one task
+  cannot access a variable by another parallel task in same execution block;
+  but when such tasks are separated by an **env** entry each task after that
+  entry is able to use it also those run in parallel too. More on this you
+  can read in the chapter about tasks.
+
 Here's a simple example for the access:
 
 ::
@@ -52,11 +62,15 @@ Here's a simple example for the access:
             count: "3"
 
         - shell:
+            script: echo "{{ env.USER }}"
+            variable: user
+
+        - shell:
             script: |
                 {% for c in range(env.count|int) %}
                 echo "{{ c+1 }}:{{ env.message }}"
                 {% endfor %}
-                echo "USER={{ env.USER }}"
+                echo "USER={{ variables.user }}"
                 echo "foo={{ model['foo'] }}"
 
 

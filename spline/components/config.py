@@ -18,27 +18,34 @@
 # pylint: disable=useless-super-delegation
 # pylint: disable=too-many-instance-attributes
 import logging
-from schema import Schema, SchemaError, And, Or, Optional
+from schema import Schema, SchemaError, And, Or, Optional, Regex
 from spline.tools.adapter import Adapter
 
 
 class ShellConfig(object):
     """Config data for Bash based objects."""
 
-    SCHEMA = {
-        'script': And(Or(type(' '), type(u' ')), len),
-        Optional('title', default=''): str,
-        Optional('model', default={}): {Optional(And(str, len)): object},
-        Optional('env', default={}): {Optional(And(str, len)): And(str, len)},
-        Optional('item', default=None): object,
-        Optional('dry_run', default=False): bool,
-        Optional('debug', default=False): bool
-    }
+    @staticmethod
+    def schema():
+        """Provide schema for shell configuration."""
+        return Schema({
+            'script': And(Or(type(' '), type(u' ')), len),
+            Optional('title', default=''): str,
+            Optional('model', default={}): {Optional(And(str, len)): object},
+            Optional('env', default={}): {Optional(And(str, len)): And(str, len)},
+            Optional('item', default=None): object,
+            Optional('dry_run', default=False): bool,
+            Optional('debug', default=False): bool,
+            Optional('variables', default={}): {
+                Optional(And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)'))):
+                    Or(type(' '), type(u' '))
+            }
+        })
 
     def __init__(self, **kwargs):
         """Initializing and validating fields."""
         try:
-            arguments = Adapter(Schema(ShellConfig.SCHEMA).validate(kwargs))
+            arguments = Adapter(ShellConfig.schema().validate(kwargs))
             self.script = arguments.script
             self.title = arguments.title
             self.model = arguments.model.data
@@ -46,6 +53,7 @@ class ShellConfig(object):
             self.item = arguments.item
             self.dry_run = arguments.dry_run
             self.debug = arguments.debug
+            self.variables = arguments.variables.data
         except SchemaError as exception:
             logging.getLogger(__name__).error(exception)
             raise RuntimeError(str(exception))

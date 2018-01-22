@@ -35,7 +35,8 @@ class TestValidation(unittest.TestCase):
                         'title': 'print out hello world!',
                         'script': 'echo "hello world"',
                         'tags': ['test'],
-                        'with': [1, "hello", 3.1415926535]
+                        'with': [1, "hello", 3.1415926535],
+                        'variable': 'output'
                     }}
                 ]}
             ]}
@@ -55,7 +56,8 @@ class TestValidation(unittest.TestCase):
                         'background': False,
                         'script': 'echo "hello world"',
                         'tags': ['test'],
-                        'with': [1, "hello", 3.1415926535]
+                        'with': [1, "hello", 3.1415926535],
+                        'variable': 'output'
                     }}
                 ]}
             ]}

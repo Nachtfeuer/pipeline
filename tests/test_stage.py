@@ -17,6 +17,7 @@ class FakePipeline(object):
         self.data = PipelineData(hooks)
         self.model = {}
         self.options = ApplicationOptions(definition='fake.yaml')
+        self.variables = {}
 
 
 class TestStage(unittest.TestCase):

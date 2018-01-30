@@ -23,6 +23,10 @@ are intended:
 
  - `{{ variables.cpu_count }} == 1` - comparison of two integers to be equal
  - `not {{ variables.cpu_count }} == 1` - comparison of two integers to be not equal
+ - `{{ variables.cpu_count }} > 1` - comparison of one integer to be greater than another
+ - `{{ variables.cpu_count }} >= 1` - comparison of one integer to be greater or equal than another
+ - `{{ variables.cpu_count }} < 2` - comparison of one integer to be less than another
+ - `{{ variables.cpu_count }} <= 2` - comparison of one integer to be less or equal than another
  - `"{{ env.BRANCH_NAME }}" == "master"` - comparison of two strings to be equal
  - `not "{{ env.BRANCH_NAME }}" == "master"` - comparison of two strings to be not equal
  - `{{ variables.cpu_count }} in [1, 2]` - integer contained in a list of integers

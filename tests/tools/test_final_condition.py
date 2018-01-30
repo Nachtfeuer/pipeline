@@ -61,6 +61,28 @@ class TestFinalCondition(unittest.TestCase):
         assert_that(Condition.evaluate('2 not in [2, 4, 6, 8]'), equal_to(False))
         assert_that(Condition.evaluate('2 not in [3, 5, 7, 9]'), equal_to(True))
 
+    def test_num_gt_num(self):
+        """Testing integer greater than another integer."""
+        assert_that(Condition.evaluate('3 > 2'), equal_to(True))
+        assert_that(Condition.evaluate('2 > 2'), equal_to(False))
+
+    def test_num_gte_num(self):
+        """Testing integer greater or equal than another integer."""
+        assert_that(Condition.evaluate('3 >= 2'), equal_to(True))
+        assert_that(Condition.evaluate('2 >= 2'), equal_to(True))
+        assert_that(Condition.evaluate('1 >= 2'), equal_to(False))
+
+    def test_num_lt_num(self):
+        """Testing integer less than another integer."""
+        assert_that(Condition.evaluate('2 < 3'), equal_to(True))
+        assert_that(Condition.evaluate('2 < 2'), equal_to(False))
+
+    def test_num_lte_num(self):
+        """Testing integer less or equal than another integer."""
+        assert_that(Condition.evaluate('2 <= 3'), equal_to(True))
+        assert_that(Condition.evaluate('2 <= 2'), equal_to(True))
+        assert_that(Condition.evaluate('2 <= 1'), equal_to(False))
+
     def test_special(self):
         """Mainly covers special cases like nested lists."""
         assert_that(Condition.evaluate('2 in [2, [3, 4]]'), equal_to(False))

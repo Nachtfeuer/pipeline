@@ -92,6 +92,22 @@ class Condition(object):
         'types': [ast.UnaryOp, ast.Not, ast.Compare, ast.Num, ast.Eq, ast.Num],
         'evaluate': lambda tokens: not tokens[5].n == tokens[7].n
     }, {
+        'name': 'num-gt-num',
+        'types': [ast.Compare, ast.Num, ast.Gt, ast.Num],
+        'evaluate': lambda tokens: tokens[3].n > tokens[5].n
+    }, {
+        'name': 'num-gte-num',
+        'types': [ast.Compare, ast.Num, ast.GtE, ast.Num],
+        'evaluate': lambda tokens: tokens[3].n >= tokens[5].n
+    }, {
+        'name': 'num-lt-num',
+        'types': [ast.Compare, ast.Num, ast.Lt, ast.Num],
+        'evaluate': lambda tokens: tokens[3].n < tokens[5].n
+    }, {
+        'name': 'num-lte-num',
+        'types': [ast.Compare, ast.Num, ast.LtE, ast.Num],
+        'evaluate': lambda tokens: tokens[3].n <= tokens[5].n
+    }, {
         'name': 'num-in-list',
         'types': [ast.Compare, ast.Num, ast.In, ast.List, ast.Num, ast.Load],
         'evaluate': lambda tokens: tokens[3].n in [token.n for token in tokens[6:-1]]

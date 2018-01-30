@@ -16,3 +16,4 @@ pipeline_demo_python_primes.egg-info/
 .ipynb_checkpoints/
 .coverage.*
 pipeline.html
+.noseids

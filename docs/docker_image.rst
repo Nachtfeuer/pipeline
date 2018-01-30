@@ -70,3 +70,10 @@ However Jinja2 templating is supported:
 
 
 The compete example - as already mentioned - in the examples folder.
+
+
+Conditional tasks
+-----------------
+The field **when** allows you to define a condition; when evaluated as true then
+the task is executed otherwise not. More details you can read in the separate
+section `Conditional Tasks`.

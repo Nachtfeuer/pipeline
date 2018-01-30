@@ -48,7 +48,7 @@ class TestApplication(unittest.TestCase):
             'pipeline': [{
                 'stage(Test)': [{
                     'tasks': [{
-                        'shell': {'script': 'echo "{{ env.message }}"'}
+                        'shell': {'script': 'echo "{{ env.message }}"', 'when': ''}
                     }]
                 }]
             }]

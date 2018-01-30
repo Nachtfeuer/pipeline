@@ -14,8 +14,8 @@ class TestPipeline(unittest.TestCase):
     def test_simple_valid_pipeline(self):
         """Testing of a simple valid pipeline."""
         definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
-                      {'shell': {'script': '''echo tasks1:hello2'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo tasks1:hello1''', 'when': ''}},
+                      {'shell': {'script': '''echo tasks1:hello2''', 'when': ''}}]}]}]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
         pipeline = Pipeline(options=ApplicationOptions(definition='fake.yaml'))
@@ -33,8 +33,8 @@ class TestPipeline(unittest.TestCase):
         """Testing of a simple valid pipeline with environment variables."""
         definition = [
             {'env': {'message': 'pipeline hello'}},
-            {'stage(test)': [{'tasks': [{'shell': {'script': '''echo $message'''}},
-                                        {'shell': {'script': '''echo tasks1:hello'''}}]}]}
+            {'stage(test)': [{'tasks': [{'shell': {'script': '''echo $message''', 'when': ''}},
+                                        {'shell': {'script': '''echo tasks1:hello''', 'when': ''}}]}]}
         ]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
@@ -52,9 +52,9 @@ class TestPipeline(unittest.TestCase):
     def test_simple_failed_pipeline(self):
         """Testing of a simple failed pipeline."""
         definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
-                      {'shell': {'script': '''exit 123'''}},
-                      {'shell': {'script': '''echo tasks1:hello3'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo tasks1:hello1''', 'when': ''}},
+                      {'shell': {'script': '''exit 123''', 'when': ''}},
+                      {'shell': {'script': '''echo tasks1:hello3''', 'when': ''}}]}]}]
         hooks = Hooks()
         hooks.cleanup = '''echo cleanup hello'''
         pipeline = Pipeline(options=ApplicationOptions(definition='fake.yaml'))

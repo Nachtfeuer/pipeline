@@ -28,9 +28,9 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline()
         tasks = Tasks(pipeline, parallel=False)
 
-        document = [{'shell': {'script': '''echo hello1'''}},
-                    {'shell': {'script': '''echo hello2'''}},
-                    {'python': {'script': '''print("hello3")'''}}]
+        document = [{'shell': {'script': '''echo hello1''', 'when': ''}},
+                    {'shell': {'script': '''echo hello2''', 'when': ''}},
+                    {'python': {'script': '''print("hello3")''', 'when': ''}}]
         result = tasks.process(document)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -45,8 +45,8 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline()
         tasks = Tasks(pipeline, parallel=True)
 
-        definition = [{'shell': {'script': '''echo hello1'''}},
-                      {'shell': {'script': '''echo hello2'''}}]
+        definition = [{'shell': {'script': '''echo hello1''', 'when': ''}},
+                      {'shell': {'script': '''echo hello2''', 'when': ''}}]
         result = tasks.process(definition)
         output = sorted([line for line in result['output'] if line.find("hello") >= 0])
 
@@ -62,8 +62,8 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline(hooks=hooks)
         tasks = Tasks(pipeline, parallel=False)
 
-        definition = [{'shell': {'script': '''exit 123'''}},
-                      {'shell': {'script': '''echo hello'''}}]
+        definition = [{'shell': {'script': '''exit 123''', 'when': ''}},
+                      {'shell': {'script': '''echo hello''', 'when': ''}}]
         result = tasks.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -78,8 +78,8 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline(hooks=hooks)
         tasks = Tasks(pipeline, parallel=True)
 
-        definition = [{'shell': {'script': '''exit 123'''}},
-                      {'shell': {'script': '''echo hello'''}}]
+        definition = [{'shell': {'script': '''exit 123''', 'when': ''}},
+                      {'shell': {'script': '''echo hello''', 'when': ''}}]
         result = tasks.process(definition)
         output = sorted([line for line in result['output']
                          if line.find("hello") >= 0 or line.find("cleanup") >= 0])
@@ -96,10 +96,10 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline(hooks=hooks)
         tasks = Tasks(pipeline, parallel=False)
 
-        definition = [{'shell': {'script': '''exit 123'''}},
-                      {'shell': {'script': '''echo hello1'''}},
+        definition = [{'shell': {'script': '''exit 123''', 'when': ''}},
+                      {'shell': {'script': '''echo hello1''', 'when': ''}},
                       {'env': {'block': 'two'}},
-                      {'shell': {'script': '''echo hello2'''}}]
+                      {'shell': {'script': '''echo hello2''', 'when': ''}}]
         result = tasks.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -112,8 +112,8 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline()
         tasks = Tasks(pipeline, parallel=False)
 
-        definition = [{'shell': {'script': '''echo hello1''', 'tags': ['first']}},
-                      {'shell': {'script': '''echo hello2''', 'tags': ['second']}}]
+        definition = [{'shell': {'script': '''echo hello1''', 'when': '', 'tags': ['first']}},
+                      {'shell': {'script': '''echo hello2''', 'when': '', 'tags': ['second']}}]
 
         pipeline.options.tags = ['first']
         result = tasks.process(definition)
@@ -133,8 +133,8 @@ class TestTasks(unittest.TestCase):
         tasks = Tasks(pipeline, parallel=False)
 
         definition = [{'env': {'message': 'hello'}},
-                      {'shell': {'script': '''echo "1:{{env.message}}"'''}},
-                      {'shell': {'script': '''echo "2:$message"'''}}]
+                      {'shell': {'script': '''echo "1:{{env.message}}"''', 'when': ''}},
+                      {'shell': {'script': '''echo "2:$message"''', 'when': ''}}]
         result = tasks.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -146,7 +146,8 @@ class TestTasks(unittest.TestCase):
     def test_worker(self):
         """Testing worker used by class Tasks for parallel execution."""
         data = {'id': 1, 'creator': 'shell',
-                'entry': {'script': '''echo "{{model.mode}}:{{env.message}} {{ variables.message }}"'''},
+                'entry': {'script': '''echo "{{model.mode}}:{{env.message}} {{ variables.message }}"''',
+                          'when': ''},
                 'env': {'message': 'hello'}, 'model': {'mode': 'test'}, 'item': None,
                 'dry_run': False, 'debug': False, 'variables': {'message': 'world'}}
         result = worker(data)
@@ -161,8 +162,8 @@ class TestTasks(unittest.TestCase):
         pipeline.options.dry_run = True
         tasks = Tasks(pipeline, parallel=True)
 
-        definition = [{'shell': {'script': '''echo hello1'''}},
-                      {'shell': {'script': '''echo hello2'''}}]
+        definition = [{'shell': {'script': '''echo hello1''', 'when': ''}},
+                      {'shell': {'script': '''echo hello2''', 'when': ''}}]
         result = tasks.process(definition)
         output = [line for line in result['output'] if len(line.strip()) > 0]
 
@@ -179,8 +180,8 @@ class TestTasks(unittest.TestCase):
         pipeline = FakePipeline()
         tasks = Tasks(pipeline, parallel=False)
 
-        document = [{'shell': {'script': '''echo hello1''', 'variable': 'hello1'}},
-                    {'shell': {'script': '''echo {{ variables.hello1 }}'''}}]
+        document = [{'shell': {'script': '''echo hello1''', 'variable': 'hello1', 'when': ''}},
+                    {'shell': {'script': '''echo {{ variables.hello1 }}''', 'when': ''}}]
         result = tasks.process(document)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 

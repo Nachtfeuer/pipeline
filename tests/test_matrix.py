@@ -14,8 +14,8 @@ class TestMatrix(unittest.TestCase):
         """Testing simple matrix with one entry."""
         matrix_definition = [{'name': 'one', 'env': {'message': 'hello'}}]
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
-                      {'shell': {'script': '''echo tasks1:hello2'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo tasks1:hello1''', 'when': ''}},
+                      {'shell': {'script': '''echo tasks1:hello2''', 'when': ''}}]}]}]
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
@@ -38,7 +38,7 @@ class TestMatrix(unittest.TestCase):
             {'name': 'three', 'env': {'message': 'hello3'}, 'tags': ['group-a']}
         ]
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo $message'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo $message''', 'when': ''}}]}]}]
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
@@ -61,7 +61,7 @@ class TestMatrix(unittest.TestCase):
             {'name': 'three', 'env': {'message': 'hello3'}, 'tags': ['group-a']}
         ]
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo $message'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo $message''', 'when': ''}}]}]}]
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
@@ -83,7 +83,7 @@ class TestMatrix(unittest.TestCase):
             {'name': 'two', 'env': {'message': 'hello2'}}
         ]
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''exit 123'''}}]}]}]
+            'tasks': [{'shell': {'script': '''exit 123''', 'when': ''}}]}]}]
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
@@ -103,7 +103,7 @@ class TestMatrix(unittest.TestCase):
             {'name': 'two', 'env': {'message': 'hello2'}}
         ]
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''exit 123'''}}]}]}]
+            'tasks': [{'shell': {'script': '''exit 123''', 'when': ''}}]}]}]
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition
@@ -119,7 +119,7 @@ class TestMatrix(unittest.TestCase):
     def test_matrix_worker(self):
         """Testing worker for matrix used in multiprocessing."""
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo $message'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo $message''', 'when': ''}}]}]}]
 
         result = matrix_worker({
             'matrix': {'name': 'one', 'env': {'message': 'hello1'}},
@@ -142,7 +142,7 @@ class TestMatrix(unittest.TestCase):
             {'name': 'three', 'env': {'message': 'hello3'}}
         ]
         pipeline_definition = [{'stage(test)': [{
-            'tasks': [{'shell': {'script': '''echo {{ env.message }}'''}}]}]}]
+            'tasks': [{'shell': {'script': '''echo {{ env.message }}''', 'when': ''}}]}]}]
 
         process_data = MatrixProcessData()
         process_data.pipeline = pipeline_definition

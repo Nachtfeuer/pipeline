@@ -1,0 +1,43 @@
+matrix:
+  - name: one
+    env: {'mode': 'ONE'}
+  - name: two
+    env: {'mode': 'TWO'}
+  - name: three
+    env: {'mode': 'THREE'}
+
+model:
+  strval: "hello"
+  intval: 1234
+
+pipeline:
+  - stage(Example):
+    - tasks(ordered):
+      - shell:
+            script: echo "string == string comparison"
+            when: "'{{ model.strval }}' == 'hello'"
+      - shell:
+            # task output should not be shown
+            script: echo "not string == string comparison"
+            when: "not '{{ model.strval }}' == 'hello'"
+      - shell:
+            script: echo "string in string list comparison"
+            when: "'{{ model.strval }}' in ['hallo', 'hello']"
+      - shell:
+            # task output should not be shown
+            script: echo "string not in string list comparison"
+            when: "'{{ model.strval }}' not in ['hallo', 'hello']"
+      - shell:
+            script: echo "integer == integer comparison"
+            when: "{{ model.intval }} == 1234"
+      - shell:
+            # task output should not be shown
+            script: echo "not integer == integer comparison"
+            when: "not {{ model.intval }} == 1234"
+      - shell:
+            script: echo "integer in integer list comparison"
+            when: "{{ model.intval }} in [1234, 4321]"
+      - shell:
+            # task output should not be shown
+            script: echo "integer not in integer list comparison"
+            when: "{{ model.intval }} not in [1234, 4321]"

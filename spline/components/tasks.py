@@ -25,6 +25,8 @@ from spline.components.config import ShellConfig
 from spline.tools.logger import Logger
 from spline.tools.event import Event
 from spline.tools.adapter import Adapter
+from spline.tools.filters import render
+from spline.tools.condition import Condition
 
 
 def get_creator_by_name(name):
@@ -168,6 +170,11 @@ class Tasks(object):
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
+        condition = render(entry['when'], variables=self.pipeline.variables,
+                           model=self.pipeline.model, env=self.get_merged_env())
+        if not Condition.evaluate("" if condition is None else condition):
+            return False
+
         if len(self.pipeline.options.tags) == 0:
             return True
 

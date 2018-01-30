@@ -170,19 +170,18 @@ class Tasks(object):
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
+        count = 0
         condition = render(entry['when'], variables=self.pipeline.variables,
                            model=self.pipeline.model, env=self.get_merged_env())
-        if not Condition.evaluate("" if condition is None else condition):
-            return False
 
-        if len(self.pipeline.options.tags) == 0:
-            return True
+        if Condition.evaluate("" if condition is None else condition):
+            if len(self.pipeline.options.tags) == 0:
+                return True
 
-        count = 0
-        if 'tags' in entry:
-            for tag in self.pipeline.options.tags:
-                if tag in entry['tags']:
-                    count += 1
+            if 'tags' in entry:
+                for tag in self.pipeline.options.tags:
+                    if tag in entry['tags']:
+                        count += 1
 
         return count > 0
 

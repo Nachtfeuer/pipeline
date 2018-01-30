@@ -1,5 +1,5 @@
 """Testing of module condition for final conditions (after rendering."""
-# pylint: disable=no-self-use, invalid-name
+# pylint: disable=no-self-use, invalid-name, too-many-public-methods
 import unittest
 from hamcrest import assert_that, equal_to
 from spline.tools.condition import Condition

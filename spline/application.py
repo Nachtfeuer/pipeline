@@ -159,7 +159,7 @@ class Application(object):
 
 @click.command()
 @click.option('--definition', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              required=True, help="Pipeline definition in yaml format")
+              default='pipeline.yaml', help="Pipeline definition in yaml format")
 @click.option('--tags', type=click.STRING, default='',
               help="Comma separated list of tags for filtering individual tasks")
 @click.option('--matrix-tags', type=click.STRING, default='',

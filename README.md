@@ -32,8 +32,8 @@
  - Python support for 2.7.x, 3.3.x 3.4.x, 3.5.x, 3.6.x, PyPy and PyPy3
  - automatic schema validation for yaml file
  - matrix based pipeline with tags
- - parallel pipelines (matrix)
- - parallel tasks execution
+ - ordered and parallel pipelines (matrix)
+ - ordered and parallel tasks execution
  - pipeline stages (named groups)
  - shell script execution: inline and file
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
@@ -46,6 +46,9 @@
  - documentation here and also at read the docs
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
  - dry run support
+ - support for Python scripts
+ - support for task variables
+ - support for conditional tasks
 
 ## <a name="links">Interesting Links</a>
 

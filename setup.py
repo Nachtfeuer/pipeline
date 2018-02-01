@@ -41,9 +41,8 @@ setup(name='spline',
       long_description=get_long_description(),
       author='Thomas Lehmann',
       author_email='thomas.lehmann.private@gmail.com',
-
       license="MIT",
-      install_requires=["click", "pyaml", "jinja2", "schema", 'pycontracts'],
+      install_requires=["click", "pyaml", "jinja2", "schema"],
       packages=['spline', 'spline.components', 'spline.tools', 'spline.tools.report'],
       scripts=['scripts/spline'],
       package_data={'spline': [

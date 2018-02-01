@@ -84,8 +84,9 @@ class TestReportStore(unittest.TestCase):
 
     def test_matrix_duration(self):
         """Testing matrix duration."""
-        timestamp_started = int(time.mktime((datetime.now()).timetuple()))
-        timestamp_succeeded = int(time.mktime((datetime.now() + timedelta(seconds=60)).timetuple()))
+        now = datetime.now()
+        timestamp_started = int(time.mktime(now.timetuple()))
+        timestamp_succeeded = int(time.mktime((now + timedelta(seconds=60)).timetuple()))
 
         store = Store()
         assert_that(store.get_duration('default'), equal_to(0))
@@ -97,4 +98,6 @@ class TestReportStore(unittest.TestCase):
 
         item = CollectorUpdate(stage='Build', status='succeeded', timestamp=timestamp_succeeded)
         store.update(item)
-        assert_that(store.get_duration('default'), equal_to(60))
+
+        duration = store.get_duration('default')
+        assert_that(duration >= 59 and duration <= 61, equal_to(True))

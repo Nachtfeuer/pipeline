@@ -21,7 +21,7 @@ matrix(parallel):
       - third
 
 pipeline:
-  - stage(example):
+  - stage(Example):
     - tasks(ordered):
       - shell:
           script: |

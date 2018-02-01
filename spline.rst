@@ -39,10 +39,10 @@ Also you are not flexible in terms of environments. You cannot
 run same pipeline in Travis CI (and such tools). 
 
 **Spline is a way to get out of this**: You can run the whole pipeline
-as command line on your machine. Also you can run matrix builds or
-you filter for certain tasks of your interest. The pipeline for the
+via command line on your machine. Also you can run matrix builds and
+you can filter for certain tasks of your interest. The pipeline for the
 spline tool itself supporting a lot Python version can be defined
-in one file with roughly 150 lines of yaml code only. Integration into
+in one file with roughly 170 lines of yaml code only. Integration into
 Jenkinsfile and/or Travis CI isn't that hard anymore.
 
 
@@ -64,15 +64,16 @@ example feel free to do following:
     cd pipeline
     pipeline --definition=pipeline.yaml --matrix-tags=py36
 
-If you leave away the tag filter then spline will be checked
-for all python version as defined in the matrix (see badges too).
+When the file in your project is `pipeline.yaml`you als can leave out
+the `--definition` parameter.
+
+If you leave out the matrix tag filter then spline will run
+all python version as defined in the matrix (see badges too).
 
 Features
 --------
  - automatic schema validation for yaml file
  - matrix based pipeline
- - parallel pipelines (matrix)
- - parallel tasks execution
  - pipeline stages (named groups)
  - shell script execution: inline and file
  - environment variables merged across each level: matrix, pipeline, stage, and tasks
@@ -83,8 +84,10 @@ Features
  - support for Docker containers and Docker images
  - execution time on each level: pipeline, stage, tasks and shell (event logging)
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
-
-
+ - dry run support
+ - support for Python scripts
+ - support for task variables
+ - support for conditional tasks
 
 Documentation
 -------------
@@ -97,4 +100,4 @@ documentation. You have two options:
 About Names
 ------------
  - **spline**: (**s**)hell oriented (**p**)ipe(**line**)
- - **Nachtfeuer**: A Demon (finally) fighting for the good side in a great fantasy (https://www.amazon.de/dp/B00946NO6I).
+ - **Nachtfeuer**: A demon (finally) fighting for the good side in a great fantasy (https://www.amazon.de/dp/B00946NO6I).

@@ -10,5 +10,10 @@ _build/
 .coverage
 coverage.xml
 coverage/
+htmlcov/
 tests.xml
 pipeline_demo_python_primes.egg-info/
+.ipynb_checkpoints/
+.coverage.*
+pipeline.html
+.noseids

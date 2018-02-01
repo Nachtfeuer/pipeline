@@ -28,9 +28,9 @@ import subprocess  # nosec
 import tempfile
 
 
-from ..tools.filters import render
-from ..tools.logger import Logger
-from ..tools.event import Event
+from spline.tools.filters import render
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 class Bash(object):
@@ -63,10 +63,11 @@ class Bash(object):
         """
         Creator function for creating an instance of a Bash.
 
-        @type  config: ShellConfig
-        @param config: options for configuring Bash environment and behavior
-        @rtype: Bash
-        @return: instance of class Bash
+        Args:
+            config (ShellConfig): options for configuring Bash environment and behavior
+
+        Returns:
+            Bash: instance of class Bash
         """
         return Bash(config)
 
@@ -91,7 +92,8 @@ class Bash(object):
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
 
         self.update_script_filename(temp.name)
-        rendered_script = render(script, model=self.config.model, env=self.env, item=self.config.item)
+        rendered_script = render(script, model=self.config.model, env=self.env, item=self.config.item,
+                                 variables=self.config.variables)
         if rendered_script is None:
             self.success = False
             temp.close()

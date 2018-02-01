@@ -17,9 +17,9 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
-    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| PIPELINE_STAGE=test" ]
-    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
-    [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
+    [ "$(echo ${lines[-5]}|cut -d' ' -f6-)" == "| PIPELINE_STAGE=test" ]
+    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
 
     [ "$(docker ps -a --format="{{.Names}}"|wc -l)" == "0" ]
 }
@@ -29,5 +29,5 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
-    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| hello world" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| hello world" ]
 }

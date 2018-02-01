@@ -111,10 +111,3 @@ class TestBash(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('''#!/bin/bash'''))
         assert_that(output[1], equal_to('''echo "hello"'''))
-
-    def test_unicode(self):
-        """Tesing unicode character."""
-        bash = Bash(ShellConfig(script=u'''echo "©"'''))
-        output = [line for line in bash.process() if len(line) > 0]
-        assert_that(len(output), equal_to(1))
-        assert_that(output[0], equal_to(u"©"))

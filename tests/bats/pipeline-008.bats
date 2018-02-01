@@ -5,10 +5,10 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
-    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
-    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| hello world one!" ]
-    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
-    [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
+    [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| hello world one!" ]
+    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
 }
 
 @test "$BATS_TEST_FILENAME :: Testing filtering by second tag" {
@@ -16,10 +16,10 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
-    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
-    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| hello world two!" ]
-    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
-    [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
+    [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "Processing pipeline stage 'test'" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| hello world two!" ]
+    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
 }
 
 @test "$BATS_TEST_FILENAME :: Testing filtering by both tags" {
@@ -27,10 +27,10 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
-    [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "| hello world one!" ]
-    [ "$(echo ${lines[-7]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-9]}|cut -d' ' -f6-)" == "| hello world one!" ]
+    [ "$(echo ${lines[-8]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
 
-    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| hello world two!" ]
-    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
-    [ "$(echo ${lines[-1]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| hello world two!" ]
+    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "Exit code has been 0" ]
+    [ "$(echo ${lines[-2]}|cut -d' ' -f6-)" == "Processing Bash code: finished" ]
 }

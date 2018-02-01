@@ -22,16 +22,6 @@ class TestApplication(unittest.TestCase):
         assert_that(application.options.validate_only, equal_to(False))
         assert_that(application.options.logging_config, equal_to(''))
 
-    def test_find_matrix(self):
-        """Testing functin Application.find_matrix."""
-        assert_that(Application.find_matrix({}), equal_to([]))
-        document = {'matrix': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
-        assert_that(Application.find_matrix(document), equal_to(document['matrix']))
-        document = {'matrix(ordered)': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
-        assert_that(Application.find_matrix(document), equal_to(document['matrix(ordered)']))
-        document = {'matrix(parallel)': [{'name': 'Python 27', 'env': {'PYTHON_VERSION': 'py27'}}]}
-        assert_that(Application.find_matrix(document), equal_to(document['matrix(parallel)']))
-
     def test_invalidate_document(self):
         """Testing invalid document."""
         application = Application(ApplicationOptions(definition='data/invalid.yaml'))
@@ -58,7 +48,7 @@ class TestApplication(unittest.TestCase):
             'pipeline': [{
                 'stage(Test)': [{
                     'tasks': [{
-                        'shell': {'script': 'echo "{{ env.message }}"'}
+                        'shell': {'script': 'echo "{{ env.message }}"', 'when': ''}
                     }]
                 }]
             }]
@@ -72,3 +62,16 @@ class TestApplication(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('hello 1'))
         assert_that(output[1], equal_to('hello 2'))
+
+    def test_run_collector(self):
+        """Test create, run and stop of collector."""
+        # we have to disable the spawinging of the process otherwise
+        # the coverage won't work ...
+        with patch("spline.application.Collector.start") as mocked_start:
+            collector = Application.create_and_run_collector(document={})
+            assert_that(collector.is_alive(), equal_to(False))
+            mocked_start.assert_called_once()
+            with patch("logging.Logger.info") as mocked_logging:
+                collector.queue.put(None)
+                collector.run()
+                mocked_logging.assert_called_once_with("Stopping collector process ...")

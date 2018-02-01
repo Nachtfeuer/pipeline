@@ -1,33 +1,28 @@
-"""
-Pipeline is list of stages.
-
-License::
-
-    Copyright (c) 2017 Thomas Lehmann
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this
-    software and associated documentation files (the "Software"), to deal in the Software
-    without restriction, including without limitation the rights to use, copy, modify, merge,
-    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-    to whom the Software is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-    DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-"""
+"""Pipeline is list of stages."""
+# Copyright (c) 2017 Thomas Lehmann
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+# to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies
+# or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 import os
 import re
 
-from .components.bash import Bash
-from .components.stage import Stage
-from .components.config import ShellConfig
-from .tools.logger import Logger
-from .tools.event import Event
+from spline.components.bash import Bash
+from spline.components.stage import Stage
+from spline.components.config import ShellConfig
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 class PipelineData(object):
@@ -51,6 +46,7 @@ class Pipeline(object):
         self.data = PipelineData()
         self.data.env_list[0].update([] if env is None else env)
         self.logger = Logger.get_logger(__name__)
+        self.variables = {}
 
     @property
     def hooks(self):
@@ -85,12 +81,12 @@ class Pipeline(object):
                                   self.data.env_list[0])
                 continue
 
-            if key.startswith("stage"):
-                stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
-                result = stage.process(entry[key])
-                output += result['output']
-                if not result['success']:
-                    return {'success': False, 'output': output}
+            # after validation it can't be anything else but a stage:
+            stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
+            result = stage.process(entry[key])
+            output += result['output']
+            if not result['success']:
+                return {'success': False, 'output': output}
 
         for line in self.cleanup():
             output.append(line)

@@ -1,22 +1,31 @@
-nose
+# unittests dependencies
 mock == 2.0.0
 pyhamcrest
 coverage
+ddt == 1.1.1
+
+# static code analyzers
 radon == 2.1.1
 pylint == 1.7.5; python_version == "3.3"
 pylint == 1.8.1; python_version != "3.3"
 pep8 == 1.7.0
 pep257 == 0.7.0
 flake8 == 3.3.0
-jinja2 == 2.9.6
-nose-watch == 0.9.1
-sphinx == 1.5.5
+bandit == 1.0.1
+
+# documentation dependencies
+sphinx == 1.6.5
+sphinxcontrib-napoleon == 0.6.1
+sphinxcontrib-inheritance == 0.9.0
+sphinxcontrib-blockdiag == 1.5.5
+sphinx_rtd_theme == 0.2.4
+epydoc
+
+# package dependencies
 wheel == 0.29.0
+
+# runtime dependencies
+jinja2 == 2.9.6
 click == 6.7
 pyaml == 17.8.0
-sphinx_rtd_theme == 0.2.4
 schema == 0.6.6
-pycontracts == 1.8.0
-bandit == 1.0.1
-epydoc
-ddt == 1.1.1

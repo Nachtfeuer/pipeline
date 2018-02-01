@@ -24,12 +24,16 @@ License::
 import os
 import tempfile
 
-from .bash import Bash
-from ..tools.filters import render
+from spline.components.bash import Bash
+from spline.tools.filters import render
 
 
 class Script(Bash):
-    """Run scripts like Python in a Bash environment."""
+    """
+    Run scripts like Python in a Bash environment.
+
+        .. inheritance-diagram:: Script
+    """
 
     def __init__(self, config):
         """Initialize with Bash code and optional environment variables."""

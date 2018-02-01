@@ -27,7 +27,8 @@ class TestDockerImage(unittest.TestCase):
         config = ShellConfig(script='''FROM {{ model.image }}:{{ env.tag }}\nRUN yum -y install ctags''',
                              title='test image creation', model={'image': 'centos'}, env={'tag': '7'})
         image = Image.creator({'name': 'test', 'tag': 'latest', 'unique': True}, config)
-        output = [line for line in image.process() if line.find('Successfully tagged') >= 0]
+        output = list(image.process())
+        output = [line for line in output if line.find('Successfully tagged') >= 0]
         assert_that(len(output), equal_to(1))
         TestDockerImage.cleanup(name="test-%s" % os.getpid(), tag='latest')
 

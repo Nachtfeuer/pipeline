@@ -1,35 +1,32 @@
-"""
-Tasks is a group of tasks/shells with no name.
-
-License::
-
-    Copyright (c) 2017 Thomas Lehmann
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this
-    software and associated documentation files (the "Software"), to deal in the Software
-    without restriction, including without limitation the rights to use, copy, modify, merge,
-    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-    to whom the Software is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-    DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-"""
+"""Tasks is a group of tasks/shells with no name."""
+# Copyright (c) 2017 Thomas Lehmann
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+# to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies
+# or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=no-member
 import multiprocessing
 from contextlib import closing
-from .bash import Bash
-from .docker import Container, Image
-from .script import Script
-from .config import ShellConfig
-from ..tools.logger import Logger
-from ..tools.event import Event
-from ..tools.adapter import Adapter
+from spline.components.bash import Bash
+from spline.components.docker import Container, Image
+from spline.components.script import Script
+from spline.components.config import ShellConfig
+from spline.tools.logger import Logger
+from spline.tools.event import Event
+from spline.tools.adapter import Adapter
+from spline.tools.filters import render
+from spline.tools.condition import Condition
 
 
 def get_creator_by_name(name):
@@ -46,12 +43,12 @@ def worker(data):
                     ShellConfig(script=data['entry']['script'],
                                 title=data['entry']['title'] if 'title' in data['entry'] else '',
                                 model=data['model'], env=data['env'], item=data['item'],
-                                dry_run=data['dry_run'], debug=data['debug']))
+                                dry_run=data['dry_run'], debug=data['debug'], variables=data['variables']))
     output = []
     for line in shell.process():
         output.append(line)
         Logger.get_logger(__name__ + '.worker').info(" | %s", line)
-    return {'success': shell.success, 'output': output}
+    return {'id': data['id'], 'success': shell.success, 'output': output}
 
 
 class Tasks(object):
@@ -63,6 +60,7 @@ class Tasks(object):
         self.pipeline = pipeline
         self.parallel = parallel if not pipeline.options.dry_run else False
         self.logger = Logger.get_logger(__name__)
+        self.next_task_id = 1
 
     def get_merged_env(self):
         """Copying and merging environment variables."""
@@ -79,13 +77,16 @@ class Tasks(object):
 
             for item in entry['with'] if 'with' in entry else ['']:
                 shells.append({
+                    'id': self.next_task_id,
                     'creator': key,
                     'entry': entry,
                     'model': self.pipeline.model,
                     'env': self.get_merged_env(),
                     'item': item,
                     'dry_run': self.pipeline.options.dry_run,
-                    'debug': self.pipeline.options.debug})
+                    'debug': self.pipeline.options.debug,
+                    'variables': self.pipeline.variables})
+                self.next_task_id += 1
 
     def get_parallel_mode(self):
         """Logging helper for visualizing parallel state."""
@@ -128,6 +129,8 @@ class Tasks(object):
         with closing(multiprocessing.Pool(multiprocessing.cpu_count())) as pool:
             for result in [Adapter(entry) for entry in pool.map(worker, [shell for shell in shells])]:
                 output += result.output
+                the_shell = [shell for shell in shells if shell['id'] == result.id][0]
+                self.__handle_variable(the_shell['entry'], result.output)
                 if not result.success:
                     success = False
         if success:
@@ -147,9 +150,11 @@ class Tasks(object):
             entry = shell['entry']
             config = ShellConfig(script=entry['script'], title=entry['title'] if 'title' in entry else '',
                                  model=shell['model'], env=shell['env'], item=shell['item'],
-                                 dry_run=shell['dry_run'], debug=shell['debug'])
+                                 dry_run=shell['dry_run'], debug=shell['debug'],
+                                 variables=shell['variables'])
             result = Adapter(self.process_shell(get_creator_by_name(shell['creator']), entry, config))
             output += result.output
+            self.__handle_variable(entry, result.output)
             if not result.success:
                 return {'success': False, 'output': output}
         return {'success': True, 'output': output}
@@ -165,14 +170,18 @@ class Tasks(object):
 
     def can_process_shell(self, entry):
         """:return: True when shell can be executed."""
-        if len(self.pipeline.options.tags) == 0:
-            return True
-
         count = 0
-        if 'tags' in entry:
-            for tag in self.pipeline.options.tags:
-                if tag in entry['tags']:
-                    count += 1
+        condition = render(entry['when'], variables=self.pipeline.variables,
+                           model=self.pipeline.model, env=self.get_merged_env())
+
+        if Condition.evaluate("" if condition is None else condition):
+            if len(self.pipeline.options.tags) == 0:
+                return True
+
+            if 'tags' in entry:
+                for tag in self.pipeline.options.tags:
+                    if tag in entry['tags']:
+                        count += 1
 
         return count > 0
 
@@ -212,3 +221,15 @@ class Tasks(object):
                 output.append(line)
                 self.logger.info(" | %s", line)
         return output
+
+    def __handle_variable(self, shell_entry, output):
+        """
+        Saving output for configured variable name.
+
+        Args:
+            shell_entry(dict): shell based configuration (shell, docker container or Python).
+            output: list of strings representing output of last shell
+        """
+        if 'variable' in shell_entry:
+            variable_name = shell_entry['variable']
+            self.pipeline.variables[variable_name] = "\n".join(output)

@@ -17,6 +17,7 @@ class FakePipeline(object):
         self.data = PipelineData(hooks)
         self.model = {}
         self.options = ApplicationOptions(definition='fake.yaml')
+        self.variables = {}
 
 
 class TestStage(unittest.TestCase):
@@ -27,10 +28,10 @@ class TestStage(unittest.TestCase):
         pipeline = FakePipeline()
         stage = Stage(pipeline, 'test')
 
-        definition = [{'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
-                                 {'shell': {'script': '''echo tasks1:hello2'''}}]},
-                      {'tasks': [{'shell': {'script': '''echo tasks2:hello1'''}},
-                                 {'shell': {'script': '''echo tasks2:hello2'''}}]}]
+        definition = [{'tasks': [{'shell': {'script': '''echo tasks1:hello1''', 'when': ''}},
+                                 {'shell': {'script': '''echo tasks1:hello2''', 'when': ''}}]},
+                      {'tasks': [{'shell': {'script': '''echo tasks2:hello1''', 'when': ''}},
+                                 {'shell': {'script': '''echo tasks2:hello2''', 'when': ''}}]}]
         result = stage.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 
@@ -47,13 +48,13 @@ class TestStage(unittest.TestCase):
         stage = Stage(pipeline, 'test')
 
         definition = [{'env': {'message': 'hello 1.0'}},
-                      {'tasks': [{'shell': {'script': '''echo "$message"'''}},
+                      {'tasks': [{'shell': {'script': '''echo "$message"''', 'when': ''}},
                                  {'env': {'message': 'hello 1.1'}},
-                                 {'shell': {'script': '''echo "$message"'''}}]},
+                                 {'shell': {'script': '''echo "$message"''', 'when': ''}}]},
                       {'env': {'message': 'hello 2.0'}},
-                      {'tasks': [{'shell': {'script': '''echo "$message"'''}},
+                      {'tasks': [{'shell': {'script': '''echo "$message"''', 'when': ''}},
                                  {'env': {'message': 'hello 2.1'}},
-                                 {'shell': {'script': '''echo "$message"'''}}]}]
+                                 {'shell': {'script': '''echo "$message"''', 'when': ''}}]}]
 
         result = stage.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
@@ -72,10 +73,10 @@ class TestStage(unittest.TestCase):
         pipeline = FakePipeline(hooks=hooks)
         stage = Stage(pipeline, 'test')
 
-        definition = [{'tasks': [{'shell': {'script': '''echo tasks1:hello1'''}},
-                                 {'shell': {'script': '''exit 123'''}}]},
-                      {'tasks': [{'shell': {'script': '''echo tasks2:hello1'''}},
-                                 {'shell': {'script': '''echo tasks2:hello2'''}}]}]
+        definition = [{'tasks': [{'shell': {'script': '''echo tasks1:hello1''', 'when': ''}},
+                                 {'shell': {'script': '''exit 123''', 'when': ''}}]},
+                      {'tasks': [{'shell': {'script': '''echo tasks2:hello1''', 'when': ''}},
+                                 {'shell': {'script': '''echo tasks2:hello2''', 'when': ''}}]}]
         result = stage.process(definition)
         output = [line for line in result['output'] if line.find("hello") >= 0]
 

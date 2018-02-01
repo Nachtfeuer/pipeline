@@ -21,17 +21,24 @@ License::
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import re
-from .tasks import Tasks
-from ..tools.logger import Logger
-from ..tools.event import Event
+from spline.components.tasks import Tasks
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 class Stage(object):
-    """Class for representing a name group (title)."""
+    """Class for representing a named group (title)."""
 
     def __init__(self, pipeline, title):
         """Initializing with reference to pipeline main object."""
-        self.event = Event.create(__name__)
+        matrix = 'default'
+
+        if 'PIPELINE_MATRIX' in pipeline.data.env_list[0]:
+            matrix = pipeline.data.env_list[0]['PIPELINE_MATRIX']
+
+        # providing title of stage and name of matrix to the event
+        self.event = Event.create(__name__, matrix=matrix, stage=title, report=pipeline.options.report)
+
         self.logger = Logger.get_logger(__name__)
         self.pipeline = pipeline
         self.title = title
@@ -55,6 +62,7 @@ class Stage(object):
             for line in result['output']:
                 output.append(line)
             if not result['success']:
+                self.event.failed()
                 return {'success': False, 'output': output}
 
         self.event.succeeded()

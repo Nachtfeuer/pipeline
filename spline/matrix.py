@@ -24,9 +24,9 @@ License::
 import multiprocessing
 from contextlib import closing
 
-from .pipeline import Pipeline
-from .tools.logger import Logger
-from .tools.event import Event
+from spline.pipeline import Pipeline
+from spline.tools.logger import Logger
+from spline.tools.event import Event
 
 
 def matrix_worker(data):
@@ -34,7 +34,11 @@ def matrix_worker(data):
     matrix = data['matrix']
     Logger.get_logger(__name__ + '.worker').info(
         "Processing pipeline for matrix entry '%s'", matrix['name'])
-    pipeline = Pipeline(model=data['model'], env=matrix['env'], options=data['options'])
+
+    env = matrix['env'].copy()
+    env.update({'PIPELINE_MATRIX': matrix['name']})
+
+    pipeline = Pipeline(model=data['model'], env=env, options=data['options'])
     pipeline.hooks = data['hooks']
     return pipeline.process(data['pipeline'])
 
@@ -118,9 +122,12 @@ class Matrix(object):
         """Running pipelines one after the other."""
         output = []
         for entry in self.matrix:
+            env = entry['env'].copy()
+            env.update({'PIPELINE_MATRIX': entry['name']})
+
             if Matrix.can_process_matrix(entry, process_data.options.matrix_tags):
                 self.logger.info("Processing pipeline for matrix entry '%s'", entry['name'])
-                pipeline = Pipeline(model=process_data.model, env=entry['env'],
+                pipeline = Pipeline(model=process_data.model, env=env,
                                     options=process_data.options)
                 pipeline.hooks = process_data.hooks
                 result = pipeline.process(process_data.pipeline)

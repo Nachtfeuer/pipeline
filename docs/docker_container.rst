@@ -3,7 +3,7 @@ The Docker Container Script
 
 Simple Example
 --------------
-The Docker container block is basically the same as the shell block with the exception
+The Docker container block **is basically the same** as the shell block with the exception
 that a simple wrapper code is injected for Running the Docker container. Assume
 following block as an example:
 
@@ -104,6 +104,14 @@ content to the host the caller might fail on removing that files and folders bec
 of missing permissions. That's why the user id and group id is always passed to the
 container allowing you to adjust the permissions correctly.
 
+
 "With" attribute
 ----------------
 It's exactly the same as for `shell <shell.rst>`_ - please read the details there.
+
+
+Conditional tasks
+-----------------
+The field **when** allows you to define a condition; when evaluated as true then
+the task is executed otherwise not. More details you can read in the separate
+section `Conditional Tasks`.

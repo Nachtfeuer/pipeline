@@ -5,7 +5,7 @@ SCRIPT="python ${WORKSPACE}/scripts/spline"
     # verifying exit code
     [ ${status} -eq 0 ]
     # verifying output
-    [ "$(echo ${lines[-5]}|cut -d' ' -f6-)" == "| Gandalf" ]
-    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| Carolinus" ]
-    [ "$(echo ${lines[-3]}|cut -d' ' -f6-)" == "| Belgarath" ]
+    [ "$(echo ${lines[-6]}|cut -d' ' -f6-)" == "| Gandalf" ]
+    [ "$(echo ${lines[-5]}|cut -d' ' -f6-)" == "| Carolinus" ]
+    [ "$(echo ${lines[-4]}|cut -d' ' -f6-)" == "| Belgarath" ]
 }

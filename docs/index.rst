@@ -23,7 +23,9 @@ Welcome to spline's documentation!
    tasks
    docker_container
    docker_image
+   conditions
    hooks
    event_logging
    options
    unicode
+   report

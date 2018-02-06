@@ -129,7 +129,7 @@ class Application(object):
         document = self.validate_document(definition)
         if self.options.validate_only:
             self.logger.info("Stopping after validation as requested!")
-            return
+            return []
 
         self.provide_temporary_scripts_path()
 

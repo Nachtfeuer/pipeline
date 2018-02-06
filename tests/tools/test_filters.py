@@ -41,3 +41,5 @@ class TestFilters(unittest.TestCase):
         """Testing function find_stages."""
         stages = find_stages({'pipeline': [{'stage(Prepare)': 1}, {'stage(Build)': 2}, {'stage(Deploy)': 3}]})
         assert_that(stages, equal_to(['Prepare', 'Build', 'Deploy']))
+        stages = find_stages({'pipeline': [{'env': 1}]})
+        assert_that(stages, equal_to([]))

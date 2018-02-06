@@ -43,7 +43,8 @@ def worker(data):
                     ShellConfig(script=data['entry']['script'],
                                 title=data['entry']['title'] if 'title' in data['entry'] else '',
                                 model=data['model'], env=data['env'], item=data['item'],
-                                dry_run=data['dry_run'], debug=data['debug'], variables=data['variables']))
+                                dry_run=data['dry_run'], debug=data['debug'], variables=data['variables'],
+                                temporary_scripts_path=data['temporary_scripts_path']))
     output = []
     for line in shell.process():
         output.append(line)
@@ -85,7 +86,8 @@ class Tasks(object):
                     'item': item,
                     'dry_run': self.pipeline.options.dry_run,
                     'debug': self.pipeline.options.debug,
-                    'variables': self.pipeline.variables})
+                    'variables': self.pipeline.variables,
+                    'temporary_scripts_path': self.pipeline.options.temporary_scripts_path})
                 self.next_task_id += 1
 
     def get_parallel_mode(self):
@@ -151,7 +153,8 @@ class Tasks(object):
             config = ShellConfig(script=entry['script'], title=entry['title'] if 'title' in entry else '',
                                  model=shell['model'], env=shell['env'], item=shell['item'],
                                  dry_run=shell['dry_run'], debug=shell['debug'],
-                                 variables=shell['variables'])
+                                 variables=shell['variables'],
+                                 temporary_scripts_path=shell['temporary_scripts_path'])
             result = Adapter(self.process_shell(get_creator_by_name(shell['creator']), entry, config))
             output += result.output
             self.__handle_variable(entry, result.output)
@@ -215,7 +218,8 @@ class Tasks(object):
             config = ShellConfig(script=self.pipeline.data.hooks.cleanup,
                                  model=self.pipeline.model, env=env,
                                  dry_run=self.pipeline.options.dry_run,
-                                 debug=self.pipeline.options.debug)
+                                 debug=self.pipeline.options.debug,
+                                 temporary_scripts_path=self.pipeline.options.temporary_scripts_path)
             cleanup_shell = Bash(config)
             for line in cleanup_shell.process():
                 output.append(line)

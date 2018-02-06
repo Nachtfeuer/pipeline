@@ -111,3 +111,14 @@ class TestBash(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('''#!/bin/bash'''))
         assert_that(output[1], equal_to('''echo "hello"'''))
+
+    def test_get_temporary_scripts_path(self):
+        """Testing temporary scripts path."""
+        bash = Bash(ShellConfig(script='''echo "hello"''', temporary_scripts_path='/tmp'))
+        assert_that(bash.get_temporary_scripts_path(), equal_to('/tmp'))
+
+        bash = Bash(ShellConfig(script='''echo "hello"''', temporary_scripts_path=''))
+        assert_that(bash.get_temporary_scripts_path(), equal_to(None))
+
+        bash = Bash(ShellConfig(script='''echo "hello"''', temporary_scripts_path='/tmp/does-not-exist'))
+        assert_that(bash.get_temporary_scripts_path(), equal_to(None))

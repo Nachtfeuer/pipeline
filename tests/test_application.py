@@ -65,13 +65,23 @@ class TestApplication(unittest.TestCase):
 
     def test_run_collector(self):
         """Test create, run and stop of collector."""
-        # we have to disable the spawinging of the process otherwise
+        # we have to disable the spawning of the process otherwise
         # the coverage won't work ...
         with patch("spline.application.Collector.start") as mocked_start:
-            collector = Application.create_and_run_collector(document={})
+            collector = Application.create_and_run_collector(
+                document={}, options=ApplicationOptions(definition='fake.html', report='html'))
             assert_that(collector.is_alive(), equal_to(False))
             mocked_start.assert_called_once()
             with patch("logging.Logger.info") as mocked_logging:
                 collector.queue.put(None)
                 collector.run()
                 mocked_logging.assert_called_once_with("Stopping collector process ...")
+
+    def test_simple(self):
+        """Testing application for a very simple example."""
+        filename = os.path.join(os.path.dirname(__file__), 'data/simple.yaml')
+        options = ApplicationOptions(definition=filename)
+        application = Application(options)
+        output = application.run(options.definition)
+        assert_that(len(output), equal_to(1))
+        assert_that(output[0], equal_to("hello world!"))

@@ -75,6 +75,19 @@ class Bash(object):
         """Writing current script path and filename into environment variables."""
         self.env.update({'PIPELINE_BASH_FILE': filename})
 
+    def get_temporary_scripts_path(self):
+        """
+        Get path for temporary scripts.
+
+        Returns:
+            str: path for temporary scripts or None if not set
+        """
+        result = None
+        if len(self.config.temporary_scripts_path) > 0:
+            if os.path.isdir(self.config.temporary_scripts_path):
+                result = self.config.temporary_scripts_path
+        return result
+
     def create_file_for(self, script):
         """
         Create a temporary, executable bash file.
@@ -83,13 +96,15 @@ class Bash(object):
         the provided environment variables and optional also an item
         when using the B{with} field.
 
-        @type script: str
-        @param script: either pather and filename or Bash code.
-        @rtype: str
-        @return: path and filename of a temporary file.
+        Args:
+            script (str): either pather and filename or Bash code.
+
+        Returns:
+            str: path and filename of a temporary file.
         """
         temp = tempfile.NamedTemporaryFile(
-            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
+            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False,
+            dir=self.get_temporary_scripts_path())
 
         self.update_script_filename(temp.name)
         rendered_script = render(script, model=self.config.model, env=self.env, item=self.config.item,

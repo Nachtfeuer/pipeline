@@ -96,10 +96,9 @@ class Application(object):
         """
         Running pipeline via a matrix.
 
-        @type matrix_definition: dict
-        @param matrix_definition: one concrete matrix item.
-        @type document: dict
-        @param document: spline document (complete) as loaded from yaml file.
+        Args:
+            matrix_definition (dict): one concrete matrix item.
+            document (dict): spline document (complete) as loaded from yaml file.
         """
         matrix = Matrix(matrix_definition, 'matrix(parallel)' in document)
 
@@ -114,8 +113,9 @@ class Application(object):
     def shutdown(self, collector, success):
         """Shutdown of the application."""
         self.event.delegate(success)
-        collector.queue.put(None)
-        collector.join()
+        if collector is not None:
+            collector.queue.put(None)
+            collector.join()
         if not success:
             sys.exit(1)
 
@@ -131,38 +131,58 @@ class Application(object):
             self.logger.info("Stopping after validation as requested!")
             return
 
-        collector = Application.create_and_run_collector(document)
+        self.provide_temporary_scripts_path()
+
+        collector = Application.create_and_run_collector(document, self.options)
         matrix = find_matrix(document)
+        output = []
         if len(matrix) == 0:
             model = {} if 'model' not in document else document['model']
             pipeline = Pipeline(model=model, options=self.options)
             pipeline.hooks = Hooks(document)
             result = pipeline.process(document['pipeline'])
+            output = result['output']
             if not result['success']:
                 self.shutdown(collector, success=False)
         else:
             result = self.run_matrix(matrix, document)
+            output = result['output']
             if not result['success']:
                 self.shutdown(collector, success=False)
 
         self.shutdown(collector, success=True)
+        return output
+
+    def provide_temporary_scripts_path(self):
+        """When configured trying to ensure that path does exist."""
+        if len(self.options.temporary_scripts_path) > 0:
+            if os.path.isfile(self.options.temporary_scripts_path):
+                self.logger.error("Error: configured script path seems to be a file!")
+                # it's ok to leave because called before the collector runs
+                sys.exit(1)
+
+            if not os.path.isdir(self.options.temporary_scripts_path):
+                os.makedirs(self.options.temporary_scripts_path)
 
     @staticmethod
-    def create_and_run_collector(document):
+    def create_and_run_collector(document, options):
         """Create and run collector process for report data."""
-        collector = Collector()
-        collector.store.configure(document)
-        Event.configure(collector_queue=collector.queue)
-        collector.start()
+        collector = None
+        if not options.report == 'off':
+            collector = Collector()
+            collector.store.configure(document)
+            Event.configure(collector_queue=collector.queue)
+            collector.start()
         return collector
 
 
 @click.command()
 @click.option('--definition', type=click.Path(exists=True, file_okay=True, dir_okay=False),
-              default='pipeline.yaml', help="Pipeline definition in yaml format")
-@click.option('--tags', type=click.STRING, default='',
+              metavar='<path/filename>',
+              default='pipeline.yaml', help="Pipeline definition in yaml format (default: pipeline.yaml)")
+@click.option('--tags', type=click.STRING, default='', metavar="tag[,tag,...]",
               help="Comma separated list of tags for filtering individual tasks")
-@click.option('--matrix-tags', type=click.STRING, default='',
+@click.option('--matrix-tags', type=click.STRING, default='', metavar="tag[,tag,...]",
               help="Comma separated list of tags for filtering individual matrix runs")
 @click.option('--validate-only', is_flag=True, default=False,
               help="When used validates given pipeline definition only")
@@ -176,6 +196,8 @@ class Application(object):
               help="When enabled then using 'set -x' for debugging Bash scripts")
 @click.option('--report', default='off', type=click.Choice(['off', 'html']),
               help="Adjusting report and format (default: off)")
+@click.option('--temporary-scripts-path', default='', type=str, metavar='<path>',
+              help="When not set using system temp path, otherwise defined one")
 def main(**kwargs):
     """The Pipeline tool."""
     options = ApplicationOptions(**kwargs)

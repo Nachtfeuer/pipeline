@@ -1,15 +1,94 @@
 #!/usr/bin/env python
+"""Test runner (discovery) for Python unittests."""
+# pylint: disable=superfluous-parens
+import sys
+import os
+import time
+# import logging
+from random import seed, randint
 from unittest import TestLoader, TextTestRunner
-from random import randint
+from coverage import Coverage
+import click
+from colorama import init, Fore
 
-# TODO: using main
-# TODO: using click
-# TODO: using seed for random for reproducing things
 
-TestLoader.sortTestMethodsUsing = lambda _, a, b: randint(-1, 1)
+@click.command()
+@click.option('-s', '--start-directory', default=os.getcwd(), metavar='<path>',
+              help='start directory for test discovery (default: current path)')
+@click.option('-p', '--pattern', default='test_*.py', type=str, metavar='<pattern>',
+              help='pattern to match tests (default: test_*.py)')
+@click.option('--cov-package', default='', type=str, metavar='<path>',
+              help='Path of root package (source)')
+@click.option('--cov-omit', default='', type=str, metavar='<pattern>',
+              help='pattern to exlude paths and files from code coverage')
+@click.option('--cov-fail-under', default='0.0', type=float, metavar='<percentage>',
+              help='Coverage does fail when test coverage is below defined threshold (default: 0.0%)')
+@click.option('-f', '--failfast', default=False, is_flag=True,
+              help='stop on first fail or error')
+@click.option('-r', '--randomly', default=False, is_flag=True,
+              help='when set run tests in random order')
+@click.option('--randomly-seed', default=int(time.time()), type=int, metavar='<timestamp>',
+              help='initialization for the random seed (default: current unix timestamp)')
+@click.option('-v', '--verbose', default=False, is_flag=True,
+              help='verbose output when set')
+def tests_runner(**kwargs):
+    """
+    Test runner (discovery) for Python unittests.
+    """
+    # logging_format = "%(asctime)-15s - %(name)s - %(message)s"
+    # logging.basicConfig(format=logging_format, level=logging.INFO)
+    init()
 
-loader = TestLoader()
-suite = loader.discover(start_dir='tests')
+    print(Fore.GREEN + '%s :: Running Python %s' % (__file__, sys.version.replace('\n', '')) + Fore.RESET)
+    print(Fore.GREEN + '%s :: Current working path is %s' % (__file__, os.getcwd()) + Fore.RESET)
 
-runner = TextTestRunner(verbosity=2)
-runner.run(suite)
+    source_path = os.getcwd()
+    if len(kwargs['cov_package']) > 0 and os.path.isdir(kwargs['cov_package']):
+        source_path = kwargs['cov_package']
+
+    source = [source_path, os.path.join(os.getcwd(), 'tests')]
+    for root, folders, _ in os.walk(source_path):
+        for folder in folders:
+            if os.path.isfile(os.path.join(root, folder, '__init__.py')):
+                source.append(os.path.join(root, folder))
+
+    coverage = Coverage(branch=True, omit=kwargs['cov_omit'].split(','), source=source)
+    coverage.start()
+
+    if kwargs['randomly']:
+        print(Fore.GREEN + '%s :: Used test seed is: %d' % (__file__, kwargs['randomly_seed']) + Fore.RESET)
+        seed(kwargs['randomly_seed'])
+        TestLoader.sortTestMethodsUsing = lambda _, a, b: randint(-1, 1)
+
+    loader = TestLoader()
+
+    # find all tests
+    suite = loader.discover(
+        start_dir=kwargs['start_directory'],
+        pattern=kwargs['pattern'])
+
+    # run all tests
+    runner = TextTestRunner(
+        verbosity=2 if kwargs['verbose'] else 1,
+        failfast=kwargs['failfast'])
+
+    # running the tests
+    runner.run(suite)
+    # stop and save of coverage results
+    coverage.stop()
+    coverage.save()
+    # generating coverage reports
+    coverage.html_report(directory='htmlcov')
+    percentage_coveraged = coverage.report(show_missing=True)
+
+    print(Fore.GREEN + '%s :: exact code coverage is: %f%%' % (__file__, percentage_coveraged) + Fore.RESET)
+    if percentage_coveraged >= kwargs['cov_fail_under']:
+        print(Fore.GREEN + '%s :: coverage succeeded' % (__file__) + Fore.RESET)
+    else:
+        print(Fore.RED + '%s :: coverage failed, %d%% coverage required'
+              % (__file__, kwargs['cov_fail_under']) + Fore.RESET)
+        sys.exit(1)
+
+
+if __name__ == "__main__":
+    tests_runner()

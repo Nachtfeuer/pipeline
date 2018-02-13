@@ -46,15 +46,40 @@ def tests_runner(**kwargs):
     if len(kwargs['cov_package']) > 0 and os.path.isdir(kwargs['cov_package']):
         source_path = kwargs['cov_package']
 
+    coverage = Coverage(branch=True, omit=kwargs['cov_omit'].split(','),
+                        source=get_source_paths(source_path))
+    coverage.start()
+
+    run_tests(kwargs)
+
+    # stop and save of coverage results
+    coverage.stop()
+    coverage.save()
+    # generating coverage reports
+    coverage.html_report(directory='htmlcov')
+    percentage_coveraged = coverage.report(show_missing=True)
+
+    print(Fore.GREEN + '%s :: exact code coverage is: %f%%' % (__file__, percentage_coveraged) + Fore.RESET)
+    if percentage_coveraged >= kwargs['cov_fail_under']:
+        print(Fore.GREEN + '%s :: coverage succeeded' % (__file__) + Fore.RESET)
+    else:
+        print(Fore.RED + '%s :: coverage failed, %d%% coverage required'
+              % (__file__, kwargs['cov_fail_under']) + Fore.RESET)
+        sys.exit(1)
+
+
+def get_source_paths(source_path):
+    """Get source path from a root path."""
     source = [source_path, os.path.join(os.getcwd(), 'tests')]
     for root, folders, _ in os.walk(source_path):
         for folder in folders:
             if os.path.isfile(os.path.join(root, folder, '__init__.py')):
                 source.append(os.path.join(root, folder))
+    return source
 
-    coverage = Coverage(branch=True, omit=kwargs['cov_omit'].split(','), source=source)
-    coverage.start()
 
+def run_tests(kwargs):
+    """Discover and run all defined unittests (pattern)."""
     if kwargs['randomly']:
         print(Fore.GREEN + '%s :: Used test seed is: %d' % (__file__, kwargs['randomly_seed']) + Fore.RESET)
         seed(kwargs['randomly_seed'])
@@ -74,20 +99,6 @@ def tests_runner(**kwargs):
 
     # running the tests
     runner.run(suite)
-    # stop and save of coverage results
-    coverage.stop()
-    coverage.save()
-    # generating coverage reports
-    coverage.html_report(directory='htmlcov')
-    percentage_coveraged = coverage.report(show_missing=True)
-
-    print(Fore.GREEN + '%s :: exact code coverage is: %f%%' % (__file__, percentage_coveraged) + Fore.RESET)
-    if percentage_coveraged >= kwargs['cov_fail_under']:
-        print(Fore.GREEN + '%s :: coverage succeeded' % (__file__) + Fore.RESET)
-    else:
-        print(Fore.RED + '%s :: coverage failed, %d%% coverage required'
-              % (__file__, kwargs['cov_fail_under']) + Fore.RESET)
-        sys.exit(1)
 
 
 if __name__ == "__main__":

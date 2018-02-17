@@ -61,16 +61,15 @@ class InMemoryFiles(object):
         Args:
             path (str): root path where to save the files.
         """
-        if not os.path.isdir(path):
-            for relative_path_and_filename, content in self.files.items():
-                full_path_and_filename = os.path.join(path, relative_path_and_filename)
-                full_path = os.path.dirname(full_path_and_filename)
+        for relative_path_and_filename, content in self.files.items():
+            full_path_and_filename = os.path.join(path, relative_path_and_filename)
+            full_path = os.path.dirname(full_path_and_filename)
 
-                if not os.path.isdir(full_path):
-                    os.makedirs(full_path)
+            if not os.path.isdir(full_path):
+                os.makedirs(full_path)
 
-                with open(full_path_and_filename, 'wb') as handle:
-                    handle.write(b64decode(content))
+            with open(full_path_and_filename, 'wb') as handle:
+                handle.write(b64decode(content))
 
     def to_json(self):
         """

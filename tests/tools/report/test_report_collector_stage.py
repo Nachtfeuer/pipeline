@@ -18,6 +18,7 @@ class TestReportCollectorStage(unittest.TestCase):
         assert_that(stage_item.stage, equal_to('build'))
         assert_that(stage_item.status, equal_to('started'))
         assert_that(len(stage_item.events), equal_to(0))
+        assert_that(stage_item.duration(), equal_to(0.0))
 
     def test_add(self):
         """Testing addding event information."""

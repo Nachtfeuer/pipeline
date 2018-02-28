@@ -16,6 +16,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=no-member
+import os
 import multiprocessing
 from contextlib import closing
 from spline.components.bash import Bash
@@ -62,11 +63,22 @@ class Tasks(object):
         self.logger = Logger.get_logger(__name__)
         self.next_task_id = 1
 
-    def get_merged_env(self):
-        """Copying and merging environment variables."""
-        env = self.pipeline.data.env_list[0].copy()
-        env.update(self.pipeline.data.env_list[1].copy())
-        env.update(self.pipeline.data.env_list[2].copy())
+    def get_merged_env(self, include_os=False):
+        """
+        Copying and merging environment variables.
+
+        Args:
+            include_os (bool): when true then include the environment variables (default: False)
+
+        Returns:
+            dict: environment variables as defined in the pipeline
+                  (optional including system environment variables).
+        """
+        env = {}
+        if include_os:
+            env.update(os.environ.copy())
+        for level in range(3):
+            env.update(self.pipeline.data.env_list[level].copy())
         return env
 
     def prepare_shell_data(self, shells, key, entry):
@@ -172,7 +184,7 @@ class Tasks(object):
         """:return: True when shell can be executed."""
         count = 0
         condition = render(entry['when'], variables=self.pipeline.variables,
-                           model=self.pipeline.model, env=self.get_merged_env())
+                           model=self.pipeline.model, env=self.get_merged_env(include_os=True))
 
         if Condition.evaluate("" if condition is None else condition):
             if len(self.pipeline.options.tags) == 0:

@@ -40,7 +40,7 @@ pipeline:
 @title[Task Types]
 ### Task Types
 
-```yaml
+```
 - shell:
     script: echo "hello world"
 - python:
@@ -54,6 +54,31 @@ pipeline:
     image: demo:1.0
     script: echo "hello world
 ```
+
+---
+@title[Jinja2 Templating Support (Part One)]
+### Jinja2 Templating Support (Part One)
+```
+model:
+  mmsg: "model message"
+pipeline:
+  - env:
+      pmsg: "pipeline message"
+  - stage(Demo):
+      - env:
+          smsg: "stage message"
+      - tasks(ordered):
+          - env:
+              tmsg: "tasks block message"
+          - shell:
+              script: |
+                echo "User: {{ env.USER }}"
+                echo "Model msg: {{ model.mmsg }}"
+                echo "Pipeline msg: {{ env.pmsg }}"
+                echo "Stage msg: {{ env.smsg }}"
+                echo "Tasks block msg: {{ env.tmsg }}"
+```
+<small>(env. variables are merged, last wins, OS env. variables come last)</small>
 
 ---
 

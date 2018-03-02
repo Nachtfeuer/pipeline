@@ -52,24 +52,20 @@ pipeline:
     script: from centos:7
 - docker(container):
     image: demo:1.0
-    script: echo "hello world
+    script: echo "hello world"
 ```
 
 ---
 @title[Jinja2 Templating Support (Part One)]
 ### Jinja2 Templating Support (Part One)
 ```
-model:
-  mmsg: "model message"
+model: {"mmsg": "model message"}
 pipeline:
-  - env:
-      pmsg: "pipeline message"
+  - env: {"pmsg": "pipeline message"}
   - stage(Demo):
-      - env:
-          smsg: "stage message"
+      - env: {"smsg": "stage message"}
       - tasks(ordered):
-          - env:
-              tmsg: "tasks block message"
+          - env: {"tmsg": "tasks block message"}
           - shell:
               script: |
                 echo "User: {{ env.USER }}"
@@ -78,8 +74,23 @@ pipeline:
                 echo "Stage msg: {{ env.smsg }}"
                 echo "Tasks block msg: {{ env.tmsg }}"
 ```
-<small>(env. variables are merged, last wins, OS env. variables come last)</small>
+<small>(env. variables are merged, last ones win, OS env. variables come last)</small>
+---
+@title[Jinja2 Templating Support (Part Two)]
+### Jinja2 Templating Support (Part Two)
+#### Nested rendering support
 
+```
+model:
+  one: "{{ env.USER }}: hello"
+  another: "{{ model.one|render(env=env) }} world!"
+pipeline:
+  - stage(This Is A Demo):
+    - tasks(ordered):
+       - shell:
+          script: echo "{{ model.another|render(model=model, env=env) }}"
+```
+(on my machine the log output: `thomas: "hello world!"`)
 ---
 
 ## The End

@@ -75,6 +75,7 @@ pipeline:
                 echo "Tasks block msg: {{ env.tmsg }}"
 ```
 <small>(env. variables are merged, last ones win, OS env. variables come last)</small>
+
 ---
 @title[Jinja2 Templating Support (Part Two)]
 ### Jinja2 Templating Support (Part Two)
@@ -83,15 +84,35 @@ pipeline:
 ```
 model:
   one: "{{ env.USER }}: hello"
-  another: "{{ model.one|render(env=env) }} world!"
+  two: "{{ model.one|render(env=env) }} world!"
 pipeline:
-  - stage(This Is A Demo):
-    - tasks(ordered):
-       - shell:
-          script: echo "{{ model.another|render(model=model, env=env) }}"
+ - stage(This Is A Demo):
+   - tasks(ordered):
+     - shell:
+         script: echo "{{model.two|render(model=model, env=env)}}"
 ```
-(on my machine the log output: `thomas: "hello world!"`)
----
+(on my machine: `thomas: "hello world!"`)
 
+---
+@title[Task Variables]
+### Task Variables
+#### Special rules:
+- either need to be separated via a tasks block or via an **env** block inbetween in same block
+- field **variable** not available for docker(image)
+
+#### Example:
+```
+pipeline:
+  - stage(Demo):
+    - tasks(ordered):
+      - shell:
+          script: git rev-parse --short HEAD
+          variable: commit
+    - tasks(ordered):
+      - shell:
+          script: "echo \"commit: {{ variables.commit }}\""
+```
+
+---
 ## The End
 

@@ -28,7 +28,7 @@ pip install spline
 ```
 
 #### Minimal Pipeline:
-```
+```yaml
 pipeline:
   - stage(Demo):
       - tasks(ordered):
@@ -40,7 +40,7 @@ pipeline:
 @title[Task Types]
 ### Task Types
 
-```
+```yaml
 - shell:
     script: echo "hello world"
 - python:
@@ -58,7 +58,7 @@ pipeline:
 ---
 @title[Jinja2 Templating Support (Part One)]
 ### Jinja2 Templating Support (Part One)
-```
+```yaml
 model: {"mmsg": "model message"}
 pipeline:
   - env: {"pmsg": "pipeline message"}
@@ -81,7 +81,7 @@ pipeline:
 ### Jinja2 Templating Support (Part Two)
 #### Nested rendering support
 
-```
+```yaml
 model:
   one: "{{ env.USER }}: hello"
   two: "{{ model.one|render(env=env) }} world!"
@@ -101,7 +101,7 @@ pipeline:
 - field **variable** not available for docker(image)
 
 #### Example:
-```nohighlight
+```yaml
 pipeline:
   - stage(Demo):
     - tasks(ordered):
@@ -112,6 +112,18 @@ pipeline:
       - shell:
           script: "echo \"commit: {{ variables.commit }}\""
 ```
+
+---
+@title[Conditional Tasks]
+### Conditional Tasks
+
+ - field **when** available on all task types
+ - example: `when: "'{{ env.BRANCH_NAME }}' == 'master'"`
+ - support for **==**, **<**, **<=**, **>** and **>=**
+ - support for lists: `when: "'{{ env.BRANCH_NAME }}' in ['prod', 'preprod']"`
+ - negate with **not** like `when: "'not {{ env.BRANCH_NAME }}' == 'master'"`;
+   for lists: **not in**.
+ - single quotes always required for strings
 
 ---
 ## The End

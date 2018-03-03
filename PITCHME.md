@@ -2,10 +2,10 @@
 # Spline
 ### The pipeline tool
 
-**Source**:
+**Source** |
 http://github.com/Nachtfeuer/pipeline
 
-**Contact**:
+**Contact** |
 [thomas.lehmann.private@gmail.com](mailto:thomas.lehmann.private@gmail.com)
 
 ---
@@ -89,7 +89,7 @@ pipeline:
  - stage(This Is A Demo):
    - tasks(ordered):
      - shell:
-         script: echo "{{model.two|render(model=model, env=env)}}"
+         script: echo "{{model.two|render(model=model,env=env)}}"
 ```
 (on my machine: `thomas: "hello world!"`)
 

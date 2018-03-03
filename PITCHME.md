@@ -101,7 +101,7 @@ pipeline:
 - field **variable** not available for docker(image)
 
 #### Example:
-```
+```nohighlight
 pipeline:
   - stage(Demo):
     - tasks(ordered):

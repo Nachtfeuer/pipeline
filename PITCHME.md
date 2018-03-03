@@ -129,28 +129,7 @@ pipeline:
 @title[Docker Image]
 ### Task: docker(image)
 
-```
-model:
-  base_url: http://download.oracle.com/otn-pub/java/jdk
-  rpm: jdk-9.0.4_linux-x64_bin.rpm
-  version_url: "9.0.4+11/c2514751926b4512b076cc82f959763f/{{ model.rpm }}"
-pipeline:
-  - stage(Demo):
-    - tasks(ordered):
-      - docker(image):
-          name: jdk
-          tag: "9.0.4"
-          unique: no
-          script: |
-            from centos:7
-            run yum -y install wget
-            run wget --quiet --no-cookies --no-check-certificate \
-                     --header "Cookie: oraclelicense=accept-securebackup-cookie" \
-                     {{ model.base_url }}/{{ model.version_url|render(model=model) }}
-            run yum -y localinstall {{ model.rpm }}
-            run rm -f {{ model.rpm }}
-            run java --version
-```
+![jdk9-docker](docs/images/docker-image.png)
 
 ---
 ## The End

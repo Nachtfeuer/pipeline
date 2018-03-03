@@ -1,2 +1,3 @@
 theme: moon
+highlight: solarized-light
 theme-override : PITCHME.css

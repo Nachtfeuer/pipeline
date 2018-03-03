@@ -1,3 +1,4 @@
 theme: moon
 highlight: github
 theme-override : PITCHME.css
+slide-number : true

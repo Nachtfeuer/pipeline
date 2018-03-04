@@ -13,14 +13,14 @@ http://github.com/Nachtfeuer/pipeline
 ### Features
 
 **Structural** | **Tasks** | **Behaviorial** | **Data**
--------------- | --------- | --------------- | -------------
+-------------- | --------- | --------------- | -----------------
 Matrix         | Shell     | Ordered         | Model
 Pipeline       | Python    | Parallelizable  | Env. Var.
 Stages         | Docker    | Filterable      | Task Var.
-Tasks Groups   |           | Conditional     | Schema Valid.
+Tasks Groups   |           | Conditional     | Schema Validation
 Tasks          |           | Templating      | Report
 
-also: dry run support
+additionally: dry run support, shell debugging
 
 ---
 @title[Quickstart]
@@ -47,13 +47,16 @@ pipeline:
 ```yaml
 - shell:
     script: echo "hello world"
+
 - python:
     script: print("hello world")
+
 - docker(image):
     name: demo
     tag: "1.0"
     unique: no
     script: from centos:7
+
 - docker(container):
     image: demo:1.0
     script: echo "hello world"
@@ -155,6 +158,27 @@ pipeline:
             run rm -f {{ model.rpm }}
             run java --version
 ```
+
+---
+@title[Docker Container]
+### Task: docker(container)
+
+```yaml
+pipeline:
+  - stage(Demo):
+      - tasks(ordered):
+          - docker(container):
+              title: Simple Docker container demo
+              image: jdk-16129:9.0.4
+              mount: yes
+              remove: yes
+              script: |
+                java --version > /mnt/host/java-version.txt
+                chown -R $UID:$GID /mnt/host/java-version.txt
+```
+
+ - default: docker container automatically removed, no user mount, centos:7
+ - using labels **pipeline=$PIPELINE_PID** and **pipeline-stage=$PIPELINE_STAGE**
 
 ---
 ## The End

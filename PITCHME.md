@@ -11,12 +11,16 @@ http://github.com/Nachtfeuer/pipeline
 ---
 @title[Features]
 ### Features
-matrix, pipeline, stages, task groups,
-shell, docker(image), docker(container), python,
-parallelizable, filterable (tags), model data,
-cleanup hook, Jinja2 templating support,
-tasks variables, conditional tasks, dynamic report,
-dry run support, schema validation.
+
+**Structural** | **Task Types**   | **Behaviorial**          | **Data**
+-------------- | ---------------- | ------------------------ | -----------------
+Matrix         | Shell            | Ordered (matrix, tasks)  | Model
+Pipeline       | Python           | Parallel (matrix, tasks) | Env. Variables
+Stages         | Docker Image     | Filter (matrix, tasks)   | Task Variables
+Tasks Groups   | Docker container | Conditional tasks        | Schema Validation
+Tasks          |                  | Jinja2 Templating        | Report
+
+also: dry run support
 
 ---
 @title[Quickstart]
@@ -129,7 +133,28 @@ pipeline:
 @title[Docker Image]
 ### Task: docker(image)
 
-![jdk9-docker](docs/images/docker-image.png)
+```
+model:
+  base_url: http://download.oracle.com/otn-pub/java/jdk
+  rpm: jdk-9.0.4_linux-x64_bin.rpm
+  version_url: "9.0.4+11/c2514751926b4512b076cc82f959763f/{{ model.rpm }}"
+pipeline:
+  - stage(Demo):
+    - tasks(ordered):
+      - docker(image):
+          name: jdk
+          tag: "9.0.4"
+          unique: no
+          script: |
+            from centos:7
+            run yum -y install wget
+            run wget --quiet --no-cookies --no-check-certificate \
+                     --header "Cookie: oraclelicense=accept-securebackup-cookie" \
+                     {{ model.base_url }}/{{ model.version_url|render(model=model) }}
+            run yum -y localinstall {{ model.rpm }}
+            run rm -f {{ model.rpm }}
+            run java --version
+```
 
 ---
 ## The End

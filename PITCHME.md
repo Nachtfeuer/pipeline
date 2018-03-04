@@ -12,13 +12,13 @@ http://github.com/Nachtfeuer/pipeline
 @title[Features]
 ### Features
 
-**Structural** | **Task Types**   | **Behaviorial**          | **Data**
--------------- | ---------------- | ------------------------ | -----------------
-Matrix         | Shell            | Ordered (matrix, tasks)  | Model
-Pipeline       | Python           | Parallel (matrix, tasks) | Env. Variables
-Stages         | Docker Image     | Filter (matrix, tasks)   | Task Variables
-Tasks Groups   | Docker container | Conditional tasks        | Schema Validation
-Tasks          |                  | Jinja2 Templating        | Report
+**Structural** | **Tasks**        | **Behaviorial** | **Data**
+-------------- | ---------------- | --------------- | -----------------
+Matrix         | Shell            | Ordered         | Model
+Pipeline       | Python           | Parallelizable  | Env. Variables
+Stages         | Docker Image     | Filterable      | Task Variables
+Tasks Groups   | Docker Container | Conditional     | Schema Validation
+Tasks          |                  | Templating      | Report
 
 also: dry run support
 

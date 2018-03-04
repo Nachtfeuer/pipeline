@@ -158,6 +158,7 @@ pipeline:
             run rm -f {{ model.rpm }}
             run java --version
 ```
+(script content: Dockerfile syntax, default: image name contains spline pid)
 
 ---
 @title[Docker Container]
@@ -181,5 +182,30 @@ pipeline:
  - using labels **pipeline=$PIPELINE_PID** and **pipeline-stage=$PIPELINE_STAGE**
 
 ---
-## The End
+@title[Matrix]
+### Matrix
 
+```yaml
+matrix:
+  - name: one
+    env: { "message": "first message" }
+  - name: two
+    env: { "message": "second message" }
+
+pipeline:
+  - stage(Demo):
+      - tasks(ordered):
+          - shell:
+              script: echo "{{ env.message }}"
+```
+
+```bash
+$ spline --definition=matrix-demo.yml 2>&1 |grep "\(message\|matrix\)"
+2018-03-04 11:51:03,624 - spline.matrix - Processing pipeline for matrix entry 'one'
+2018-03-04 11:51:03,641 - spline.components.tasks -  | first message
+2018-03-04 11:51:03,642 - spline.matrix - Processing pipeline for matrix entry 'two'
+2018-03-04 11:51:03,665 - spline.components.tasks -  | second message
+```
+
+---
+## The End

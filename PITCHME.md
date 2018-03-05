@@ -268,4 +268,30 @@ $ spline --definition=foo 2>&1 | grep message
 2018-03-05 18:26:47,536 - spline.components.tasks -  | first message
 ```
 ---
+@title[Parallel Tasks]
+### Parallel Tasks
+
+```
+pipeline:
+  - stage(Demo):
+      - tasks(parallel):
+          - shell:
+              script: sleep 5; echo "hello word 1"
+          - shell:
+              script: sleep 3; echo "hello word 2"
+          - shell:
+              script: sleep 1; echo "hello word 3"
+          - env: { "split": "parallel tasks"}
+          - shell:
+              script: sleep 5; echo "hello word 4"
+          - shell:
+              script: sleep 3; echo "hello word 5"
+          - shell:
+              script: sleep 1; echo "hello word 6"
+```
+
+- *env* does split parallel "blocks"
+- Parallel works just as good as many cpu you have
+
+---
 ## The End

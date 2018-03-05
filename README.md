@@ -9,6 +9,7 @@
 [![Coverage Status](https://coveralls.io/repos/github/Nachtfeuer/pipeline/badge.svg?branch=master&service=github)](https://coveralls.io/github/Nachtfeuer/pipeline?branch=master)
 [![BCH compliance](https://bettercodehub.com/edge/badge/Nachtfeuer/pipeline?branch=master)](https://bettercodehub.com/)
 [![Known Vulnerabilities](https://snyk.io/test/github/nachtfeuer/pipeline/badge.svg)](https://snyk.io/test/github/nachtfeuer/pipeline)
+[![GitPitch](https://gitpitch.com/assets/badge.svg)](https://gitpitch.com/Nachtfeuer/pipeline/master)
 
 
 **Table Of Content**:  

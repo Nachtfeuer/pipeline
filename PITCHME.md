@@ -198,6 +198,7 @@ pipeline:
           - shell:
               script: echo "{{ env.message }}"
 ```
+default: run all matrix items, ordered.
 
 ```bash
 $ spline --definition=matrix-demo.yml 2>&1 |grep "\(message\|matrix\)"
@@ -206,6 +207,32 @@ $ spline --definition=matrix-demo.yml 2>&1 |grep "\(message\|matrix\)"
 2018-03-04 11:51:03,642 - spline.matrix - Processing pipeline for matrix entry 'two'
 2018-03-04 11:51:03,665 - spline.components.tasks -  | second message
 ```
+
+---
+@title[Tags]
+### Tags
+
+```yaml
+matrix:
+  - name: one
+    env: { "message": "first message" }
+    tags: ['one']
+  - name: two
+    env: { "message": "second message" }
+    tags: ['two']
+
+pipeline:
+  - stage(Demo):
+      - tasks(ordered):
+          - shell:
+              script: "first task - {{ env.message }}"
+              tags: [ 'one' ]
+          - shell:
+              script: echo "second task - {{ env.message }}"
+              tags: [ 'two' ]
+```
+ - `**--matrix-tags=**  - comma separated list for matrix tags
+ - `**--tags=**  - comma separated list for task tags
 
 ---
 ## The End

@@ -231,8 +231,9 @@ pipeline:
               script: echo "second task - {{ env.message }}"
               tags: [ 'two' ]
 ```
- - `**--matrix-tags=**  - comma separated list for matrix tags
- - `**--tags=**  - comma separated list for task tags
+ - `**--matrix-tags=**  - comma separated, for matrix only
+ - `**--tags=**  - comma separated, for tasks only
+ - can be combined
 
 ---
 ## The End

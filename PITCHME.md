@@ -40,6 +40,8 @@ pipeline:
               script: echo "hello world"
 ```
 
+**advised use** | virtualenv for flexible upgrading
+
 ---
 @title[Task Types]
 ### Task Types
@@ -170,7 +172,7 @@ pipeline:
       - tasks(ordered):
           - docker(container):
               title: Simple Docker container demo
-              image: jdk-16129:9.0.4
+              image: jdk:9.0.4
               mount: yes
               remove: yes
               script: |
@@ -209,8 +211,8 @@ $ spline --definition=matrix-demo.yml 2>&1 |grep "\(message\|matrix\)"
 ```
 
 ---
-@title[Tags]
-### Tags
+@title[Filtering With Tags]
+### Filtering With Tags
 
 ```yaml
 matrix:

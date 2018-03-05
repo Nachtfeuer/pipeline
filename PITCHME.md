@@ -238,4 +238,33 @@ pipeline:
  - can be combined
 
 ---
+@title[Parallel Matrix]
+
+```yaml
+matrix(parallel):
+  - name: one
+    env: { "message": "first message", "sleep": "3" }
+  - name: two
+    env: { "message": "second message", "sleep": "2" }
+  - name: three
+    env: { "message": "third message", "sleep": "1" }
+
+pipeline:
+  - stage(Demo):
+      - tasks(ordered):
+          - shell:
+              script: |
+                sleep {{ env.sleep }}
+                echo "{{ env.message }}"
+```
+
+Slowest task comes last:
+
+```bash
+$ spline --definition=foo 2>&1 | grep message
+2018-03-05 18:26:45,544 - spline.components.tasks -  | third message
+2018-03-05 18:26:46,541 - spline.components.tasks -  | second message
+2018-03-05 18:26:47,536 - spline.components.tasks -  | first message
+```
+---
 ## The End

@@ -290,7 +290,7 @@ pipeline:
               script: sleep 1; echo "hello word 6"
 ```
 
-- *env* does split parallel "blocks"
+- **env** does split parallel "blocks"
 - Parallel works just as good as many cpu you have
 
 ---
@@ -312,7 +312,7 @@ pipeline:
               script: exit 1
               tags: ['bad']
 ```
- - called on each pipeline end when successful
+ - called on finish of each pipeline when successful
  - called on failed failed task (pipeline stops)
 
 ```bash
@@ -322,6 +322,15 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 2018-03-05 19:06:01,797 - spline.components.tasks -  | cleanup called (exit code:1)
 ```
 (for parallel tasks spline waits until completion)
+
+---
+@title[Dry Run Mode]
+### Dry Run Mode
+
+ - nothing is execute
+ - all Bash code visible in the spline log
+ - Dockerfile visualized as Bash comments
+ - support for problem analysis
 
 ---
 @title[Ideas, Future Direction]

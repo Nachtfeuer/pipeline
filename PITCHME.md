@@ -239,6 +239,7 @@ pipeline:
 
 ---
 @title[Parallel Matrix]
+### Parallel Matrix
 
 ```yaml
 matrix(parallel):

@@ -294,4 +294,46 @@ pipeline:
 - Parallel works just as good as many cpu you have
 
 ---
+@title[Cleanup Hook]
+### Cleanup Hook
+
+```yaml
+hooks:
+  cleanup:
+    script: |
+       echo "cleanup called (exit code:$PIPELINE_SHELL_EXIT_CODE)"
+pipeline:
+  - stage(Demo):
+      - tasks(parallel):
+          - shell:
+              script: echo "all good"
+              tags: ['good']
+          - shell:
+              script: exit 1
+              tags: ['bad']
+```
+ - called on each pipeline end when successful
+ - called on failed failed task (pipeline stops)
+
+```bash
+$ spline --definition=demo.yml --tags=good 2>&1 | grep "cleanup"
+2018-03-05 19:05:51,780 - spline.pipeline -  | cleanup called (exit code:0)
+$ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
+2018-03-05 19:06:01,797 - spline.components.tasks -  | cleanup called (exit code:1)
+```
+(for parallel tasks spline waits until completion)
+
+---
+@title[Ideas, Future Direction]
+### Ideas | Future Direction
+
+ * Auto Cleanup Docker Images+Container
+ * New task type: Ansible
+ * Support for docker-compose
+ * Support for Packer
+ * Include statement
+ * Generator for Jenkinsfile and .travis.yml
+ * Spline Server
+
+---
 ## The End

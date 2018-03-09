@@ -1,0 +1,54 @@
+.reveal img, .reveal section img {
+    border:0px; 
+    background-color: transparent;
+}
+
+.reveal img.faroImage{
+    display:inline-block;
+    width:30%;
+    background-color: transparent;
+    border:0px;
+}
+
+.reveal .smallText{ font-size:60%; }
+
+.reveal div.left, .reveal div.eventstorming {
+    left:-8.33%;
+    text-align: left;
+    float: left;
+    width:50%;
+    z-index:-10;
+    font-size:75%;
+}
+
+.reveal div.left img{
+    width:100%;
+}
+
+.reveal div.eventstorming img, {
+    height:80%;
+    width:80%;
+}
+
+.reveal div.right {
+    left:31.25%;
+    top: 75px;
+    float: right;
+    text-align: right;
+    z-index:-10;
+    width:50%;
+    font-size:75%;
+}
+
+.reveal .lowernote {
+    font-size:60%;
+}
+
+.reveal pre code{
+    font-size: 65%;
+    line-height: 92%;
+}
+
+.highlight{
+    color: #fdf479;
+}

@@ -182,6 +182,7 @@ pipeline:
 
  - default: docker container automatically removed, no user mount, centos:7
  - using labels **pipeline=$PIPELINE_PID** and **pipeline-stage=$PIPELINE_STAGE**
+ - automatic forwarding of ssh agent (see ssh.yaml example)
 
 ---
 @title[Matrix]

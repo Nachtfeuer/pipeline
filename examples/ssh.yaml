@@ -9,6 +9,7 @@ pipeline:
     - tasks(ordered):
       - shell:
           script: |
+            echo "ssh -q -T -o StrictHostKeyChecking=no localhost ls -a .ssh/*"
             ssh -q -T -o StrictHostKeyChecking=no localhost ls -a .ssh/*
           tags:
             - shell
@@ -19,15 +20,15 @@ pipeline:
           unique: no
           script: |
             from centos:7
-            run yum -y install openssh-clients openssh-askpass which less
+            run yum -y install openssh-clients openssh-askpass
           tags:
             - docker
 
       - docker(container):
           image: ssh-agent-demo:0.1
+          title: Running ssh inside Docker container (ssh-agent forwarded)
           script: |
-            echo "SSH_AUTH_SOCK=${SSH_AUTH_SOCK}"
-            unset SSH_ASKPASS
+            echo "ssh -q -T -o StrictHostKeyChecking=no {{ env.USER }}@{{ env.PIPELINE_HOST }} ls -a .ssh/*"
             ssh -q -T -o StrictHostKeyChecking=no {{ env.USER }}@{{ env.PIPELINE_HOST }} ls -a .ssh/*
           tags:
             - docker

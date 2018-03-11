@@ -1,25 +1,20 @@
-"""
-Executing a bash script.
-
-License::
-
-    Copyright (c) 2017 Thomas Lehmann
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this
-    software and associated documentation files (the "Software"), to deal in the Software
-    without restriction, including without limitation the rights to use, copy, modify, merge,
-    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-    to whom the Software is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-    DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-"""
+"""Executing a bash script."""
+# Copyright (c) 2017 Thomas Lehmann
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+# to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies
+# or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=too-many-instance-attributes
 import sys
 import os
@@ -40,8 +35,8 @@ class Bash(object):
         """
         Initialize with Bash code and optional environment variables.
 
-        @type  config: ShellConfig
-        @param config: options for configuring Bash environment and behavior
+        Args:
+            config(ShellConfig): options for configuring Bash environment and behavior
         """
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
@@ -121,12 +116,21 @@ class Bash(object):
             content = str(open(rendered_script).read())
             temp.writelines(content)
         else:
-            temp.write(u"#!/bin/bash\n%s" % ("set -x\n" if self.config.debug else ''))
+            temp.write(u"#!/bin/bash\n%s" % self.render_bash_options())
             temp.write(to_file_map[sys.version_info.major](rendered_script))
         temp.close()
         # make Bash script executable
         os.chmod(temp.name, 777)  # nosec
         return temp.name
+
+    def render_bash_options(self):
+        """Rendering Bash options."""
+        options = ''
+        if self.config.debug:
+            options += "set -x\n"
+        if self.config.strict:
+            options += "set -euo pipefail\n"
+        return options
 
     def process_script(self, filename):
         """Running the Bash code."""

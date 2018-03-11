@@ -44,7 +44,8 @@ def worker(data):
                     ShellConfig(script=data['entry']['script'],
                                 title=data['entry']['title'] if 'title' in data['entry'] else '',
                                 model=data['model'], env=data['env'], item=data['item'],
-                                dry_run=data['dry_run'], debug=data['debug'], variables=data['variables'],
+                                dry_run=data['dry_run'], debug=data['debug'], strict=data['strict'],
+                                variables=data['variables'],
                                 temporary_scripts_path=data['temporary_scripts_path']))
     output = []
     for line in shell.process():
@@ -98,6 +99,7 @@ class Tasks(object):
                     'item': item,
                     'dry_run': self.pipeline.options.dry_run,
                     'debug': self.pipeline.options.debug,
+                    'strict': self.pipeline.options.strict,
                     'variables': self.pipeline.variables,
                     'temporary_scripts_path': self.pipeline.options.temporary_scripts_path})
                 self.next_task_id += 1
@@ -164,7 +166,7 @@ class Tasks(object):
             entry = shell['entry']
             config = ShellConfig(script=entry['script'], title=entry['title'] if 'title' in entry else '',
                                  model=shell['model'], env=shell['env'], item=shell['item'],
-                                 dry_run=shell['dry_run'], debug=shell['debug'],
+                                 dry_run=shell['dry_run'], debug=shell['debug'], strict=shell['strict'],
                                  variables=shell['variables'],
                                  temporary_scripts_path=shell['temporary_scripts_path'])
             result = Adapter(self.process_shell(get_creator_by_name(shell['creator']), entry, config))
@@ -231,6 +233,7 @@ class Tasks(object):
                                  model=self.pipeline.model, env=env,
                                  dry_run=self.pipeline.options.dry_run,
                                  debug=self.pipeline.options.debug,
+                                 strict=self.pipeline.options.strict,
                                  temporary_scripts_path=self.pipeline.options.temporary_scripts_path)
             cleanup_shell = Bash(config)
             for line in cleanup_shell.process():

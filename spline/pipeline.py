@@ -66,7 +66,7 @@ class Pipeline(object):
             env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
             config = ShellConfig(script=self.data.hooks.cleanup, model=self.model,
                                  env=env, dry_run=self.options.dry_run,
-                                 debug=self.options.debug,
+                                 debug=self.options.debug, strict=self.options.strict,
                                  temporary_scripts_path=self.options.temporary_scripts_path)
             cleanup_shell = Bash(config)
             for line in cleanup_shell.process():

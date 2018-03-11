@@ -122,3 +122,12 @@ class TestBash(unittest.TestCase):
 
         bash = Bash(ShellConfig(script='''echo "hello"''', temporary_scripts_path='/tmp/does-not-exist'))
         assert_that(bash.get_temporary_scripts_path(), equal_to(None))
+
+    def test_render_bash_options(self):
+        """Testing rendering Bash options."""
+        bash = Bash(ShellConfig(script='''echo "hello"'''))
+        assert_that(bash.render_bash_options(), equal_to(''))
+        bash = Bash(ShellConfig(script='''echo "hello"''', debug=True))
+        assert_that(bash.render_bash_options(), equal_to('set -x\n'))
+        bash = Bash(ShellConfig(script='''echo "hello"''', strict=True))
+        assert_that(bash.render_bash_options(), equal_to('set -euo pipefail\n'))

@@ -28,6 +28,7 @@ install:
 
 script:
     - tox
+    - tests/scripts/verify_package.sh
 
 after_success:
     - coveralls

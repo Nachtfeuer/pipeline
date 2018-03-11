@@ -1,0 +1,16 @@
+matrix(ordered):
+  - name: first
+    env: {'PROMPT': 'first - '}
+  - name: second
+    env: {'PROMPT': 'second - '}
+
+model:
+  message: "hello world"
+
+pipeline:
+  - stage(Verify):
+    - tasks(ordered):
+      - shell:
+          script: echo "{{ env.PROMPT }}Bash - {{ model.message }}"
+      - python:
+          script: print("{{ env.PROMPT }}Python - {{ model.message }}")

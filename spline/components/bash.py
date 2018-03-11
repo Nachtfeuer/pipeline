@@ -1,25 +1,20 @@
-"""
-Executing a bash script.
-
-License::
-
-    Copyright (c) 2017 Thomas Lehmann
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy of this
-    software and associated documentation files (the "Software"), to deal in the Software
-    without restriction, including without limitation the rights to use, copy, modify, merge,
-    publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
-    to whom the Software is furnished to do so, subject to the following conditions:
-    The above copyright notice and this permission notice shall be included in all copies
-    or substantial portions of the Software.
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
-    INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
-    IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
-    DAMAGES OR OTHER LIABILITY,
-    WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-"""
+"""Executing a bash script."""
+# Copyright (c) 2017 Thomas Lehmann
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify, merge,
+# publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons
+# to whom the Software is furnished to do so, subject to the following conditions:
+# The above copyright notice and this permission notice shall be included in all copies
+# or substantial portions of the Software.
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY,
+# WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=too-many-instance-attributes
 import sys
 import os
@@ -40,8 +35,8 @@ class Bash(object):
         """
         Initialize with Bash code and optional environment variables.
 
-        @type  config: ShellConfig
-        @param config: options for configuring Bash environment and behavior
+        Args:
+            config(ShellConfig): options for configuring Bash environment and behavior
         """
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
@@ -75,6 +70,19 @@ class Bash(object):
         """Writing current script path and filename into environment variables."""
         self.env.update({'PIPELINE_BASH_FILE': filename})
 
+    def get_temporary_scripts_path(self):
+        """
+        Get path for temporary scripts.
+
+        Returns:
+            str: path for temporary scripts or None if not set
+        """
+        result = None
+        if len(self.config.temporary_scripts_path) > 0:
+            if os.path.isdir(self.config.temporary_scripts_path):
+                result = self.config.temporary_scripts_path
+        return result
+
     def create_file_for(self, script):
         """
         Create a temporary, executable bash file.
@@ -83,13 +91,15 @@ class Bash(object):
         the provided environment variables and optional also an item
         when using the B{with} field.
 
-        @type script: str
-        @param script: either pather and filename or Bash code.
-        @rtype: str
-        @return: path and filename of a temporary file.
+        Args:
+            script (str): either pather and filename or Bash code.
+
+        Returns:
+            str: path and filename of a temporary file.
         """
         temp = tempfile.NamedTemporaryFile(
-            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False)
+            prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False,
+            dir=self.get_temporary_scripts_path())
 
         self.update_script_filename(temp.name)
         rendered_script = render(script, model=self.config.model, env=self.env, item=self.config.item,
@@ -106,12 +116,21 @@ class Bash(object):
             content = str(open(rendered_script).read())
             temp.writelines(content)
         else:
-            temp.write(u"#!/bin/bash\n%s" % ("set -x\n" if self.config.debug else ''))
+            temp.write(u"#!/bin/bash\n%s" % self.render_bash_options())
             temp.write(to_file_map[sys.version_info.major](rendered_script))
         temp.close()
         # make Bash script executable
         os.chmod(temp.name, 777)  # nosec
         return temp.name
+
+    def render_bash_options(self):
+        """Rendering Bash options."""
+        options = ''
+        if self.config.debug:
+            options += "set -x\n"
+        if self.config.strict:
+            options += "set -euo pipefail\n"
+        return options
 
     def process_script(self, filename):
         """Running the Bash code."""

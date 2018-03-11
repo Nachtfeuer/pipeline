@@ -1,0 +1,34 @@
+# Required for the demo
+# a) Your own key registered in $HOME/.ssh/authorized_keys
+# b) $ eval `ssh-agent -s`
+#    $ ssh-add
+# c) $ export PIPELINE_HOST=$(hostname -I |cut -d' ' -f2)
+# d) $ spline --definition=examples/ssh.yaml
+pipeline:
+  - stage(Demo):
+    - tasks(ordered):
+      - shell:
+          script: |
+            echo "ssh -q -T -o StrictHostKeyChecking=no localhost ls -a .ssh/*"
+            ssh -q -T -o StrictHostKeyChecking=no localhost ls -a .ssh/*
+          tags:
+            - shell
+
+      - docker(image):
+          name: ssh-agent-demo
+          tag: "0.1"
+          unique: no
+          script: |
+            from centos:7
+            run yum -y install openssh-clients openssh-askpass
+          tags:
+            - docker
+
+      - docker(container):
+          image: ssh-agent-demo:0.1
+          title: Running ssh inside Docker container (ssh-agent forwarded)
+          script: |
+            echo "ssh -q -T -o StrictHostKeyChecking=no {{ env.USER }}@{{ env.PIPELINE_HOST }} ls -a .ssh/*"
+            ssh -q -T -o StrictHostKeyChecking=no {{ env.USER }}@{{ env.PIPELINE_HOST }} ls -a .ssh/*
+          tags:
+            - docker

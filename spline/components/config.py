@@ -36,10 +36,12 @@ class ShellConfig(object):
             Optional('item', default=None): object,
             Optional('dry_run', default=False): bool,
             Optional('debug', default=False): bool,
+            Optional('strict', default=False): bool,
             Optional('variables', default={}): {
                 Optional(And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)'))):
                     Or(type(' '), type(u' '))
-            }
+            },
+            Optional('temporary_scripts_path', default=''): Or(type(''), type(u''))
         })
 
     def __init__(self, **kwargs):
@@ -53,7 +55,9 @@ class ShellConfig(object):
             self.item = arguments.item
             self.dry_run = arguments.dry_run
             self.debug = arguments.debug
+            self.strict = arguments.strict
             self.variables = arguments.variables.data
+            self.temporary_scripts_path = arguments.temporary_scripts_path
         except SchemaError as exception:
             logging.getLogger(__name__).error(exception)
             raise RuntimeError(str(exception))
@@ -71,16 +75,18 @@ class ApplicationOptions(object):
         Optional('event_logging', default=False): bool,
         Optional('logging_config', default=''): Or(type(''), type(u'')),
         Optional('debug', default=False): bool,
+        Optional('strict', default=False): bool,
         Optional('report', default='off'):
-            And(str, lambda s: s in ['off', 'json', 'html'])
+            And(str, lambda s: s in ['off', 'json', 'html']),
+        Optional('temporary_scripts_path', default=''): Or(type(''), type(u''))
     }
 
     def __init__(self, **kwargs):
         """
         Initializing and validating fields.
 
-        @type kwargs: dict
-        @param kwargs: application command line options.
+        Args:
+            kwargs (dict): application command line options.
         """
         try:
             arguments = Adapter(Schema(ApplicationOptions.SCHEMA).validate(kwargs))
@@ -92,7 +98,9 @@ class ApplicationOptions(object):
             self.event_logging = arguments.event_logging
             self.logging_config = arguments.logging_config
             self.debug = arguments.debug
+            self.strict = arguments.strict
             self.report = arguments.report
+            self.temporary_scripts_path = arguments.temporary_scripts_path
         except SchemaError as exception:
             logging.getLogger(__name__).error(exception)
             raise RuntimeError(str(exception))

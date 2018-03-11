@@ -29,3 +29,4 @@ Welcome to spline's documentation!
    options
    unicode
    report
+   development

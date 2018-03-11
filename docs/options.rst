@@ -79,3 +79,25 @@ I'm just printing the first 20 lines:
     2018-01-05 19:31:12,053 - spline.components.tasks -  | ++ n=1
     2018-01-05 19:31:12,053 - spline.components.tasks -  | ++ '[' 1 -lt 2 ']'
 
+
+Temporary Scripts Path
+----------------------
+The Python library functionality related to temporary folders is explained here:
+https://docs.python.org/2/library/tempfile.html#tempfile.mkstemp
+
+However you can specify another path that is used to store splines temporary scripts
+by specifying the path with `--temporary-scripts-path`. When the path doesn't exist
+the tool tries to create it for you. Here's an example:
+
+::
+
+    $ spline --definition=examples/colors.yaml --temporary-scripts-path=$PWD/temp
+    2018-02-06 05:52:57,547 - spline.application - Running with Python 2.7.13 (default, Nov 24 2017, 17:33:09) [GCC 6.3.0 20170516]
+    2018-02-06 05:52:57,553 - spline.application - Running on platform Linux-4.9.0-5-amd64-x86_64-with-debian-9.3
+    2018-02-06 05:52:57,553 - spline.application - Current cpu count is 4
+    2018-02-06 05:52:57,553 - spline.application - Processing pipeline definition 'examples/colors.yaml'
+    2018-02-06 05:52:57,557 - spline.application - Schema validation for 'examples/colors.yaml' succeeded
+    2018-02-06 05:52:57,558 - spline.components.stage - Processing pipeline stage 'Example'
+    2018-02-06 05:52:57,559 - spline.components.tasks - Processing group of tasks (parallel=no)
+    2018-02-06 05:52:57,566 - spline.components.tasks - Processing Bash code: start
+    2018-02-06 05:52:57,568 - spline.components.bash - Running script /work/pipeline/temp/pipeline-script-FxvNFG.sh

@@ -20,7 +20,7 @@ Stages         | Docker    | Filterable      | Task Var.
 Tasks Groups   |           | Conditional     | Schema Validation
 Tasks          |           | Templating      | Report
 
-additionally: dry run support, shell debugging
+**finally** | dry run support, shell debugging, strict mode
 
 ---
 @title[Quickstart]
@@ -182,6 +182,7 @@ pipeline:
 
  - default: docker container automatically removed, no user mount, centos:7
  - using labels **pipeline=$PIPELINE_PID** and **pipeline-stage=$PIPELINE_STAGE**
+ - automatic forwarding of ssh agent (see ssh.yaml example)
 
 ---
 @title[Matrix]
@@ -327,10 +328,19 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 @title[Dry Run Mode]
 ### Dry Run Mode
 
- - nothing is execute
+ - nothing is executed
  - all Bash code visible in the spline log
- - Dockerfile visualized as Bash comments
+ - Dockerfile visualized as Bash comment
  - support for problem analysis
+
+---
+@title[Report]
+### Report
+
+![report](docs/images/pipeline.png)
+
+- **--report=html**
+- refresh each 5 seconds
 
 ---
 @title[Ideas, Future Direction]

@@ -1,0 +1,34 @@
+model:
+    image: centos:7
+
+pipeline:
+    - stage(Example):
+        - tasks(ordered):
+            - packer:
+                script: |
+                  {
+                    "builders": [{
+                        "type": "docker",
+                        "image": "{{ model.image }}",
+                        "commit": true,
+                        "changes": [
+                            "LABEL pipeline={{ env.PIPELINE_PID }}",
+                            "LABEL pipeline-stage={{ env.PIPELINE_STAGE }}"
+                        ]
+                    }],
+
+                    "provisioners": [{
+                        "type": "shell",
+                        "inline": [
+                            "yum -y install python-setuptools",
+                            "easy_install pip",
+                            "pip install tox"
+                        ]
+                    }],
+
+                    "post-processors": [{
+                        "type": "docker-tag",
+                        "repository": "spline/packer/demo",
+                        "tag": "0.1"
+                    }]
+                  }

@@ -23,6 +23,7 @@ Welcome to spline's documentation!
    tasks
    docker_container
    docker_image
+   packer
    conditions
    hooks
    event_logging

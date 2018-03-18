@@ -82,9 +82,10 @@ Features
  - filtered execution via tags (matrix and/or tasks)
  - supporting Jinja templating in scripts (also nested inside model)
  - support for Docker containers and Docker images
+ - support for the Packer tool
  - execution time on each level: pipeline, stage, tasks and shell (event logging)
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
- - dry run support
+ - dry run and debug support
  - support for Python scripts
  - support for task variables
  - support for conditional tasks
@@ -96,6 +97,7 @@ documentation. You have two options:
 
  - follow the links on the Github main page: https://github.com/Nachtfeuer/pipeline
  - follow the link to read the docs: http://spline.readthedocs.io/en/master/
+ - presentation: https://gitpitch.com/Nachtfeuer/pipeline/master
 
 About Names
 ------------

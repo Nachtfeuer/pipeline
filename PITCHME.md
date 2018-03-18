@@ -17,7 +17,7 @@ http://github.com/Nachtfeuer/pipeline
 Matrix         | Shell     | Ordered         | Model
 Pipeline       | Python    | Parallelizable  | Env. Var.
 Stages         | Docker    | Filterable      | Task Var.
-Tasks Groups   |           | Conditional     | Schema Validation
+Tasks Groups   | Packer    | Conditional     | Schema Validation
 Tasks          |           | Templating      | Report
 
 **finally** | dry run support, shell debugging, strict mode
@@ -325,6 +325,29 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 (for parallel tasks spline waits until completion)
 
 ---
+@title[Packer]
+### Packer
+
+```yaml
+- packer:
+    script: |
+        {"builders": [{
+            "type": "docker",
+            "image": "centos:7",
+            "commit": true,
+        }],
+        "provisioners": [{
+            "type": "shell",
+            "inline": [ "yum -y install gcc-c++ make cmake" ]
+        }],
+        "post-processors": [{
+            "type": "docker-tag",
+            "repository": "spline/packer/demo",
+            "tag": "0.1"
+        }]}
+```
+
+---
 @title[Dry Run Mode]
 ### Dry Run Mode
 
@@ -349,7 +372,6 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
  * Auto Cleanup Docker Images+Container
  * New task type: Ansible
  * Support for docker-compose
- * Support for Packer
  * Include statement
  * Generator for Jenkinsfile and .travis.yml
  * Spline Server

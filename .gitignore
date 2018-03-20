@@ -17,3 +17,4 @@ pipeline_demo_python_primes.egg-info/
 .coverage.*
 pipeline.html
 .noseids
+~/

@@ -104,6 +104,21 @@ content to the host the caller might fail on removing that files and folders bec
 of missing permissions. That's why the user id and group id is always passed to the
 container allowing you to adjust the permissions correctly.
 
+Network
+-------
+The optional field **network** allows you to specify a network name. You can create
+a network with `docker network create <name>` (see docker.yaml in examples folder).
+Another usecase is docker-compose which usually does create a network for all containers
+it does create; if you now create an additional container that should be able
+to work with the existing ones you have to "join" the network by specifying the name
+of that network.
+
+::
+
+    - docker(container):
+        network: demo
+        script: echo "hello world"
+
 
 "With" attribute
 ----------------

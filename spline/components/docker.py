@@ -45,11 +45,13 @@ class Container(Bash):
         """Creator function for creating an instance of a Bash."""
         template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-container.sh.j2')
         template = open(template_file).read()
+        # all fields are re-rendered via the Bash script
         wrapped_script = render(template, container={
             'image': 'centos:7' if 'image' not in entry else entry['image'],
             'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
             'background': False if 'background' not in entry else str(entry['background']).lower(),
             'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
+            'network': '' if 'network' not in entry else entry['network'],
             'script': config.script
         })
 

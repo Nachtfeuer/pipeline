@@ -1,8 +1,12 @@
+model:
+  image: centos:7.4.1708
+
 pipeline:
   - stage(example):
     - tasks:
       # use --tags=background-and-auto-remove
       - docker(container):
+          image: "{{ model.image }}"
           script: sleep infinity
           background: true
           tags:
@@ -43,3 +47,23 @@ pipeline:
             rm -f hello.txt
           tags:
             - using-mount
+
+      # use --tags=using-network
+      - shell:
+          script: |
+            docker network create demo
+          tags:
+            - using-network
+
+      - docker(container):
+          network: demo
+          script: echo "hello world"
+          tags:
+            - using-network
+
+      # use --tags=using-network
+      - shell:
+          script: |
+            docker network remove demo
+          tags:
+            - using-network

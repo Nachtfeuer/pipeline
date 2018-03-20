@@ -77,6 +77,7 @@ class Validator(object):
                         Optional('mount', default=False): bool,
                         Optional('background', default=False): bool,
                         Optional('remove', default=True): bool,
+                        Optional('network', default=''): And(str, len),
                         Optional('tags'): And([And(str, len)], len),
                         Optional('with'): And(len, [object]),
                         Optional('variable'):

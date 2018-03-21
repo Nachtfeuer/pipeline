@@ -95,3 +95,6 @@ but all tasks of one block are executed in parallel. When executing it looks lik
     2018-01-22 19:49:44,576 - spline.components.tasks.worker -  | a great world
     2018-01-22 19:49:44,577 - spline.components.tasks.worker -  | a great hello
     2018-01-22 19:49:44,581 - spline.components.tasks.worker -  | a great hello world
+
+When the tasks are ordered a previous variable by a previous task
+can be evaluated immediately. 

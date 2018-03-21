@@ -1,5 +1,15 @@
 pipeline:
   - stage(Example):
+    - tasks(ordered):
+        - shell:
+            script: echo "hello"
+            variable: one
+        - shell:
+            script: echo "world"
+            variable: two
+        - shell:
+            script: echo "Immediately - {{ variables.one }} {{ variables.two }}"
+
     - tasks(parallel):
         # first block
         - shell:

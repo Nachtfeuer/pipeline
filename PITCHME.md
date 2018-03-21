@@ -106,7 +106,7 @@ pipeline:
 @title[Task Variables]
 ### Task Variables
 #### Special rules:
-- either need to be separated via a tasks block or via an **env** block inbetween in same block
+- parallel: either need to be separated via a tasks block or an **env** block
 - field **variable** not available for docker(image)
 
 #### Example:
@@ -117,7 +117,6 @@ pipeline:
       - shell:
           script: git rev-parse --short HEAD
           variable: commit
-    - tasks(ordered):
       - shell:
           script: "echo \"commit: {{ variables.commit }}\""
 ```

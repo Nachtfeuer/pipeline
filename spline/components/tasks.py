@@ -128,13 +128,15 @@ class Tasks(object):
         result = Adapter({'success': True, 'output': []})
         for task_entry in document:
             key, entry = list(task_entry.items())[0]
-            if key == "env":
+
+            if (not self.parallel or key == 'env') and len(shells) > 0:
                 result = Adapter(self.process_shells(shells))
                 output += result.output
                 shells = []
                 if not result.success:
                     break
 
+            if key == 'env':
                 self.pipeline.data.env_list[2].update(entry)
 
             elif key in ['shell', 'docker(container)', 'docker(image)', 'python', 'packer']:
@@ -143,8 +145,8 @@ class Tasks(object):
         if result.success:
             result = Adapter(self.process_shells(shells))
             output += result.output
-            self.event.delegate(result.success)
 
+        self.event.delegate(result.success)
         return {'success': result.success, 'output': output}
 
     def process_shells_parallel(self, shells):

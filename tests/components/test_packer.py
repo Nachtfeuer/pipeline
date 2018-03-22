@@ -28,3 +28,14 @@ class TestPacker(unittest.TestCase):
             '==> Builds finished. The artifacts of successful builds are:'))
         assert_that(output[-1], contains_string(
             "--> docker: Exported Docker file: %s" % filename))
+
+    def test_creator_dry_run(self):
+        """Testing dry run for Packer Docker image."""
+        filename = os.path.join(os.path.dirname(__file__), 'image.tar')
+        script = '''{"builders": [{"type": "docker", "image": "centos:7", "export_path": "%s"}]}''' % filename
+        config = ShellConfig(script=script,
+                             title='test image creation', model={'image': 'centos'}, env={'tag': '7'},
+                             dry_run=True)
+        image = Packer.creator({}, config)
+        output = [line for line in image.process() if line.find('export_path') >= 0]
+        assert_that(len(output), equal_to(1))

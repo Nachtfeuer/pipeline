@@ -37,7 +37,8 @@ class Packer(Bash):
     def creator(_, config):
         """Creator function for creating an instance of a Packer image script."""
         # writing Dockerfile
-        packer_script = render(config.script, model=config.model, env=config.env, item=config.item)
+        packer_script = render(config.script, model=config.model, env=config.env,
+                               variables=config.variables, item=config.item)
         filename = "packer.dry.run.see.comment"
 
         if not config.dry_run:

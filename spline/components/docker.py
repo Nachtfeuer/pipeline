@@ -74,7 +74,8 @@ class Image(Bash):
     def creator(entry, config):
         """Creator function for creating an instance of a Docker image script."""
         # writing Dockerfile
-        dockerfile = render(config.script, model=config.model, env=config.env, item=config.item)
+        dockerfile = render(config.script, model=config.model, env=config.env,
+                            variables=config.variables, item=config.item)
         filename = "dockerfile.dry.run.see.comment"
 
         if not config.dry_run:

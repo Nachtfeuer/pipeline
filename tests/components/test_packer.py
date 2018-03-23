@@ -32,10 +32,13 @@ class TestPacker(unittest.TestCase):
     def test_creator_dry_run(self):
         """Testing dry run for Packer Docker image."""
         filename = os.path.join(os.path.dirname(__file__), 'image.tar')
-        script = '''{"builders": [{"type": "docker", "image": "centos:7", "export_path": "%s"}]}''' % filename
-        config = ShellConfig(script=script,
-                             title='test image creation', model={'image': 'centos'}, env={'tag': '7'},
-                             dry_run=True)
+        script = '''{"builders": [{
+                "type": "docker",
+                "image": "{{ model.image }}:{{ env.tag }}",
+                "export_path": "{{ variables.filename }}"}]}'''
+        config = ShellConfig(script=script, title='test image creation',
+                             model={'image': 'centos'}, env={'tag': '7'},
+                             variables={'filename': filename}, dry_run=True)
         image = Packer.creator({}, config)
         output = [line for line in image.process() if line.find('export_path') >= 0]
         assert_that(len(output), equal_to(1))

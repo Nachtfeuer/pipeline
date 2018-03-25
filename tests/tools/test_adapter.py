@@ -36,4 +36,3 @@ class TestAdapter(unittest.TestCase):
         data = {'a': 10, 'b': {'c': 20}}
         adapted = Adapter(data)
         assert_that(adapted.foo, equal_to(None))
-

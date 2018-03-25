@@ -1,0 +1,13 @@
+pipeline:
+  - stage(Demo):
+    - tasks(ordered):
+      - docker(image):
+          name: demo
+          tag: "0.1"
+          unique: no
+          script: |
+            from centos:7
+            run yum install -y bc
+            add examples/primes.sh /root
+
+# after running try following: docker run --rm -it demo:0.1 /root/primes.sh 100

@@ -6,12 +6,18 @@
 {% endfor -%}
 # <<
 {% endif -%}
+
+DOCKERFILE=$(basename {{ dockerfile_filename }})
+cp {{ dockerfile_filename }} $PWD/${DOCKERFILE}
+
 # for visibility in logging
-echo "docker build -t {{ name }}:{{ tag }} < {{ dockerfile_filename }}"
+echo "docker build -t {{ name }}:{{ tag }} -f ${DOCKERFILE} $PWD"
 # trying to build docker image
-docker build -t {{ name }}:{{ tag }} - < {{ dockerfile_filename }}
+docker build -t {{ name }}:{{ tag }} -f ${DOCKERFILE} $PWD
 docker_error=$?
+
 # cleanup
+rm -f ${DOCKERFILE}
 rm -f {{ dockerfile_filename }}
 # give back result
 exit ${docker_error}

@@ -20,10 +20,12 @@ pipeline:
                     "provisioners": [{
                         "type": "shell",
                         "inline": [
-                            "yum -y install python-setuptools",
-                            "easy_install pip",
-                            "pip install tox"
+                            "yum -y install bc"
                         ]
+                    }, {
+                        "type": "file",
+                        "source": "examples/primes.sh",
+                        "destination": "/root/primes.sh"
                     }],
 
                     "post-processors": [{

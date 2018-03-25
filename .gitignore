@@ -18,3 +18,4 @@ pipeline_demo_python_primes.egg-info/
 pipeline.html
 .noseids
 ~/
+dockerfile-*

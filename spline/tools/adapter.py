@@ -42,7 +42,7 @@ class Adapter(object):
         else:
             try:
                 value = getattr(self.data, key)
-            except AttributeError as _:
+            except AttributeError:
                 value = None
         return value
 

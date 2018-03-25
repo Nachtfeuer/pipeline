@@ -1,7 +1,7 @@
 """Testing of module adapter."""
 # pylint: disable=no-self-use, invalid-name
 import unittest
-from hamcrest import assert_that, equal_to, calling, raises
+from hamcrest import assert_that, equal_to
 from spline.tools.adapter import Adapter
 
 

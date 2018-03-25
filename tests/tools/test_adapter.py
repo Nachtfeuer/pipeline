@@ -35,5 +35,5 @@ class TestAdapter(unittest.TestCase):
         """Testing unknown field or callable."""
         data = {'a': 10, 'b': {'c': 20}}
         adapted = Adapter(data)
-        assert_that(calling(adapted.__getattr__).with_args('foo'),
-                    raises(AttributeError))
+        assert_that(adapted.foo, equal_to(None))
+

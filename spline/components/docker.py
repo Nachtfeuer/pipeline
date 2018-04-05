@@ -34,8 +34,9 @@ class Container(Bash):
         """Initialize with Bash code and optional environment variables."""
         super(Container, self).__init__(config)
 
-    def update_script_filename(self, filename):
-        """Writing current script path and filename into environment variables."""
+    def update_environment_variables(self, filename):
+        """Updating OS environment variables and current script path and filename."""
+        super(Container, self).update_environment_variables(filename)
         self.env.update({'PIPELINE_BASH_FILE_ORIGINAL': filename})
         filename = os.path.join('/root/scripts', os.path.basename(filename))
         self.env.update({'PIPELINE_BASH_FILE': filename})

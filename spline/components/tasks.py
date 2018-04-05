@@ -22,6 +22,7 @@ from contextlib import closing
 from spline.components.bash import Bash
 from spline.components.docker import Container, Image
 from spline.components.packer import Packer
+from spline.components.ansible import Ansible
 from spline.components.script import Script
 from spline.components.config import ShellConfig
 from spline.tools.logger import Logger
@@ -43,7 +44,8 @@ def get_creator_by_name(name):
     """
     return {'docker(container)': Container.creator,
             'shell': Bash.creator, 'docker(image)': Image.creator,
-            'python': Script.creator, 'packer': Packer.creator}[name]
+            'python': Script.creator, 'packer': Packer.creator,
+            'ansible(simple)': Ansible.creator}[name]
 
 
 def worker(data):
@@ -139,7 +141,8 @@ class Tasks(object):
             if key == 'env':
                 self.pipeline.data.env_list[2].update(entry)
 
-            elif key in ['shell', 'docker(container)', 'docker(image)', 'python', 'packer']:
+            elif key in ['shell', 'docker(container)', 'docker(image)', 'python',
+                         'packer', 'ansible(simple)']:
                 self.prepare_shell_data(shells, key, entry)
 
         if result.success:

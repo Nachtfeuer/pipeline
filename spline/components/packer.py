@@ -17,9 +17,9 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=useless-super-delegation
 import os
-import tempfile
 from spline.components.bash import Bash
 from spline.tools.filters import render
+from spline.tools.stream import write_temporary_file
 
 
 class Packer(Bash):
@@ -36,17 +36,13 @@ class Packer(Bash):
     @staticmethod
     def creator(_, config):
         """Creator function for creating an instance of a Packer image script."""
-        # writing Dockerfile
         packer_script = render(config.script, model=config.model, env=config.env,
                                variables=config.variables, item=config.item)
         filename = "packer.dry.run.see.comment"
 
         if not config.dry_run:
-            temp = tempfile.NamedTemporaryFile(
-                prefix="packer-", suffix=".json", mode='w+t', delete=False)
-            temp.writelines(packer_script)
-            temp.close()
-            filename = temp.name
+            # writing Packer file (JSON)
+            filename = write_temporary_file(packer_script, 'packer-', '.json')
             packer_script = ''
 
         # rendering the Bash script for generating the Packer image

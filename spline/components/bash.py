@@ -42,7 +42,7 @@ class Bash(object):
         self.logger = Logger.get_logger(__name__)
         self.config = config
         self.success = True
-        self.env = os.environ.copy()
+        self.env = {}
         self.env.update(config.env)
 
         if len(config.title) > 0:
@@ -66,8 +66,9 @@ class Bash(object):
         """
         return Bash(config)
 
-    def update_script_filename(self, filename):
-        """Writing current script path and filename into environment variables."""
+    def update_environment_variables(self, filename):
+        """Updating OS environment variables and current script path and filename."""
+        self.env.update(os.environ.copy())
         self.env.update({'PIPELINE_BASH_FILE': filename})
 
     def get_temporary_scripts_path(self):
@@ -101,7 +102,7 @@ class Bash(object):
             prefix="pipeline-script-", mode='w+t', suffix=".sh", delete=False,
             dir=self.get_temporary_scripts_path())
 
-        self.update_script_filename(temp.name)
+        self.update_environment_variables(temp.name)
         rendered_script = render(script, model=self.config.model, env=self.env, item=self.config.item,
                                  variables=self.config.variables)
         if rendered_script is None:

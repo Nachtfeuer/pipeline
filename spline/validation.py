@@ -104,9 +104,18 @@ class Validator(object):
                             And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)')),
                         Optional('when', default=''): And(str, Condition.is_valid)
                     }},
-                    # optional Package task
+                    # optional Packer task
                     {Optional('packer'): {
                         'script': And(str, len),
+                        Optional('tags'): And([And(str, len)], len),
+                        Optional('with'): And(len, [object]),
+                        Optional('when', default=''): And(str, Condition.is_valid)
+                    }},
+                    # optional Ansible task
+                    {Optional('ansible(simple)'): {
+                        'script': And(str, len),
+                        'inventory': And(str, len),
+                        Optional('limit', default=''): And(str, len),
                         Optional('tags'): And([And(str, len)], len),
                         Optional('with'): And(len, [object]),
                         Optional('when', default=''): And(str, Condition.is_valid)

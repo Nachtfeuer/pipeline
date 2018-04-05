@@ -18,7 +18,7 @@ Matrix         | Shell     | Ordered         | Model
 Pipeline       | Python    | Parallelizable  | Env. Var.
 Stages         | Docker    | Filterable      | Task Var.
 Tasks Groups   | Packer    | Conditional     | Schema Validation
-Tasks          |           | Templating      | Report
+Tasks          | Ansible   | Templating      | Report
 
 **finally** | dry run support, shell debugging, strict mode
 
@@ -345,6 +345,15 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
             "tag": "0.1"
         }]}
 ```
+---
+@title[Ansible(simple)]
+### Ansible(simple)
+
+- dynamic inventory (+ credentials)
+- dynamic playbook
+- massive Jinja2 templating
+- examples | ansible-docker.yaml
+- support | dry-run and debug
 
 ---
 @title[Dry Run Mode]
@@ -369,7 +378,6 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 ### Ideas | Future Direction
 
  * Auto Cleanup Docker Images+Container
- * New task type: Ansible
  * Support for docker-compose
  * Include statement
  * Generator for Jenkinsfile and .travis.yml

@@ -24,7 +24,7 @@ WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 from spline.version import VERSION
 
 
@@ -43,14 +43,16 @@ setup(name='spline',
       author_email='thomas.lehmann.private@gmail.com',
       license="MIT",
       install_requires=["click", "pyaml", "jinja2", "schema"],
-      packages=['spline', 'spline.components', 'spline.tools', 'spline.tools.report'],
+      packages=find_packages(exclude=['tests', 'tests.*']),
       scripts=['scripts/spline'],
       package_data={'spline': [
           'components/templates/docker-container.sh.j2',
           'components/templates/docker-image.sh.j2',
+          'components/templates/packer-image.sh.j2',
+          'components/templates/ansible.sh.j2',
           'components/templates/python-script.sh.j2',
           'tools/report/templates/report.html.j2']},
-      keywords="pipeline tool ci/cd bash docker",
+      keywords="pipeline tool ci/cd bash docker packer ansible python",
       url="https://github.com/Nachtfeuer/pipeline",
       classifiers=[
           "Development Status :: 5 - Production/Stable",

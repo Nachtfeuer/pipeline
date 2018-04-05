@@ -19,7 +19,7 @@ class TestPacker(unittest.TestCase):
         config = ShellConfig(script=script, model={}, env={})
         image = Packer.creator({}, config)
         output = list(image.process())
-        assert_that(os.path.isfile(filename), equal_to(True))
+        assert_that(os.path.isfile(filename), equal_to(True), "Missing %s" % filename)
         os.remove(filename)
 
         assert_that(output[-4], contains_string(

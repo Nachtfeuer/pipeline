@@ -7,7 +7,7 @@ Welcome to spline's documentation!
 ==================================
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :caption: Contents:
 
    motivation
@@ -16,6 +16,7 @@ Welcome to spline's documentation!
    pipeline
    matrix
    stages
+   type-of-tasks
    shell
    python
    model
@@ -24,6 +25,7 @@ Welcome to spline's documentation!
    docker_container
    docker_image
    packer
+   ansible
    conditions
    hooks
    event_logging

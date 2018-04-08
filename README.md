@@ -42,10 +42,11 @@
  - filtered execution via tags
  - supporting Jinja templating in Bash scripts (also nested inside model)
  - support for Docker containers and Docker images
+ - support for the Packer tool
  - execution time on each level: pipeline, stage, tasks and shell (event logging)
  - documentation here and also at read the docs
  - usable by Jenkinsfile as well as by a `.travis.yml` (or other pipelines).
- - dry run support
+ - dry run and debug support
  - support for Python scripts
  - support for task variables
  - support for conditional tasks
@@ -61,3 +62,4 @@
  - http://sphinxcontrib-napoleon.readthedocs.io/en/latest/example_google.html
  - https://pymotw.com/2/multiprocessing/communication.html
  - https://regex101.com/
+ - https://www.packer.io/intro/index.html

@@ -17,3 +17,4 @@ rm -rf .tox
 rm -rf .eggs
 rm -rf pipeline.egg-info
 rm -f .coverage.*
+rm -rf "$PWD/~"

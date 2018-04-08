@@ -17,8 +17,8 @@ http://github.com/Nachtfeuer/pipeline
 Matrix         | Shell     | Ordered         | Model
 Pipeline       | Python    | Parallelizable  | Env. Var.
 Stages         | Docker    | Filterable      | Task Var.
-Tasks Groups   |           | Conditional     | Schema Validation
-Tasks          |           | Templating      | Report
+Tasks Groups   | Packer    | Conditional     | Schema Validation
+Tasks          | Ansible   | Templating      | Report
 
 **finally** | dry run support, shell debugging, strict mode
 
@@ -106,7 +106,7 @@ pipeline:
 @title[Task Variables]
 ### Task Variables
 #### Special rules:
-- either need to be separated via a tasks block or via an **env** block inbetween in same block
+- parallel: either need to be separated via a tasks block or an **env** block
 - field **variable** not available for docker(image)
 
 #### Example:
@@ -117,7 +117,6 @@ pipeline:
       - shell:
           script: git rev-parse --short HEAD
           variable: commit
-    - tasks(ordered):
       - shell:
           script: "echo \"commit: {{ variables.commit }}\""
 ```
@@ -325,6 +324,38 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 (for parallel tasks spline waits until completion)
 
 ---
+@title[Packer]
+### Packer
+
+```yaml
+- packer:
+    script: |
+        {"builders": [{
+            "type": "docker",
+            "image": "centos:7",
+            "commit": true,
+        }],
+        "provisioners": [{
+            "type": "shell",
+            "inline": [ "yum -y install gcc-c++ make cmake" ]
+        }],
+        "post-processors": [{
+            "type": "docker-tag",
+            "repository": "spline/packer/demo",
+            "tag": "0.1"
+        }]}
+```
+---
+@title[Ansible(simple)]
+### Ansible(simple)
+
+- dynamic inventory (+ credentials)
+- dynamic playbook
+- massive Jinja2 templating
+- examples | ansible-docker.yaml
+- support | dry-run and debug
+
+---
 @title[Dry Run Mode]
 ### Dry Run Mode
 
@@ -347,9 +378,7 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 ### Ideas | Future Direction
 
  * Auto Cleanup Docker Images+Container
- * New task type: Ansible
  * Support for docker-compose
- * Support for Packer
  * Include statement
  * Generator for Jenkinsfile and .travis.yml
  * Spline Server

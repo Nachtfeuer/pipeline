@@ -21,6 +21,8 @@ import multiprocessing
 from contextlib import closing
 from spline.components.bash import Bash
 from spline.components.docker import Container, Image
+from spline.components.packer import Packer
+from spline.components.ansible import Ansible
 from spline.components.script import Script
 from spline.components.config import ShellConfig
 from spline.tools.logger import Logger
@@ -31,10 +33,19 @@ from spline.tools.condition import Condition
 
 
 def get_creator_by_name(name):
-    """Get creator function by name."""
+    """
+    Get creator function by name.
+
+    Args:
+        name (str): name of the creator function.
+
+    Returns:
+        function: creater function.
+    """
     return {'docker(container)': Container.creator,
             'shell': Bash.creator, 'docker(image)': Image.creator,
-            'python': Script.creator}[name]
+            'python': Script.creator, 'packer': Packer.creator,
+            'ansible(simple)': Ansible.creator}[name]
 
 
 def worker(data):
@@ -119,23 +130,26 @@ class Tasks(object):
         result = Adapter({'success': True, 'output': []})
         for task_entry in document:
             key, entry = list(task_entry.items())[0]
-            if key == "env":
+
+            if (not self.parallel or key == 'env') and len(shells) > 0:
                 result = Adapter(self.process_shells(shells))
                 output += result.output
                 shells = []
                 if not result.success:
                     break
 
+            if key == 'env':
                 self.pipeline.data.env_list[2].update(entry)
 
-            elif key in ['shell', 'docker(container)', 'docker(image)', 'python']:
+            elif key in ['shell', 'docker(container)', 'docker(image)', 'python',
+                         'packer', 'ansible(simple)']:
                 self.prepare_shell_data(shells, key, entry)
 
         if result.success:
             result = Adapter(self.process_shells(shells))
             output += result.output
-            self.event.delegate(result.success)
 
+        self.event.delegate(result.success)
         return {'success': result.success, 'output': output}
 
     def process_shells_parallel(self, shells):

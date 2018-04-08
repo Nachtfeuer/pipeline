@@ -1,7 +1,7 @@
 """Testing of module adapter."""
 # pylint: disable=no-self-use, invalid-name
 import unittest
-from hamcrest import assert_that, equal_to, calling, raises
+from hamcrest import assert_that, equal_to
 from spline.tools.adapter import Adapter
 
 
@@ -35,5 +35,4 @@ class TestAdapter(unittest.TestCase):
         """Testing unknown field or callable."""
         data = {'a': 10, 'b': {'c': 20}}
         adapted = Adapter(data)
-        assert_that(calling(adapted.__getattr__).with_args('foo'),
-                    raises(AttributeError))
+        assert_that(adapted.foo, equal_to(None))

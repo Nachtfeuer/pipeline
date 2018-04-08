@@ -21,6 +21,7 @@ License::
     OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 """
 import sys
+import tempfile
 from contextlib import contextmanager
 
 
@@ -37,3 +38,24 @@ def stdout_redirector(stream):
         yield
     finally:
         sys.stdout = old_stdout
+
+
+def write_temporary_file(content, prefix='', suffix=''):
+    """
+    Generating a temporary file with content.
+
+    Args:
+        content (str): file content (usually a script, Dockerfile, playbook or config file)
+        prefix (str): the filename starts with this prefix (default: no prefix)
+        suffix (str): the filename ends with this suffix (default: no suffix)
+
+    Returns:
+        str: name of the temporary file
+
+    Note:
+        You are responsible for the deletion of the file.
+    """
+    temp = tempfile.NamedTemporaryFile(prefix=prefix, suffix=suffix, mode='w+t', delete=False)
+    temp.writelines(content)
+    temp.close()
+    return temp.name

@@ -1,0 +1,50 @@
+hooks:
+  cleanup:
+    script: |
+      {% raw %}
+      ID=$(docker ps -a --filter="label=pipeline=${PIPELINE_PID}" --format="{{.ID}}")
+      {% endraw %}
+      echo "Stopped container: $(docker stop ${ID})"
+
+pipeline:
+  - env:
+      PASS: demo
+  - stage(Demo):
+    - tasks(ordered):
+      - docker(container):
+          title: Setup of sshd enabled Docker conainer
+          mount: no
+          remove: yes
+          background: yes
+          script: |
+            yum -y install openssh-server
+            ssh-keygen -A
+            echo "changing login password"
+            echo "root:{{ env.PASS }}" | chpasswd
+            echo "starting sshd process (in foreground mode) ..."
+            /usr/sbin/sshd -D
+
+      - shell:
+          script: |
+            {% raw %}
+            ID=$(docker ps -a --filter="label=pipeline=${PIPELINE_PID}" --filter="label=pipeline-stage=${PIPELINE_STAGE}" --format="{{.ID}}")
+            {% endraw %}
+            IP=$(docker inspect ${ID} | jq -r '.[].NetworkSettings.IPAddress')
+
+            ssh_error=0
+            TRY=0
+            while [ $TRY -lt 5 ]; do
+              # sudo apt-get install sshpass
+              sshpass -p "{{ env.PASS }}" \
+                ssh -o StrictHostKeyChecking=no \
+                    -o UserKnownHostsFile=/dev/null \
+                    root@${IP} cat /etc/redhat-release
+              ssh_error=$?
+              if [ ${ssh_error} -eq 0 ]; then
+                  break
+              fi
+              sleep 10
+              TRY=$((TRY + 1))
+            done
+
+            exit ${ssh_error}

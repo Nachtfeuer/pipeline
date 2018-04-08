@@ -1,4 +1,4 @@
-"""Provide custom jinja filters."""
+"""Provide custom Jinja2 filters."""
 # Copyright (c) 2017 Thomas Lehmann
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this

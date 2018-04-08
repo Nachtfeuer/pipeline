@@ -20,6 +20,7 @@ class TestDockerImage(unittest.TestCase):
         shell = Bash(ShellConfig(script="docker rmi %s:%s" % (name, tag)))
         for line in shell.process():
             logging.info(line)
+
         assert_that(shell.success, equal_to(True))
 
     def test_creator_simple(self):

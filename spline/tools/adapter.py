@@ -40,9 +40,10 @@ class Adapter(object):
             if isinstance(value, dict):
                 value = Adapter(value)
         else:
-            attr = getattr(self.data, key)
-            if callable(attr):
-                value = attr
+            try:
+                value = getattr(self.data, key)
+            except AttributeError:
+                value = None
         return value
 
     def __str__(self):

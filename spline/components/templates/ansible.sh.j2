@@ -1,0 +1,29 @@
+{% if ansible_playbook_content|length -%}
+# Ansible Inventory:
+# >>
+{% for line in ansible_inventory_content.split('\n') -%}
+# {{ line }}
+{% endfor -%}
+# <<
+#
+# Ansible Playbook:
+# >>
+{% for line in ansible_playbook_content.split('\n') -%}
+# {{ line }}
+{% endfor -%}
+# <<
+{% endif -%}
+LIMIT=
+if [ -n "{{ limit }}" ]; then
+    LIMIT="--limit {{ limit }}"
+fi
+# for visibility in logging
+echo "ansible-playbook --inventory-file {{ ansible_inventory }} --ssh-common-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ${LIMIT} {{ ansible_playbook }}"
+# trying to run Ansible playbook
+ansible-playbook --inventory-file {{ ansible_inventory }} --ssh-common-args='-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null' ${LIMIT} {{ ansible_playbook }}
+ansible_playbook_error=$?
+# cleanup
+rm -f {{ ansible_inventory }}
+rm -f {{ ansible_playbook }}
+# give back result
+exit ${ansible_playbook_error}

@@ -1,0 +1,17 @@
+{% if packer_content|length -%}
+# Packer JSON:
+# >>
+{% for line in packer_content.split('\n') -%}
+# {{ line }}
+{% endfor -%}
+# <<
+{% endif -%}
+# for visibility in logging
+echo "packer build  {{ packer_filename }}"
+# trying to build an image via Packer
+PACKER_TMP_DIR=$(dirname {{ packer_filename }}) packer build {{ "-debug" if debug else "" }} -parallel=true -on-error=cleanup {{ packer_filename }}
+packer_error=$?
+# cleanup
+rm -f {{ packer_filename }}
+# give back result
+exit ${packer_error}

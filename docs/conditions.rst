@@ -54,5 +54,3 @@ here is an extract of it:
         # task output should not be shown
         script: echo "integer not in integer list comparison"
         when: "{{ model.intval }} not in [1234, 4321]"
-
-

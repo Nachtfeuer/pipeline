@@ -2,6 +2,7 @@ if [ $# -eq 0 ]; then
     BACKGROUND_MODE=-i
     MOUNT=
     SSH_AGENT=
+    NETWORK=
 
     if [ "{{ container.background }}" == "true" ]; then
         BACKGROUND_MODE=-d
@@ -15,7 +16,12 @@ if [ $# -eq 0 ]; then
         SSH_AGENT="-v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent"
     fi
 
+    if [ -n "{{ container.network }}" ]; then
+        NETWORK="--network={{ container.network }}"
+    fi
+
     docker run --rm={{ container.remove }} \
+        ${NETWORK} \
         -v $(dirname ${PIPELINE_BASH_FILE_ORIGINAL}):/root/scripts ${MOUNT} \
         -e UID=$(id -u) -e GID=$(id -g) {% raw %}{{ env|docker_environment }}{% endraw %} \
         ${SSH_AGENT} \

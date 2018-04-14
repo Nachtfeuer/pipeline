@@ -33,6 +33,7 @@ from spline.tools.logger import Logger
 from spline.tools.filters import find_matrix
 from spline.tools.event import Event
 from spline.tools.report.collector import Collector
+from spline.tools.version import VersionsReport
 from spline.validation import Validator
 
 
@@ -132,6 +133,7 @@ class Application(object):
             return []
 
         self.provide_temporary_scripts_path()
+        VersionsReport().process(document)
 
         collector = Application.create_and_run_collector(document, self.options)
         matrix = find_matrix(document)
@@ -141,16 +143,11 @@ class Application(object):
             pipeline = Pipeline(model=model, options=self.options)
             pipeline.hooks = Hooks(document)
             result = pipeline.process(document['pipeline'])
-            output = result['output']
-            if not result['success']:
-                self.shutdown(collector, success=False)
         else:
             result = self.run_matrix(matrix, document)
-            output = result['output']
-            if not result['success']:
-                self.shutdown(collector, success=False)
 
-        self.shutdown(collector, success=True)
+        output = result['output']
+        self.shutdown(collector, success=result['success'])
         return output
 
     def provide_temporary_scripts_path(self):

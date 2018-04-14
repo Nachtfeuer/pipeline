@@ -148,31 +148,39 @@ class Bash(object):
             process.wait()
             self.exit_code = process.returncode
             self.success = (process.returncode == 0)
-            if process.returncode == 0:
-                self.logger.info("Exit code has been %d", process.returncode)
-            else:
-                self.logger.error("Exit code has been %d", process.returncode)
+            if not self.config.internal:
+                if process.returncode == 0:
+                    self.logger.info("Exit code has been %d", process.returncode)
+                else:
+                    self.logger.error("Exit code has been %d", process.returncode)
         except OSError as exception:
             self.exit_code = 1
             yield str(exception)
+
+    def process_file(self, filename):
+        """Processing one file."""
+        if self.config.dry_run:
+            if not self.config.internal:
+                self.logger.info("Dry run mode for script %s", filename)
+            for line in open(filename):
+                yield line[0:-1] if line[-1] == '\n' else line
+        else:
+            if not self.config.internal:
+                self.logger.info("Running script %s", filename)
+            for line in self.process_script(filename):
+                yield line
 
     def process(self):
         """Running the Bash code."""
         temp_filename = self.create_file_for(self.config.script)
         if temp_filename is not None:
-            if self.config.dry_run:
-                self.logger.info("Dry run mode for script %s", temp_filename)
-                for line in open(temp_filename):
-                    yield line[0:-1] if line[-1] == '\n' else line
-            else:
-                self.logger.info("Running script %s", temp_filename)
-                for line in self.process_script(temp_filename):
-                    yield line
-
+            for line in self.process_file(temp_filename):
+                yield line
             # removing script
             os.remove(temp_filename)
 
-        if self.exit_code == 0:
-            self.event.succeeded()
-        else:
-            self.event.failed(exit_code=self.exit_code)
+        if not self.config.internal:
+            if self.exit_code == 0:
+                self.event.succeeded()
+            else:
+                self.event.failed(exit_code=self.exit_code)

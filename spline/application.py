@@ -33,7 +33,7 @@ from spline.tools.logger import Logger
 from spline.tools.filters import find_matrix
 from spline.tools.event import Event
 from spline.tools.report.collector import Collector
-from spline.tools.version import VersionsReport
+from spline.tools.version import VersionsCheck, VersionsReport
 from spline.validation import Validator
 
 
@@ -133,7 +133,9 @@ class Application(object):
             return []
 
         self.provide_temporary_scripts_path()
-        VersionsReport().process(document)
+
+        versions = VersionsCheck().process(document)
+        VersionsReport().process(versions)
 
         collector = Application.create_and_run_collector(document, self.options)
         matrix = find_matrix(document)

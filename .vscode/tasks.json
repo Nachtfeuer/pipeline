@@ -1,0 +1,26 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [{
+            "label": "Spline - run tox (full build)",
+            "type": "shell",
+            "command": "tox -r -e py27",
+            "group": "build"
+        }, {
+            "label": "Spline - run tox (radon only)",
+            "type": "shell",
+            "command": "tox -e radon",
+            "group": "build"
+        }, {
+            "label": "Spline - run tox (tests only, all tests)",
+            "type": "shell",
+            "command": "tox -e test",
+            "group": "build"
+        }, {
+            "label": "Spline - run tox (tests only, for current file)",
+            "type": "shell",
+            "command": "tox -e test-pattern ${fileBasename}",
+            "group": "build"
+        }]
+}

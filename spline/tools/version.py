@@ -50,16 +50,16 @@ class VersionsCheck(object):
     LOGGER = Logger.get_logger(__name__)
     """Logger instance for this class."""
 
-    BASH_VERSION = r'''bash --version|head -1|grep -Po "\d+\.\d+\.\d+"'''
+    BASH_VERSION = r'''bash --version|head -1|grep -Po "\d+(\.\d+)+"'''
     """Find Bash version."""
 
-    DOCKER_VERSION = r'''docker version|grep "Version:"|head -1|grep -Po "\d+\.\d+\.\d+"'''
+    DOCKER_VERSION = r'''docker version|grep "Version:"|head -1|grep -Po "\d+(\.\d+)+"'''
     """Find Docker version."""
 
     PACKER_VERSION = r'''packer -version'''
     """Find Packer version."""
 
-    ANSIBLE_VERSION = r'''ansible --version|grep -Po "\d+\.\d+\.\d+\.\d+"'''
+    ANSIBLE_VERSION = r'''ansible --version|grep -Po "\d+(\.\d+)+"'''
     """Find Ansible version."""
 
     def __init__(self):

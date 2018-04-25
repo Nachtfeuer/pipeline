@@ -21,7 +21,7 @@ before_install:
 
 install:
     - pip install pip --upgrade
-    - pip install click pyaml Jinja2 ansible tox tox-travis coveralls
+    - pip install click pyaml Jinja2 ansible==2.4.0.0 tox tox-travis coveralls
     - which python
     - python -V
     - pip -V

@@ -59,15 +59,20 @@ class TestToolsVersion(unittest.TestCase):
 
     def test_bash_and_ansible(self):
         """Testing with Bash and Ansible only."""
-        versions = VersionsCheck().process({'ansible(simple)': ''})
-        report = VersionsReport()
-        with patch.object(report, '_log') as mocked_log:
-            report.process(versions)
-            assert_that(mocked_log.mock_calls, equal_to([
-                call("Using tool 'Ansible', %s" % versions['Ansible']),
-                call("Using tool 'Bash', %s" % versions['Bash']),
-                call("Using tool 'Spline', %s" % versions['Spline'])
-            ]))
+        with patch("spline.tools.version.VersionsCheck.get_version") as mocked_get_version:
+            mocked_versions = {'Bash': Version("2.0"), 'Ansible': Version("1.0")}
+            mocked_get_version.side_effect = lambda key, _: {key: mocked_versions[key]}
+
+            versions = VersionsCheck().process({'ansible(simple)': ''})
+            report = VersionsReport()
+
+            with patch.object(report, '_log') as mocked_log:
+                report.process(versions)
+                assert_that(mocked_log.mock_calls, equal_to([
+                    call("Using tool 'Ansible', %s" % versions['Ansible']),
+                    call("Using tool 'Bash', %s" % versions['Bash']),
+                    call("Using tool 'Spline', %s" % versions['Spline'])
+                ]))
 
     def test_get_version(self):
         """Testing get_version function."""

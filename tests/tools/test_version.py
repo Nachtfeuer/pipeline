@@ -97,4 +97,4 @@ class TestToolsVersion(unittest.TestCase):
         assert_that(Version("1.3"), is_not(less_than(Version("1.2"))))
         assert_that(Version("1.3") == 1.3, equal_to(False))
         assert_that(calling(Version("1.3").__lt__).with_args(1.3),
-                    raises(TypeError, "Comparing type Version with incomaptible type <type 'float'>"))
+                    raises(TypeError, "Comparing type Version with incomaptible type"))

@@ -36,13 +36,16 @@ class Container(Bash):
 
     def update_environment_variables(self, filename):
         """Updating OS environment variables and current script path and filename."""
-        super(Container, self).update_environment_variables(filename)
         self.env.update({'PIPELINE_BASH_FILE_ORIGINAL': filename})
         filename = os.path.join('/root/scripts', os.path.basename(filename))
         self.env.update({'PIPELINE_BASH_FILE': filename})
+
         # remove those keys for Docker since the paths inside Docker are different
-        for remove_variable in ['PATH', 'PYTHONPATH', 'JAVA_HOME']:
-            self.env.pop(remove_variable, None)
+        os_environ = os.environ.copy()
+        for remove_variable in ['PATH', 'PYTHONPATH', 'JAVA_HOME', 'HOME']:
+            os_environ.pop(remove_variable, None)
+
+        self.env.update(os_environ)
 
     @staticmethod
     def creator(entry, config):

@@ -23,12 +23,12 @@ import logging
 import multiprocessing
 
 import click
-import yaml
 
 from spline.matrix import Matrix, MatrixProcessData
 from spline.pipeline import Pipeline
 from spline.components.hooks import Hooks
 from spline.components.config import ApplicationOptions
+from spline.tools.loader import Loader
 from spline.tools.logger import Logger
 from spline.tools.filters import find_matrix
 from spline.tools.event import Event
@@ -86,7 +86,14 @@ class Application(object):
         See Also:
             spline.validation.Validator
         """
-        document = Validator().validate(yaml.safe_load(open(definition).read()))
+        initial_document = {}
+        try:
+            initial_document = Loader.load(definition)
+        except RuntimeError as exception:
+            self.logger.error(exception.message)
+            sys.exit(1)
+
+        document = Validator().validate(initial_document)
         if document is None:
             self.logger.info("Schema validation for '%s' has failed", definition)
             sys.exit(1)

@@ -90,7 +90,7 @@ class Application(object):
         try:
             initial_document = Loader.load(definition)
         except RuntimeError as exception:
-            self.logger.error(exception.message)
+            self.logger.error(str(exception))
             sys.exit(1)
 
         document = Validator().validate(initial_document)

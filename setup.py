@@ -31,8 +31,8 @@ from spline.version import VERSION
 def get_long_description():
     """Reading long description from a file."""
     file_path = os.path.join(os.path.dirname(__file__), 'spline.rst')
-    print(file_path)
-    return open(file_path).read()
+    with open(file_path) as handle:
+        return handle.read()
 
 
 setup(name='spline',

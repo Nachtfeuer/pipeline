@@ -47,9 +47,11 @@ class Packer(Bash):
 
         # rendering the Bash script for generating the Packer image
         template_file = os.path.join(os.path.dirname(__file__), 'templates/packer-image.sh.j2')
-        template = open(template_file).read()
-        config.script = render(template, debug=config.debug,
-                               packer_content=packer_script,
-                               packer_filename=filename)
+
+        with open(template_file) as handle:
+            template = handle.read()
+            config.script = render(template, debug=config.debug,
+                                   packer_content=packer_script,
+                                   packer_filename=filename)
 
         return Packer(config)

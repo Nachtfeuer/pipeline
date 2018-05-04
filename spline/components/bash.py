@@ -114,8 +114,9 @@ class Bash(object):
         to_file_map = {2: lambda s: s.encode('utf-8'), 3: lambda s: s}
 
         if all(ord(ch) < 128 for ch in rendered_script) and os.path.isfile(rendered_script):
-            content = str(open(rendered_script).read())
-            temp.writelines(content)
+            with open(rendered_script) as handle:
+                content = str(handle.read())
+                temp.writelines(content)
         else:
             temp.write(u"#!/bin/bash\n%s" % self.render_bash_options())
             temp.write(to_file_map[sys.version_info.major](rendered_script))
@@ -136,11 +137,9 @@ class Bash(object):
     def process_script(self, filename):
         """Running the Bash code."""
         try:
-            process = subprocess.Popen(
-                shlex.split("bash %s" % filename),
-                stdout=self.stdout, stderr=self.stderr,
-                shell=self.shell, env=self.env)  # nosec
-
+            process = subprocess.Popen(shlex.split("bash %s" % filename),
+                                       stdout=self.stdout, stderr=self.stderr,
+                                       shell=self.shell, env=self.env)  # nosec
             for line in iter(process.stdout.readline, ' '):
                 if not line:
                     break
@@ -162,8 +161,9 @@ class Bash(object):
         if self.config.dry_run:
             if not self.config.internal:
                 self.logger.info("Dry run mode for script %s", filename)
-            for line in open(filename):
-                yield line[0:-1] if line[-1] == '\n' else line
+            with open(filename) as handle:
+                for line in handle:
+                    yield line[0:-1] if line[-1] == '\n' else line
         else:
             if not self.config.internal:
                 self.logger.info("Running script %s", filename)

@@ -50,7 +50,9 @@ class Script(Bash):
 
         language = 'python' if 'type' not in entry else entry['type']
         template_file = os.path.join(os.path.dirname(__file__), 'templates/%s-script.sh.j2' % language)
-        template = open(template_file).read()
 
-        config.script = render(template, script=temp.name)
+        with open(template_file) as handle:
+            template = handle.read()
+            config.script = render(template, script=temp.name)
+
         return Script(config)

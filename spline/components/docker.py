@@ -51,18 +51,21 @@ class Container(Bash):
     def creator(entry, config):
         """Creator function for creating an instance of a Bash."""
         template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-container.sh.j2')
-        template = open(template_file).read()
-        # all fields are re-rendered via the Bash script
-        wrapped_script = render(template, container={
-            'image': 'centos:7' if 'image' not in entry else entry['image'],
-            'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
-            'background': False if 'background' not in entry else str(entry['background']).lower(),
-            'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
-            'network': '' if 'network' not in entry else entry['network'],
-            'script': config.script
-        })
 
-        config.script = wrapped_script
+        with open(template_file) as handle:
+            template = handle.read()
+            # all fields are re-rendered via the Bash script
+            wrapped_script = render(template, container={
+                'image': 'centos:7' if 'image' not in entry else entry['image'],
+                'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
+                'background': False if 'background' not in entry else str(entry['background']).lower(),
+                'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
+                'network': '' if 'network' not in entry else entry['network'],
+                'script': config.script
+            })
+
+            config.script = wrapped_script
+
         return Container(config)
 
 
@@ -97,9 +100,11 @@ class Image(Bash):
         name = entry['name'] + "-%s" % os.getpid() if entry['unique'] else entry['name']
         tag = render(entry['tag'], model=config.model, env=config.env, item=config.item)
         template_file = os.path.join(os.path.dirname(__file__), 'templates/docker-image.sh.j2')
-        template = open(template_file).read()
-        config.script = render(template, name=name, tag=tag,
-                               dockerfile_content=dockerfile,
-                               dockerfile_filename=filename)
+
+        with open(template_file) as handle:
+            template = handle.read()
+            config.script = render(template, name=name, tag=tag,
+                                   dockerfile_content=dockerfile,
+                                   dockerfile_filename=filename)
 
         return Image(config)

@@ -356,6 +356,19 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 - support | dry-run and debug
 
 ---
+@title[Code Reuse]
+### Code reuse (!include)
+
+```yaml
+model: !include library/model.yml
+pipeline: !include library/pipeline.yaml
+```
+
+- on maps and lists
+- on main yaml only
+- done before validation
+
+---
 @title[Dry Run Mode]
 ### Dry Run Mode
 
@@ -379,9 +392,18 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 
  * Auto Cleanup Docker Images+Container
  * Support for docker-compose
- * Include statement
  * Generator for Jenkinsfile and .travis.yml
  * Spline Server
+ * Verify concrete tool versions
+
+---
+@title[Contact, Comments, Issues]
+### Contact, Comments, Issues
+
+ - https://github.com/Nachtfeuer/pipeline/issues
+ - tickets for | proposes, ideas
+ - tickets for | improvements
+ - tickets for | questions
 
 ---
 ## The End

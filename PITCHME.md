@@ -360,12 +360,18 @@ $ spline --definition=demo.yml --tags=bad 2>&1 | grep "cleanup"
 ### Code reuse (!include)
 
 ```yaml
-model: !include library/model.yml
-pipeline: !include library/pipeline.yaml
+model: !include library/model.yaml
+pipeline:
+   - stage(Setup): !include library/setup.yaml
+   - stage(Build): !include library/build.yaml
+   - stage(Test):
+        - !include library/setup-test.yaml
+        - !include library/run-test.yaml
+        - !include library/teardown-test.yaml
+   - stage(Deploy): !include library/deploy.yaml
 ```
 
-- on maps and lists
-- on main yaml only
+- on maps and lists and for main yaml only
 - done before validation
 
 ---
@@ -397,11 +403,11 @@ pipeline: !include library/pipeline.yaml
  * Verify concrete tool versions
 
 ---
-@title[Contact, Comments, Issues]
-### Contact, Comments, Issues
+@title[Contact, Comments, Issues, Questions]
+### Contact | Comments | Issues | Questions
 
  - https://github.com/Nachtfeuer/pipeline/issues
- - tickets for | proposes, ideas
+ - tickets for | proposes and ideas
  - tickets for | improvements
  - tickets for | questions
 

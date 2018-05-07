@@ -1,0 +1,1 @@
+model: !include tests/tools/data/file-that-does-not-exist.yaml

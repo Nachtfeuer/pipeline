@@ -23,16 +23,17 @@ import logging
 import multiprocessing
 
 import click
-import yaml
 
 from spline.matrix import Matrix, MatrixProcessData
 from spline.pipeline import Pipeline
 from spline.components.hooks import Hooks
 from spline.components.config import ApplicationOptions
+from spline.tools.loader import Loader
 from spline.tools.logger import Logger
 from spline.tools.filters import find_matrix
 from spline.tools.event import Event
 from spline.tools.report.collector import Collector
+from spline.tools.version import VersionsCheck, VersionsReport
 from spline.validation import Validator
 
 
@@ -85,7 +86,14 @@ class Application(object):
         See Also:
             spline.validation.Validator
         """
-        document = Validator().validate(yaml.safe_load(open(definition).read()))
+        initial_document = {}
+        try:
+            initial_document = Loader.load(definition)
+        except RuntimeError as exception:
+            self.logger.error(str(exception))
+            sys.exit(1)
+
+        document = Validator().validate(initial_document)
         if document is None:
             self.logger.info("Schema validation for '%s' has failed", definition)
             sys.exit(1)
@@ -133,6 +141,9 @@ class Application(object):
 
         self.provide_temporary_scripts_path()
 
+        versions = VersionsCheck().process(document)
+        VersionsReport().process(versions)
+
         collector = Application.create_and_run_collector(document, self.options)
         matrix = find_matrix(document)
         output = []
@@ -141,16 +152,11 @@ class Application(object):
             pipeline = Pipeline(model=model, options=self.options)
             pipeline.hooks = Hooks(document)
             result = pipeline.process(document['pipeline'])
-            output = result['output']
-            if not result['success']:
-                self.shutdown(collector, success=False)
         else:
             result = self.run_matrix(matrix, document)
-            output = result['output']
-            if not result['success']:
-                self.shutdown(collector, success=False)
 
-        self.shutdown(collector, success=True)
+        output = result['output']
+        self.shutdown(collector, success=result['success'])
         return output
 
     def provide_temporary_scripts_path(self):

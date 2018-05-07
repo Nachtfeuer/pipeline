@@ -25,6 +25,7 @@
 [Environment Variables](docs/env.rst)  
 [Docker Container](docs/docker_container.rst)  
 [Hooks](docs/hooks.rst)  
+[Include](docs/include.rst)  
 [Event Logging](docs/event_logging.rst)  
 [Links](#links)  
 
@@ -50,6 +51,7 @@
  - support for Python scripts
  - support for task variables
  - support for conditional tasks
+ - enabled for code reuse: !include statement
 
 ## <a name="links">Interesting Links</a>
 

@@ -52,12 +52,13 @@ class Ansible(Bash):
 
         # rendering the Bash script for running the Ansible playbook
         template_file = os.path.join(os.path.dirname(__file__), 'templates/ansible.sh.j2')
-        template = open(template_file).read()
-        config.script = render(template, debug=config.debug,
-                               ansible_playbook_content=ansible_playbook_content,
-                               ansible_playbook=ansible_playbook,
-                               ansible_inventory_content=ansible_inventory_content,
-                               ansible_inventory=ansible_inventory,
-                               limit=entry['limit'])
+        with open(template_file) as handle:
+            template = handle.read()
+            config.script = render(template, debug=config.debug,
+                                   ansible_playbook_content=ansible_playbook_content,
+                                   ansible_playbook=ansible_playbook,
+                                   ansible_inventory_content=ansible_inventory_content,
+                                   ansible_inventory=ansible_inventory,
+                                   limit=entry['limit'])
 
         return Ansible(config)

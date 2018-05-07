@@ -1,4 +1,4 @@
-.vscode/
+.ropeproject/
 bats-core/
 *.pyc
 .tox/

@@ -28,6 +28,7 @@ Welcome to spline's documentation!
    ansible
    conditions
    hooks
+   include
    event_logging
    options
    unicode

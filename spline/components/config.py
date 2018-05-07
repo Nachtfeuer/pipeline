@@ -41,7 +41,8 @@ class ShellConfig(object):
                 Optional(And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)'))):
                     Or(type(' '), type(u' '))
             },
-            Optional('temporary_scripts_path', default=''): Or(type(''), type(u''))
+            Optional('temporary_scripts_path', default=''): Or(type(''), type(u'')),
+            Optional('internal', default=False): bool
         })
 
     def __init__(self, **kwargs):
@@ -58,6 +59,7 @@ class ShellConfig(object):
             self.strict = arguments.strict
             self.variables = arguments.variables.data
             self.temporary_scripts_path = arguments.temporary_scripts_path
+            self.internal = arguments.internal
         except SchemaError as exception:
             logging.getLogger(__name__).error(exception)
             raise RuntimeError(str(exception))

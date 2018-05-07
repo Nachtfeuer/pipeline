@@ -89,6 +89,7 @@ Features
  - support for Python scripts
  - support for task variables
  - support for conditional tasks
+ - enabled for code reuse: !include statement
 
 Documentation
 -------------

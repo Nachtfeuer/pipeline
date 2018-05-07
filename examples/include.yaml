@@ -1,0 +1,8 @@
+model:
+  message: !include examples/message.yaml
+
+pipeline:
+    - stage(Example):
+        - tasks(ordered):
+            - shell:
+                script: "{{ model.message.text }}"

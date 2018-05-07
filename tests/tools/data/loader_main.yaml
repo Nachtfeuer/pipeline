@@ -1,0 +1,2 @@
+model: !include tests/tools/data/loader_whole_model.yaml
+some: "{{ model.message }}"

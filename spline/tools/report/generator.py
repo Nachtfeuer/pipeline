@@ -40,8 +40,9 @@ def generate_html(store):
     }
 
     html_template_file = os.path.join(os.path.dirname(__file__), 'templates/report.html.j2')
-    html_template = open(html_template_file).read()
-    return render(html_template, spline=spline, store=store)
+    with open(html_template_file) as handle:
+        html_template = handle.read()
+        return render(html_template, spline=spline, store=store)
 
 
 def generate(store, report_format, path):

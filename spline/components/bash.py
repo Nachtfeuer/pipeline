@@ -45,9 +45,6 @@ class Bash(object):
         self.env = {}
         self.env.update(config.env)
 
-        if len(config.title) > 0:
-            self.logger.info(config.title)
-
         self.stdout = subprocess.PIPE
         self.stderr = subprocess.STDOUT
         self.shell = False
@@ -173,6 +170,11 @@ class Bash(object):
     def process(self):
         """Running the Bash code."""
         temp_filename = self.create_file_for(self.config.script)
+
+        if len(self.config.title) > 0:
+            self.logger.info(render(self.config.title, model=self.config.model, env=self.env,
+                                    item=self.config.item, variables=self.config.variables))
+
         if temp_filename is not None:
             for line in self.process_file(temp_filename):
                 yield line

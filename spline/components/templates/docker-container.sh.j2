@@ -9,11 +9,11 @@ if [ $# -eq 0 ]; then
     fi
 
     if [ "{{ container.mount }}" == "true" ]; then
-        MOUNT="-v $PWD:/mnt/host"
+        MOUNT="-v "${PWD}":/mnt/host"
     fi
 
     if [ -n "${SSH_AUTH_SOCK}" ]; then
-        SSH_AGENT="-v $SSH_AUTH_SOCK:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent"
+        SSH_AGENT="-v ${SSH_AUTH_SOCK}:/ssh-agent -e SSH_AUTH_SOCK=/ssh-agent"
     fi
 
     if [ -n "{{ container.network }}" ]; then
@@ -23,7 +23,7 @@ if [ $# -eq 0 ]; then
     docker run --rm={{ container.remove }} \
         ${NETWORK} \
         -v $(dirname ${PIPELINE_BASH_FILE_ORIGINAL}):/root/scripts ${MOUNT} \
-        -e UID=$(id -u) -e GID=$(id -g) {% raw %}{{ env|docker_environment }}{% endraw %} \
+        -e "UID=$(id -u)" -e "GID=$(id -g)" {% raw %}{{ env|docker_environment }}{% endraw %} \
         ${SSH_AGENT} \
         --label="pipeline=${PIPELINE_PID}" \
         --label="pipeline-stage=${PIPELINE_STAGE}" \

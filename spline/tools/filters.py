@@ -62,10 +62,10 @@ def docker_environment(env):
     Transform dictionary of environment variables into Docker -e parameters.
 
     >>> result = docker_environment({'param1': 'val1', 'param2': 'val2'})
-    >>> result in ['-e "param1=val1" -e "param2=val2"', '-e "param2=val2" -e "param1=val1"']
+    >>> result in ["-e 'param1=val1' -e 'param2=val2'", "-e 'param2=val2' -e 'param1=val1'"]
     True
     """
-    return ' '.join(["-e \"%s=%s\"" % (key, value) for key, value in env.items()])
+    return ' '.join(["-e '%s=%s'" % (key, value) for key, value in env.items()])
 
 
 def find_matrix(document):

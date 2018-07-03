@@ -27,6 +27,7 @@
 [Hooks](docs/hooks.rst)  
 [Include](docs/include.rst)  
 [Event Logging](docs/event_logging.rst)  
+[How to contact?](#contact)  
 [Links](#links)  
 
 **Features**:
@@ -52,6 +53,11 @@
  - support for task variables
  - support for conditional tasks
  - enabled for code reuse: !include statement
+
+## <a name="contact">How to contact?</a>
+ - https://groups.google.com/forum/#!forum/spline-the-pipeline-tool
+ - https://github.com/Nachtfeuer/pipeline/issues
+
 
 ## <a name="links">Interesting Links</a>
 

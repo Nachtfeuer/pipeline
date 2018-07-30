@@ -44,7 +44,7 @@ setup(name='spline',
       license="MIT",
       install_requires=["click", "pyaml", "jinja2", "schema"],
       packages=find_packages(exclude=['tests', 'tests.*']),
-      scripts=['scripts/spline'],
+      scripts=['scripts/spline', 'scripts/spline-loc'],
       package_data={'spline': [
           'components/templates/docker-container.sh.j2',
           'components/templates/docker-image.sh.j2',

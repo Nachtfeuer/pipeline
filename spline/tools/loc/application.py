@@ -1,4 +1,4 @@
-"""Represent the main entry point for the pipeline tool."""
+"""Represent the main entry point for the spline loc tool."""
 # Copyright (c) 2018 Thomas Lehmann
 #
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this
@@ -15,7 +15,7 @@
 # DAMAGES OR OTHER LIABILITY,
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# pylint: disable=no-self-use
+# pylint: disable=no-self-use, cell-var-from-loop
 import sys
 import os
 import platform
@@ -24,13 +24,17 @@ import multiprocessing
 import re
 
 import click
+from yaml import safe_load
+
 from spline.tools.logger import Logger
+from spline.tools.adapter import Adapter
+from spline.tools.query import Select
 
 
 class Application(object):
     """Spline loc application."""
 
-    def __init__(self, options):
+    def __init__(self, **options):
         """
         Initialize application with command line options.
 
@@ -41,14 +45,21 @@ class Application(object):
         self.logging_level = logging.DEBUG
         self.setup_logging()
         self.logger = Logger.get_logger(__name__)
+        self.results = []
 
     def setup_logging(self):
         """Setup of application logging."""
         logging_format = "%(asctime)-15s - %(name)s - %(message)s"
         Logger.configure_default(logging_format, self.logging_level)
 
+    def load_configuration(self):
+        """Loading configuration."""
+        filename = os.path.join(os.path.dirname(__file__), 'templates/spline-loc.yml.j2')
+        with open(filename) as handle:
+            return Adapter(safe_load(handle)).configuration
+
     @staticmethod
-    def walk_files_for(supported_extensions):
+    def walk_files_for(path, supported_extensions):
         """
         Iterating files for given extensions.
 
@@ -58,12 +69,13 @@ class Application(object):
         Returns:
             str: yield each full path and filename found.
         """
-        for root, _, files in os.walk(os.getcwd()):
+        for root, _, files in os.walk(path):
             for filename in files:
-                if os.path.splitext(filename)[1] in supported_extensions:
-                    yield os.path.join(root, filename)
+                extension = os.path.splitext(filename)[1]
+                if extension in supported_extensions:
+                    yield os.path.join(root, filename), extension
 
-    def analyse(self, path_and_filename):
+    def analyse(self, path_and_filename, pattern):
         """
         Find out lines of code and lines of comments.
 
@@ -73,7 +85,6 @@ class Application(object):
         Returns:
             int, int: loc and com for given file.
         """
-        pattern = r'([ ]*#[^\n]*|""".*?""")'
         with open(path_and_filename) as handle:
             content = handle.read()
             loc = content.count('\n') + 1
@@ -89,17 +100,33 @@ class Application(object):
         self.logger.info("Running on platform %s", platform.platform())
         self.logger.info("Current cpu count is %d", multiprocessing.cpu_count())
 
-        for path_and_filename in Application.walk_files_for(['.py']):
-            loc, com = self.analyse(path_and_filename)
-            print(path_and_filename, loc, com, float(com) / float(loc))
+        configuration = self.load_configuration()
+        path = os.path.abspath(Adapter(self.options).path)
+        supported_extension = [Adapter(entry).extension for entry in configuration]
+
+        for path_and_filename, extension in Application.walk_files_for(path, supported_extension):
+            regex = Select(*configuration) \
+                .where(lambda entry: Adapter(entry).extension == extension) \
+                .transform(lambda entry: Adapter(entry).regex) \
+                .build()[0]
+
+            loc, com = self.analyse(path_and_filename, regex)
+            self.results.append({'file': path_and_filename, 'loc': loc, 'com': com})
+
+
+def main(**options):
+    """Spline loc tool."""
+    application = Application(**options)
+    application.run()
+    return application
 
 
 @click.command()
-def main(**options):
+@click.option('--path', type=str, default='.', help="Path where to parse files")
+def click_main(**options):
     """Spline loc tool."""
-    application = Application(options)
-    application.run()
+    main(**options)
 
 
 if __name__ == "__main__":
-    main()
+    click_main()

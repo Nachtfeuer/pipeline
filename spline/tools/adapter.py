@@ -46,6 +46,10 @@ class Adapter(object):
                 value = None
         return value
 
+    def __iter__(self):
+        """Iter support for adapter dictionary or list."""
+        return iter(self.data)
+
     def __str__(self):
         """string representation of the underlying object."""
         return str(self.data)

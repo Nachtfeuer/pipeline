@@ -29,6 +29,7 @@ from yaml import safe_load
 from spline.tools.logger import Logger
 from spline.tools.adapter import Adapter
 from spline.tools.query import Select
+from spline.tools.table import pprint
 
 
 class Application(object):
@@ -111,7 +112,14 @@ class Application(object):
                 .build()[0]
 
             loc, com = self.analyse(path_and_filename, regex)
-            self.results.append({'file': path_and_filename, 'loc': loc, 'com': com})
+            self.results.append({
+                'file': path_and_filename.replace(path + '/', ''),
+                'loc': loc,
+                'com': com,
+                'ratio': "%.1f" % (float(com) / float(loc))
+            })
+
+        pprint(self.results, keys=['ratio', 'loc', 'com', 'file'])
 
 
 def main(**options):
@@ -122,7 +130,7 @@ def main(**options):
 
 
 @click.command()
-@click.option('--path', type=str, default='.', help="Path where to parse files")
+@click.option('--path', type=str, default=os.getcwd(), help="Path where to parse files")
 def click_main(**options):
     """Spline loc tool."""
     main(**options)

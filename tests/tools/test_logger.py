@@ -2,7 +2,6 @@
 # pylint: disable=no-self-use, invalid-name
 import unittest
 import logging
-from io import StringIO
 from mock import patch
 from hamcrest import assert_that, equal_to
 from spline.tools.logger import Logger, NoLogger
@@ -17,13 +16,11 @@ class TestLogger(unittest.TestCase):
         logger = Logger.get_logger(None)
         assert_that(isinstance(logger, NoLogger), equal_to(True))
 
-        f = StringIO()
-        with stdout_redirector(f):
+        with stdout_redirector() as stream:
             logger.info("hello")
             logger.warning("hello")
             logger.severe("hello")
-        assert_that(len(f.getvalue()), equal_to(0))
-        f.close()
+            assert_that(len(stream.getvalue()), equal_to(0))
 
     def test_configure_default(self):
         """Testing function Logger.configure_default."""

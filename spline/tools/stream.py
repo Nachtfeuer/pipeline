@@ -22,21 +22,23 @@ License::
 """
 import sys
 import tempfile
+from io import BytesIO
 from contextlib import contextmanager
 
 
 @contextmanager
-def stdout_redirector(stream):
+def stdout_redirector():
     """
     Simplify redirect of stdout.
 
     Taken from here: https://eli.thegreenplace.net/2015/redirecting-all-kinds-of-stdout-in-python/
     """
     old_stdout = sys.stdout
-    sys.stdout = stream
+    sys.stdout = BytesIO()
     try:
-        yield
+        yield sys.stdout
     finally:
+        sys.stdout.close()
         sys.stdout = old_stdout
 
 

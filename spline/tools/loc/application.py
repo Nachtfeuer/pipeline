@@ -15,7 +15,7 @@
 # DAMAGES OR OTHER LIABILITY,
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# pylint: disable=no-self-use, cell-var-from-loop
+# pylint: disable=no-self-use, cell-var-from-loop,unnecessary-lambda
 import sys
 import os
 import platform
@@ -106,31 +106,44 @@ class Application(object):
         supported_extension = [Adapter(entry).extension for entry in configuration]
 
         for path_and_filename, extension in Application.walk_files_for(path, supported_extension):
-            regex = Select(*configuration) \
+            entry = Select(*configuration) \
                 .where(lambda entry: Adapter(entry).extension == extension) \
-                .transform(lambda entry: Adapter(entry).regex) \
+                .transform(lambda entry: Adapter(entry)) \
                 .build()[0]
 
-            loc, com = self.analyse(path_and_filename, regex)
-            self.results.append({
-                'file': path_and_filename.replace(path + '/', ''),
-                'loc': loc,
-                'com': com,
-                'ratio': "%.1f" % (float(com) / float(loc))
-            })
+            loc, com = self.analyse(path_and_filename, entry.regex)
+            ratio = float(com) / float(loc)
 
-        pprint(self.results, keys=['ratio', 'loc', 'com', 'file'])
+            if ratio < Adapter(self.options).threshold or Adapter(self.options).show_all:
+                self.results.append({
+                    'type': entry.type,
+                    'file': path_and_filename.replace(path + '/', ''),
+                    'loc': loc,
+                    'com': com,
+                    'ratio': "%.1f" % ratio
+                })
+
+        pprint(self.results, keys=['ratio', 'loc', 'com', 'file', 'type'])
+
+        return len(Select(*self.results).where(
+            lambda entry: float(Adapter(entry).ratio) < Adapter(self.options).threshold).build()) == 0
 
 
 def main(**options):
     """Spline loc tool."""
     application = Application(**options)
-    application.run()
+    if not application.run():
+        sys.exit(1)
     return application
 
 
 @click.command()
-@click.option('--path', type=str, default=os.getcwd(), help="Path where to parse files")
+@click.option('--path', type=str, default=os.getcwd(),
+              help="Path where to parse files")
+@click.option('-t', '--threshold', type=float, default=0.5,
+              help="Expected Ratio between documentation and code (default: 0.5)")
+@click.option('-s', '--show-all', is_flag=True, default=False,
+              help="When enabled then showing statistic for all files")
 def click_main(**options):
     """Spline loc tool."""
     main(**options)

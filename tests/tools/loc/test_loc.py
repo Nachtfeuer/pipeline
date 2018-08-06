@@ -12,7 +12,7 @@ class TestLoc(unittest.TestCase):
 
     def test_loc_application(self):
         """Testing application."""
-        loc = Application(path=os.path.join(os.path.dirname(__file__), 'data'))
+        loc = Application(path=os.path.join(os.path.dirname(__file__), 'data'), show_all=True)
         loc.run()
         assert_that(len(loc.results), equal_to(1))
         assert_that(Adapter(loc.results[0]).file, ends_with('fifty_fifty.py'))
@@ -21,7 +21,7 @@ class TestLoc(unittest.TestCase):
 
     def test_loc_main(self):
         """Testing main."""
-        loc = main(path=os.path.join(os.path.dirname(__file__), 'data'))
+        loc = main(path=os.path.join(os.path.dirname(__file__), 'data'), show_all=True)
         assert_that(len(loc.results), equal_to(1))
         assert_that(Adapter(loc.results[0]).file, ends_with('fifty_fifty.py'))
         assert_that(Adapter(loc.results[0]).loc, equal_to(4))

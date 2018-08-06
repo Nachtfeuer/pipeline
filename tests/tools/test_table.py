@@ -2,7 +2,7 @@
 # pylint: disable=no-self-use
 import unittest
 
-from hamcrest import assert_that, equal_to
+from hamcrest import assert_that, equal_to, contains_string
 from spline.tools.table import calculate_columns, calculate_row_format, pprint
 from spline.tools.stream import stdout_redirector
 
@@ -28,7 +28,13 @@ class TestTable(unittest.TestCase):
         expected_row_format = '|%(character)-14s|%(first name)-10s|%(surname)-8s|'
         assert_that(row_format, equal_to(expected_row_format))
 
+        row_format = calculate_row_format(columns)
+        assert_that(row_format, contains_string('|%(character)-14s'))
+        assert_that(row_format, contains_string('|%(first name)-10s'))
+        assert_that(row_format, contains_string('|%(surname)-8s'))
+
     def test_pprint(self):
+        """Testing pprint function."""
         data = self.default_test_data()
         with stdout_redirector() as stream:
             pprint(data, list(sorted(data[0].keys())))
@@ -48,6 +54,7 @@ class TestTable(unittest.TestCase):
     def default_test_data():
         """
         Provide test data.
+
         Returns:
             list: each entry a dictionatory representing the row data.
         """

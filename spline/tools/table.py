@@ -1,4 +1,5 @@
 """Module table."""
+# pylint: disable=superfluous-parens
 
 
 def calculate_columns(sequence):
@@ -25,13 +26,13 @@ def calculate_columns(sequence):
     return columns
 
 
-def calculate_row_format(columns, keys):
+def calculate_row_format(columns, keys=None):
     """
     Calculate row format.
 
     Args:
         columns (dict): the keys are the column name and the value the max length.
-        keys (list): list of keys to order columns as well as to filter for them.
+        keys (list): optional list of keys to order columns as well as to filter for them.
 
     Returns:
         str: format for table row
@@ -39,6 +40,8 @@ def calculate_row_format(columns, keys):
     row_format = ''
     if keys is None:
         keys = columns.keys()
+    else:
+        keys = [key for key in keys if key in columns]
 
     for key in keys:
         if len(row_format) > 0:

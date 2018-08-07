@@ -22,8 +22,12 @@ License::
 """
 import sys
 import tempfile
-from io import BytesIO
 from contextlib import contextmanager
+
+if sys.version_info.major == 3:
+    from io import StringIO as Stream
+else:
+    from io import BytesIO as Stream
 
 
 @contextmanager
@@ -34,7 +38,7 @@ def stdout_redirector():
     Taken from here: https://eli.thegreenplace.net/2015/redirecting-all-kinds-of-stdout-in-python/
     """
     old_stdout = sys.stdout
-    sys.stdout = BytesIO()
+    sys.stdout = Stream()
     try:
         yield sys.stdout
     finally:

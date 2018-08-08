@@ -93,7 +93,7 @@ class Application(object):
             for match in re.findall(pattern, content, re.DOTALL):
                 com += match.count('\n') + 1
 
-            return loc, com
+            return max(0, loc - com), com
 
     def run(self):
         """Processing the pipeline."""
@@ -120,7 +120,7 @@ class Application(object):
                     'file': path_and_filename.replace(path + '/', ''),
                     'loc': loc,
                     'com': com,
-                    'ratio': "%.1f" % ratio
+                    'ratio': "%.2f" % ratio
                 })
 
         pprint(self.results, keys=['ratio', 'loc', 'com', 'file', 'type'])

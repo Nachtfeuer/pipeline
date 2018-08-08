@@ -16,7 +16,7 @@ class TestLoc(unittest.TestCase):
         loc.run()
         assert_that(len(loc.results), equal_to(1))
         assert_that(Adapter(loc.results[0]).file, ends_with('fifty_fifty.py'))
-        assert_that(Adapter(loc.results[0]).loc, equal_to(4))
+        assert_that(Adapter(loc.results[0]).loc, equal_to(2))
         assert_that(Adapter(loc.results[0]).com, equal_to(2))
 
     def test_loc_main(self):
@@ -24,7 +24,7 @@ class TestLoc(unittest.TestCase):
         loc = main(**self.default_options())
         assert_that(len(loc.results), equal_to(1))
         assert_that(Adapter(loc.results[0]).file, ends_with('fifty_fifty.py'))
-        assert_that(Adapter(loc.results[0]).loc, equal_to(4))
+        assert_that(Adapter(loc.results[0]).loc, equal_to(2))
         assert_that(Adapter(loc.results[0]).com, equal_to(2))
 
     @staticmethod

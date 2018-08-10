@@ -104,11 +104,12 @@ class Application(object):
 
         configuration = self.load_configuration()
         paths = [os.path.abspath(path) for path in Adapter(self.options).path]
-        supported_extension = [Adapter(entry).extension for entry in configuration]
+        supported_extension = [
+            ext.strip() for entry in configuration for ext in Adapter(entry).extension.split()]
 
         for path, path_and_filename, extension in Application.walk_files_for(paths, supported_extension):
             entry = Select(*configuration) \
-                .where(lambda entry: Adapter(entry).extension == extension) \
+                .where(lambda entry: extension in Adapter(entry).extension.split()) \
                 .transform(lambda entry: Adapter(entry)) \
                 .build()[0]
             # parsing file with regex to get loc and com values

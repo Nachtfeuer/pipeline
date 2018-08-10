@@ -7,3 +7,7 @@ configuration:
     - extension: .sh
       type: Bash
       regex: ([ ]*#[^\n]*)
+
+    - extension: .cxx .cpp .h .hpp
+      type: C++
+      regex: ([ ]*//[^\n]*|/\*\*.*?\*/)

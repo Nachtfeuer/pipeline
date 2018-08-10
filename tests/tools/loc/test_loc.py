@@ -33,15 +33,17 @@ class TestLoc(unittest.TestCase):
             assert_that(Adapter(results[idx]).file, ends_with(expected.filename))
             assert_that(Adapter(results[idx]).loc, equal_to(expected.loc))
             assert_that(Adapter(results[idx]).com, equal_to(expected.com))
+            assert_that(float(Adapter(results[idx]).ratio), equal_to(expected.ratio))
 
     @staticmethod
     def expected_results():
         """Expected test results."""
         return [
-            Adapter({'filename': 'com_only.py', 'loc': 0, 'com': 4}),
-            Adapter({'filename': 'fifty_fifty.py', 'loc': 2, 'com': 2}),
-            Adapter({'filename': 'more_com_than_loc.py', 'loc': 2, 'com': 3}),
-            Adapter({'filename': 'more_loc_than_com.py', 'loc': 4, 'com': 1})
+            Adapter({'filename': 'com_only.py', 'loc': 0, 'com': 4, 'ratio': 1.0}),
+            Adapter({'filename': 'fifty_fifty.cpp', 'loc': 7, 'com': 7, 'ratio': 1.0}),
+            Adapter({'filename': 'fifty_fifty.py', 'loc': 2, 'com': 2, 'ratio': 1.0}),
+            Adapter({'filename': 'more_com_than_loc.py', 'loc': 2, 'com': 3, 'ratio': 1.0}),
+            Adapter({'filename': 'more_loc_than_com.py', 'loc': 4, 'com': 1, 'ratio': 0.25})
         ]
 
     @staticmethod

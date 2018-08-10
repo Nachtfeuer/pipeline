@@ -59,16 +59,17 @@ def pprint(sequence, keys=None):
         sequence (list or tuple): a sequence with a dictionary each entry.
         keys (list): optional list of keys to order columns as well as to filter for them.
     """
-    columns = calculate_columns(sequence)
-    row_format = calculate_row_format(columns, keys)
-    header = row_format % dict([(key, key.title()) for key in columns])
-    separator = row_format % dict([(key, '-' * columns[key]) for key in columns])
+    if len(sequence) > 0:
+        columns = calculate_columns(sequence)
+        row_format = calculate_row_format(columns, keys)
+        header = row_format % dict([(key, key.title()) for key in columns])
+        separator = row_format % dict([(key, '-' * columns[key]) for key in columns])
 
-    print(separator)
-    print(header)
-    print(separator)
+        print(separator)
+        print(header)
+        print(separator)
 
-    for row in sequence:
-        print(row_format % row)
+        for row in sequence:
+            print(row_format % row)
 
-    print(separator)
+        print(separator)

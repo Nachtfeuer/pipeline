@@ -60,7 +60,7 @@ class Application(object):
             return Adapter(safe_load(handle)).configuration
 
     @staticmethod
-    def walk_files_for(path, supported_extensions):
+    def walk_files_for(paths, supported_extensions):
         """
         Iterating files for given extensions.
 
@@ -70,11 +70,12 @@ class Application(object):
         Returns:
             str: yield each full path and filename found.
         """
-        for root, _, files in os.walk(path):
-            for filename in files:
-                extension = os.path.splitext(filename)[1]
-                if extension in supported_extensions:
-                    yield os.path.join(root, filename), extension
+        for path in paths:
+            for root, _, files in os.walk(path):
+                for filename in files:
+                    extension = os.path.splitext(filename)[1]
+                    if extension in supported_extensions:
+                        yield path, os.path.join(root, filename), extension
 
     def analyse(self, path_and_filename, pattern):
         """
@@ -102,17 +103,19 @@ class Application(object):
         self.logger.info("Current cpu count is %d", multiprocessing.cpu_count())
 
         configuration = self.load_configuration()
-        path = os.path.abspath(Adapter(self.options).path)
+        paths = [os.path.abspath(path) for path in Adapter(self.options).path]
         supported_extension = [Adapter(entry).extension for entry in configuration]
 
-        for path_and_filename, extension in Application.walk_files_for(path, supported_extension):
+        for path, path_and_filename, extension in Application.walk_files_for(paths, supported_extension):
             entry = Select(*configuration) \
                 .where(lambda entry: Adapter(entry).extension == extension) \
                 .transform(lambda entry: Adapter(entry)) \
                 .build()[0]
-
+            # parsing file with regex to get loc and com values
+            # 100 lines of code (total) with 50 lines of comments means: loc=50, com=50
+            # the ratio would be then: 1.0
             loc, com = self.analyse(path_and_filename, entry.regex)
-            ratio = float(com) / float(loc)
+            ratio = float(com) / float(loc) if loc > 0 and com < loc else 1.0
 
             if ratio < Adapter(self.options).threshold or Adapter(self.options).show_all:
                 self.results.append({
@@ -122,9 +125,9 @@ class Application(object):
                     'com': com,
                     'ratio': "%.2f" % ratio
                 })
-
+        # print out results
         pprint(self.results, keys=['ratio', 'loc', 'com', 'file', 'type'])
-
+        # providing results (mainly for unittesting)
         return len(Select(*self.results).where(
             lambda entry: float(Adapter(entry).ratio) < Adapter(self.options).threshold).build()) == 0
 
@@ -138,7 +141,7 @@ def main(**options):
 
 
 @click.command()
-@click.option('--path', type=str, default=os.getcwd(),
+@click.option('--path', type=str, default=os.getcwd(), multiple=True,
               help="Path where to parse files")
 @click.option('-t', '--threshold', type=float, default=0.5,
               help="Expected Ratio between documentation and code (default: 0.5)")

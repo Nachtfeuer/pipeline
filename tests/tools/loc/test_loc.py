@@ -24,6 +24,11 @@ class TestLoc(unittest.TestCase):
             assert_that(mocked_exit.mock_calls, equal_to([call(1)]))
             self.verify_results(loc)
 
+    def test_ignore_path(self):
+        """Testing Application.ignore_path."""
+        assert_that(Application.ignore_path(os.path.join(os.getcwd(), '.tox')), equal_to(True))
+        assert_that(Application.ignore_path(os.path.dirname(__file__)), equal_to(False))
+
     def verify_results(self, loc):
         """Testing for expected results."""
         results = sorted(loc.results, key=lambda entry: Adapter(entry).file)

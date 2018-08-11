@@ -60,6 +60,24 @@ class Application(object):
             return Adapter(safe_load(handle)).configuration
 
     @staticmethod
+    def ignore_path(path):
+        """
+        Verify whether to ignore a path.
+
+        Args:
+            path (str): path to check.
+
+        Returns:
+            bool: True when to ignore given path.
+        """
+        ignore = False
+        for name in ['.tox', 'dist', 'build', 'node_modules', 'htmlcov']:
+            if path.find(name) >= 0:
+                ignore = True
+                break
+        return ignore
+
+    @staticmethod
     def walk_files_for(paths, supported_extensions):
         """
         Iterating files for given extensions.
@@ -72,6 +90,9 @@ class Application(object):
         """
         for path in paths:
             for root, _, files in os.walk(path):
+                if Application.ignore_path(root):
+                    continue
+
                 for filename in files:
                     extension = os.path.splitext(filename)[1]
                     if extension in supported_extensions:
@@ -142,7 +163,7 @@ def main(**options):
 
 
 @click.command()
-@click.option('--path', type=str, default=os.getcwd(), multiple=True,
+@click.option('--path', type=str, default=[os.getcwd()], multiple=True,
               help="Path where to parse files")
 @click.option('-t', '--threshold', type=float, default=0.5,
               help="Expected Ratio between documentation and code (default: 0.5)")

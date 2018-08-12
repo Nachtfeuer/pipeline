@@ -16,10 +16,10 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=no-member
-import ast
 import os
 import multiprocessing
 from contextlib import closing
+import ast
 from spline.components.bash import Bash
 from spline.components.docker import Container, Image
 from spline.components.packer import Packer

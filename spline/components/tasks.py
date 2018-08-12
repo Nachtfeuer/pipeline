@@ -16,6 +16,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=no-member
+import ast
 import os
 import multiprocessing
 from contextlib import closing
@@ -100,7 +101,17 @@ class Tasks(object):
             if key in ['python']:
                 entry['type'] = key
 
-            for item in entry['with'] if 'with' in entry else ['']:
+            if 'with' in entry and isinstance(entry['with'], str):
+                rendered_with = ast.literal_eval(render(entry['with'],
+                                                        variables=self.pipeline.variables,
+                                                        model=self.pipeline.model,
+                                                        env=self.get_merged_env(include_os=True)))
+            elif 'with' in entry:
+                rendered_with = entry['with']
+            else:
+                rendered_with = ['']
+
+            for item in rendered_with:
                 shells.append({
                     'id': self.next_task_id,
                     'creator': key,

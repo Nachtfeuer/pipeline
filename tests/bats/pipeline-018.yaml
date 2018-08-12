@@ -1,0 +1,12 @@
+model:
+  data:
+    - 1
+    - 2
+    - 3
+
+pipeline:
+  - stage(setup):
+    - tasks(ordered):
+      - shell:
+          script: echo "---{{ item }}---"
+          with: "{{ model.data }}"

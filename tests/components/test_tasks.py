@@ -1,5 +1,5 @@
 """Testing of class Tasks."""
-# pylint: disable=no-self-use, invalid-name
+# pylint: disable=no-self-use, invalid-name, too-many-public-methods
 import unittest
 from hamcrest import assert_that, equal_to
 
@@ -190,3 +190,23 @@ class TestTasks(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('hello1'))
         assert_that(output[1], equal_to('hello1'))
+
+    def test_tasks_ordered_having_with(self):
+        """Testing with two task only (ordered)."""
+        pipeline = FakePipeline()
+        tasks = Tasks(pipeline, parallel=False)
+        pipeline.model = {'foo': [4, 5, 6]}
+
+        document = [{'shell': {'script': '''echo test:{{ item }}''', 'when': '', 'with': [1, 2, 3]}},
+                    {'shell': {'script': '''echo test:{{ item }}''', 'when': '', 'with': "{{ model.foo }}"}}]
+        result = tasks.process(document)
+        output = [line for line in result['output'] if line.find("test:") >= 0]
+
+        assert_that(result['success'], equal_to(True))
+        assert_that(len(output), equal_to(6))
+        assert_that(output[0], equal_to('test:1'))
+        assert_that(output[1], equal_to('test:2'))
+        assert_that(output[2], equal_to('test:3'))
+        assert_that(output[3], equal_to('test:4'))
+        assert_that(output[4], equal_to('test:5'))
+        assert_that(output[5], equal_to('test:6'))

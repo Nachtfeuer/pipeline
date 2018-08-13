@@ -18,6 +18,7 @@
 # pylint: disable=no-member
 import os
 import multiprocessing
+import time
 from contextlib import closing
 from spline.components.bash import Bash
 from spline.components.docker import Container, Image
@@ -218,6 +219,32 @@ class Tasks(object):
 
     def process_shell(self, creator, entry, config):
         """Processing a shell entry."""
+        retries = entry['retries'] if 'retries' in entry else 1
+        counter = 0
+        output = []
+
+        while counter < retries:
+            result = Adapter(self._process_shell(creator, entry, config))
+            output += result.output
+
+            if not result.success:
+                counter = counter + 1
+
+                if counter < retries:
+                    to_sleep = counter * counter
+                    self.logger.error("Processing failed, will retry automatically in %d seconds.", to_sleep)
+                    time.sleep(to_sleep)
+            else:
+                return {'success': True, 'output': output}
+
+        if retries > 1 and counter >= retries:
+            self.logger.error("All retries failed to process. Giving up.")
+            self.event.failed()
+
+        return {'success': False, 'output': output}
+
+    def _process_shell(self, creator, entry, config):
+        """Internal processing of a shell entry."""
         self.logger.info("Processing Bash code: start")
 
         output = []

@@ -1,5 +1,5 @@
 """Testing of class Tasks."""
-# pylint: disable=no-self-use, invalid-name
+# pylint: disable=no-self-use, invalid-name, too-many-public-methods
 import unittest
 from hamcrest import assert_that, equal_to
 
@@ -190,3 +190,15 @@ class TestTasks(unittest.TestCase):
         assert_that(len(output), equal_to(2))
         assert_that(output[0], equal_to('hello1'))
         assert_that(output[1], equal_to('hello1'))
+
+    def test_tasks_ordered_with_retry(self):
+        """Testing with one task only, having a retry given. (ordered)."""
+        pipeline = FakePipeline()
+        tasks = Tasks(pipeline, parallel=False)
+
+        document = [{'shell': {'script': '''echo test:text && false''', 'when': '', 'retries': 3}}]
+        result = tasks.process(document)
+        output = [line for line in result['output'] if line.find("test:") >= 0]
+
+        assert_that(result['success'], equal_to(False))
+        assert_that(len(output), equal_to(3))

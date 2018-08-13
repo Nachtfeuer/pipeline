@@ -119,7 +119,7 @@ class Bash(object):
             temp.write(to_file_map[sys.version_info.major](rendered_script))
         temp.close()
         # make Bash script executable
-        os.chmod(temp.name, 777)  # nosec
+        os.chmod(temp.name, 0o700)
         return temp.name
 
     def render_bash_options(self):

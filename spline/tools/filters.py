@@ -20,7 +20,7 @@ from jinja2.exceptions import TemplateSyntaxError, UndefinedError
 from spline.tools.logger import Logger
 
 
-def render(value, **kwargs):
+def render(value, recursive=True, **kwargs):
     """
     Use Jinja2 rendering for given text an key key/values.
 
@@ -48,8 +48,13 @@ def render(value, **kwargs):
         environment.filters['docker_environment'] = docker_environment
         environment.filters['find_matrix'] = find_matrix
         environment.filters['find_stages'] = find_stages
-        template = environment.from_string(value)
-        return template.render(**kwargs)
+        prev = value
+        while True:
+            curr = environment.from_string(prev).render(**kwargs)
+            if recursive and curr != prev:
+                prev = curr
+            else:
+                return curr
     except UndefinedError as exception:
         Logger.get_logger(__name__).error("render(undefined): %s", exception)
     except TemplateSyntaxError as exception:

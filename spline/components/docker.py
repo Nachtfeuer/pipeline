@@ -55,7 +55,7 @@ class Container(Bash):
         with open(template_file) as handle:
             template = handle.read()
             # all fields are re-rendered via the Bash script
-            wrapped_script = render(template, container={
+            wrapped_script = render(template, recursive=False, container={
                 'image': 'centos:7' if 'image' not in entry else entry['image'],
                 'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
                 'background': False if 'background' not in entry else str(entry['background']).lower(),

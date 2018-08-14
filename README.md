@@ -27,6 +27,7 @@
 [Hooks](docs/hooks.rst)  
 [Include](docs/include.rst)  
 [Event Logging](docs/event_logging.rst)  
+[Tool: spline-loc](docs/spline_loc.rst)  
 [How to contact?](#contact)  
 [Links](#links)  
 

@@ -123,6 +123,20 @@ list of tasks to be processed and it depends on the setup of the **tasks**
 block whether those tasks are executed in **order** or in **parallel**.
 Please have a look and try the example **with.yaml** in the repository.
 
+"Retries" attribute
+-------------------
+Using the **retries** attribute, one can automatically have a failed shell retried
+up the number of attempts specified.
+
+An example of usage is the following:
+
+::
+
+    - shell:
+        script: |
+            echo "wont work" && false
+        retries: 3
+
 Colors
 ------
 Colors are working fine!

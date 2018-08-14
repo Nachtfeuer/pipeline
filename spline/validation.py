@@ -67,7 +67,8 @@ class Validator(object):
                         Optional('with'): And(len, [object]),
                         Optional('variable'):
                             And(Or(type(' '), type(u' ')), len, Regex(r'([a-zA-Z][_a-zA-Z]*)')),
-                        Optional('when', default=''): And(str, Condition.is_valid)
+                        Optional('when', default=''): And(str, Condition.is_valid),
+                        Optional('retries', default=1): int
                     }},
                     # optional Docker container task
                     {Optional('docker(container)'): {

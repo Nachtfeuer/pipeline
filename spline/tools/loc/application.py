@@ -139,16 +139,27 @@ class Application(object):
             loc, com = self.analyse(path_and_filename, entry.regex)
             ratio = float(com) / float(loc) if loc > 0 and com < loc else 1.0
 
-            if ratio < Adapter(self.options).threshold or Adapter(self.options).show_all:
-                self.results.append({
-                    'type': entry.type,
-                    'file': path_and_filename.replace(path + '/', ''),
-                    'loc': loc,
-                    'com': com,
-                    'ratio': "%.2f" % ratio
-                })
+            self.results.append({
+                'type': entry.type,
+                'file': path_and_filename.replace(path + '/', ''),
+                'loc': loc,
+                'com': com,
+                'ratio': "%.2f" % ratio
+            })
+
+        ppresults = Select(*self.results).where(
+            lambda entry: float(Adapter(entry).ratio) < Adapter(self.options).threshold or
+            Adapter(self.options).show_all).build()
+
         # print out results
-        pprint(self.results, keys=['ratio', 'loc', 'com', 'file', 'type'])
+        pprint(ppresults, keys=['ratio', 'loc', 'com', 'file', 'type'])
+
+        if Adapter(self.options).average:
+            all_ratio = Select(*self.results).transform(lambda entry: float(Adapter(entry).ratio)).build()
+            avg_ratio = float(sum(all_ratio)) / float(len(all_ratio)) if len(all_ratio) > 0 else 1.0
+            self.logger.info('average ratio is %.2f for %d files', avg_ratio, len(all_ratio))
+            return avg_ratio >= Adapter(self.options).threshold
+
         # providing results (mainly for unittesting)
         return len(Select(*self.results).where(
             lambda entry: float(Adapter(entry).ratio) < Adapter(self.options).threshold).build()) == 0
@@ -169,6 +180,8 @@ def main(**options):
               help="Expected Ratio between documentation and code (default: 0.5)")
 @click.option('-s', '--show-all', is_flag=True, default=False,
               help="When enabled then showing statistic for all files")
+@click.option('-a', '--average', is_flag=True, default=False,
+              help='When set use the average com/loc of all files against threshold (default: false)')
 def click_main(**options):
     """Spline loc tool."""
     main(**options)

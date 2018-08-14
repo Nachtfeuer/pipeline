@@ -59,3 +59,28 @@ focuses on ratios below 1.0. That's the idea.
  - I do not check for sense ... if somebody writes 'bla bla bla' a code review should reject.
  - I do not check tags against parameters because a) there are to many different styles and b)
    it would required to parse each language to know which parameters a function or method has.
+
+## Using average ratio only for valuation
+
+The option `--average` does still report all files that have not enough documentation but
+the **spline-loc** tool (now) fails only when the average of all your ratios is smaller
+than your defined threshold:
+
+```bash
+$ spline-loc --path=spline --average
+2018-08-14 05:44:03,157 - spline.tools.loc.application - Running with Python 2.7.13 (default, Nov 24 2017, 17:33:09) [GCC 6.3.0 20170516]
+2018-08-14 05:44:03,221 - spline.tools.loc.application - Running on platform Linux-4.9.0-6-amd64-x86_64-with-debian-9.4
+2018-08-14 05:44:03,221 - spline.tools.loc.application - Current cpu count is 4
+|-----|---|---|------------------------|------|
+|Ratio|Loc|Com|File                    |Type  |
+|-----|---|---|------------------------|------|
+|0.36 |73 |26 |pipeline.py             |Python|
+|0.35 |162|57 |application.py          |Python|
+|0.34 |77 |26 |tools/event.py          |Python|
+|0.38 |89 |34 |tools/version.py        |Python|
+|0.48 |130|62 |tools/loc/application.py|Python|
+|0.26 |213|56 |components/tasks.py     |Python|
+|0.36 |80 |29 |components/config.py    |Python|
+|-----|---|---|------------------------|------|
+2018-08-14 05:44:03,240 - spline.tools.loc.application - average ratio is 0.72 for 34 files
+```

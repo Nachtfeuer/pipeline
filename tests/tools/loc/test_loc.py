@@ -14,7 +14,7 @@ class TestLoc(unittest.TestCase):
     def test_loc_application(self):
         """Testing application."""
         loc = Application(**self.default_options())
-        loc.run()
+        assert_that(loc.run(), equal_to(False))
         self.verify_results(loc)
 
     def test_loc_main(self):
@@ -28,6 +28,15 @@ class TestLoc(unittest.TestCase):
         """Testing Application.ignore_path."""
         assert_that(Application.ignore_path(os.path.join(os.getcwd(), '.tox')), equal_to(True))
         assert_that(Application.ignore_path(os.path.dirname(__file__)), equal_to(False))
+
+    def test_average(self):
+        """Testing using average to verify threshold."""
+        options = self.default_options()
+        options.update({'average': True})
+
+        loc = Application(**options)
+        assert_that(loc.run(), equal_to(True))
+        self.verify_results(loc)
 
     def verify_results(self, loc):
         """Testing for expected results."""

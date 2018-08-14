@@ -90,7 +90,7 @@ class Application(object):
         """
         for path in paths:
             for root, _, files in os.walk(path):
-                if Application.ignore_path(root):
+                if Application.ignore_path(root.replace(path, '')):
                     continue
 
                 for filename in files:

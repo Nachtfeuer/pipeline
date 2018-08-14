@@ -26,8 +26,8 @@ class TestLoc(unittest.TestCase):
 
     def test_ignore_path(self):
         """Testing Application.ignore_path."""
-        assert_that(Application.ignore_path(os.path.join(os.getcwd(), '.tox')), equal_to(True))
-        assert_that(Application.ignore_path(os.path.dirname(__file__)), equal_to(False))
+        assert_that(Application.ignore_path('/work/pipeline/.tox'), equal_to(True))
+        assert_that(Application.ignore_path('/work/pipeline/spline'), equal_to(False))
 
     def test_average(self):
         """Testing using average to verify threshold."""

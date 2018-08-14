@@ -77,19 +77,21 @@ class Pipeline(object):
         output = []
         for entry in pipeline:
             key = list(entry.keys())[0]
+            # an evironment block can be repeated
             if key == "env":
                 self.data.env_list[0].update(entry[key])
                 self.logger.debug("Updating environment at level 0 with %s",
                                   self.data.env_list[0])
                 continue
 
-            # after validation it can't be anything else but a stage:
+            # after validation it can't be anything else but a stage
+            # and the title is inside the round brackets:
             stage = Stage(self, re.match(r"stage\((?P<title>.*)\)", key).group("title"))
             result = stage.process(entry[key])
             output += result['output']
             if not result['success']:
                 return {'success': False, 'output': output}
-
+        # logging the output of the cleanup shell when registered
         for line in self.cleanup():
             output.append(line)
             self.logger.info(" | %s", line)

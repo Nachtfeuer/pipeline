@@ -393,13 +393,35 @@ pipeline:
 - refresh each 5 seconds
 
 ---
+@title[Spline Loc Tool]
+### Spline Loc Tool
+
+```bash
+$ spline-loc --path=spline  --average
+|-----|---|---|--------------------|------|
+|Ratio|Loc|Com|File                |Type  |
+|-----|---|---|--------------------|------|
+|0.35 |162|57 |application.py      |Python|
+|0.34 |77 |26 |tools/event.py      |Python|
+|0.38 |89 |34 |tools/version.py    |Python|
+|0.26 |213|56 |components/tasks.py |Python|
+|0.36 |80 |29 |components/config.py|Python|
+|-----|---|---|--------------------|------|
+2018-08-14 19:28:42,131 - spline.tools.loc.application - average ratio is 0.72 for 34 files
+```
+
+ * Distributed together with spline
+ * `--average` for average com/loc ratio of found files otherwise per file
+ * Supported|C++, Java, Javascript, Typescript, Groovy and Python
+ * Failed (customizable) threshold forces exit code 1
+
+---
 @title[Ideas, Future Direction]
 ### Ideas | Future Direction
 
  * Auto Cleanup Docker Images+Container
  * Support for docker-compose
  * Generator for Jenkinsfile and .travis.yml
- * Spline Server
  * Verify concrete tool versions
 
 ---

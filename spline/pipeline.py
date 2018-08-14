@@ -39,7 +39,14 @@ class Pipeline(object):
     """Class for processing a pipeline definition."""
 
     def __init__(self, model=None, env=None, options=None):
-        """Initializing pipeline with definition (loaded from a yaml file)."""
+        """
+        Initializing pipeline with definition (loaded from a yaml file).
+
+        Args:
+            model (dict): if you have a model defined in your pipeline definition (yaml)
+            env (dict): the env as defined (if) per matrix
+            options (dict): command line options for spline
+        """
         self.event = Event.create(__name__)
         self.options = options
         self.model = {} if not isinstance(model, dict) else model
@@ -62,8 +69,7 @@ class Pipeline(object):
         """Run cleanup script of pipeline when hook is configured."""
         if self.data.hooks and len(self.data.hooks.cleanup) > 0:
             env = self.data.env_list[0].copy()
-            env.update({'PIPELINE_RESULT': 'SUCCESS'})
-            env.update({'PIPELINE_SHELL_EXIT_CODE': '0'})
+            env.update({'PIPELINE_RESULT': 'SUCCESS', 'PIPELINE_SHELL_EXIT_CODE': '0'})
             config = ShellConfig(script=self.data.hooks.cleanup, model=self.model,
                                  env=env, dry_run=self.options.dry_run,
                                  debug=self.options.debug, strict=self.options.strict,
@@ -77,7 +83,7 @@ class Pipeline(object):
         output = []
         for entry in pipeline:
             key = list(entry.keys())[0]
-            # an evironment block can be repeated
+            # an environment block can be repeated
             if key == "env":
                 self.data.env_list[0].update(entry[key])
                 self.logger.debug("Updating environment at level 0 with %s",
@@ -91,6 +97,7 @@ class Pipeline(object):
             output += result['output']
             if not result['success']:
                 return {'success': False, 'output': output}
+
         # logging the output of the cleanup shell when registered
         for line in self.cleanup():
             output.append(line)

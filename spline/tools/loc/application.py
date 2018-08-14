@@ -33,7 +33,7 @@ from spline.tools.table import pprint
 
 
 class Application(object):
-    """Spline loc application."""
+    """Spline loc application for counting loc, com and calculating ratio, failing by threshold."""
 
     def __init__(self, **options):
         """
@@ -104,6 +104,7 @@ class Application(object):
 
         Args:
             path_and_filename (str): path and filename to parse  for loc and com.
+            pattern (str): regex to search for line commens and block comments
 
         Returns:
             int, int: loc and com for given file.
@@ -146,12 +147,13 @@ class Application(object):
                 'com': com,
                 'ratio': "%.2f" % ratio
             })
-
+        # for the table we are mainly interested in ratio below defined threshold
+        # (except you want to see all of your code: --show-all)
         ppresults = Select(*self.results).where(
             lambda entry: float(Adapter(entry).ratio) < Adapter(self.options).threshold or
             Adapter(self.options).show_all).build()
 
-        # print out results
+        # print out results in table format
         pprint(ppresults, keys=['ratio', 'loc', 'com', 'file', 'type'])
 
         if Adapter(self.options).average:
@@ -168,6 +170,7 @@ class Application(object):
 def main(**options):
     """Spline loc tool."""
     application = Application(**options)
+    # fails application when your defined threshold is higher than your ratio of com/loc.
     if not application.run():
         sys.exit(1)
     return application
@@ -183,7 +186,7 @@ def main(**options):
 @click.option('-a', '--average', is_flag=True, default=False,
               help='When set use the average com/loc of all files against threshold (default: false)')
 def click_main(**options):
-    """Spline loc tool."""
+    """Spline loc tool - application entry point."""
     main(**options)
 
 

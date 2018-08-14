@@ -8,14 +8,13 @@ is at a level you can accept.
 
 ## The usage
 
-You can be sure that the list will be empty when you read this :)
-However you can specify a path with `--path` (you can repeat that parameter).
+You can specify a path with `--path` (parameter is repeatable).
 
-The threshold (ratio) is at 0.5 by default but you can specify `--threshold` (or `-t`)
-to take another one you prefer. The threshold is for all files. At the moment
+The threshold (ratio) is at 0.5 by default but you can specify with `--threshold` (or `-t`)
+to take another one you prefer. The threshold is for all files by default. At the moment
 Bash, Python, Java, Javascript, Typescript, Groovy and C++ are supported.
 
-If one file has been found that is below given threshold the tool ends with exit code 1.
+If one file has been found that is below given threshold the tool ends with exit code 1 (default).
 
 ```bash
 $ spline-loc --path=spline
@@ -25,7 +24,6 @@ $ spline-loc --path=spline
 |-----|---|---|--------------------|------|
 |Ratio|Loc|Com|File                |Type  |
 |-----|---|---|--------------------|------|
-|0.36 |73 |26 |pipeline.py         |Python|
 |0.35 |162|57 |application.py      |Python|
 |0.34 |77 |26 |tools/event.py      |Python|
 |0.38 |89 |34 |tools/version.py    |Python|
@@ -74,11 +72,9 @@ $ spline-loc --path=spline --average
 |-----|---|---|------------------------|------|
 |Ratio|Loc|Com|File                    |Type  |
 |-----|---|---|------------------------|------|
-|0.36 |73 |26 |pipeline.py             |Python|
 |0.35 |162|57 |application.py          |Python|
 |0.34 |77 |26 |tools/event.py          |Python|
 |0.38 |89 |34 |tools/version.py        |Python|
-|0.48 |130|62 |tools/loc/application.py|Python|
 |0.26 |213|56 |components/tasks.py     |Python|
 |0.36 |80 |29 |components/config.py    |Python|
 |-----|---|---|------------------------|------|

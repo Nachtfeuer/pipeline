@@ -118,6 +118,16 @@ example a dictionary is used:
             - message: third
               time: 1
 
+You also can use a **rendered with** like following when
+you put the list of items into the model:
+
+::
+
+    - shell:
+        script: echo "{{ item }}"
+        with: "{{ model.data }}"
+
+
 Finally all generated tasks (shell or docker container) are added to the
 list of tasks to be processed and it depends on the setup of the **tasks**
 block whether those tasks are executed in **order** or in **parallel**.

@@ -1,16 +1,26 @@
+model:
+   data:
+     - hello
+     - world
+
 pipeline:
     - stage(Example):
         - tasks(ordered):
             - shell:
-                script: echo "{{ item }}"
+                script: echo "shell - {{ item }}"
                 with:
                     - hello
                     - world
+
             - docker(container):
-                script: echo "{{ item }}"
+                script: echo "docker - {{ item }}"
                 with:
                     - hello
                     - world
+
+            - shell:
+                script: echo "rendered with - {{ item }}"
+                with: "{{ model.data }}"
 
         - tasks(parallel):
             - shell:

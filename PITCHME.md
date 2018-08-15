@@ -102,6 +102,31 @@ pipeline:
 ```
 (on my machine: `thomas: "hello world!"`)
 
+ * support for automatic nested rendering
+
+---
+@title[The With Field]
+### The Width Field
+
+```
+model:
+   data:
+     - hello
+     - world
+
+pipeline:
+    - stage(This Is A Demo):
+        - tasks(ordered):
+            - shell:
+                 script: "{{ item }}"
+                 with: "{{ model.data }}"
+```
+
+ * task repeated as many items you have.
+ * each item can be any valid yaml structure.
+ * you also can specify the items below the **with**.
+ * depending on tasks block: ordered or parallel
+
 ---
 @title[Task Variables]
 ### Task Variables

@@ -71,7 +71,7 @@ class Validator(object):
                         'script': And(Or(type(' '), type(u' ')), len),
                         Optional('title'): And(str, len),
                         Optional('tags'): And([And(str, len)], len),
-                        Optional('with'): And(len, [object]),
+                        Optional('with'): And(len, Or(type(' '), type(u' '), [object])),
                         # when set store output of shell task into a variable with this name
                         # can be referenced in jinja templating with {{ variables.name }}
                         Optional('variable'):

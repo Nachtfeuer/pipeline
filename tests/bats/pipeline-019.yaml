@@ -1,0 +1,13 @@
+model:
+  bar: 42
+  foo: "The answer is {{ model.bar }}."
+
+pipeline:
+  - stage(setup):
+    - tasks(ordered):
+      - env:
+          foo: env foo
+
+      - shell:
+          script: echo "test:{{ env.foo }}-{{ model.foo }}"
+          title: test

@@ -16,6 +16,7 @@
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 # pylint: disable=too-many-instance-attributes
+import contextlib
 import sys
 import os
 import shlex
@@ -26,6 +27,18 @@ import tempfile
 from spline.tools.filters import render
 from spline.tools.logger import Logger
 from spline.tools.event import Event
+
+
+@contextlib.contextmanager
+def managed_process(process):
+    """Wrapper for subprocess.Popen to work across various Python versions, when using the with syntax."""
+    try:
+        yield process
+    finally:
+        for stream in [process.stdout, process.stdin, process.stderr]:
+            if stream:
+                stream.close()
+        process.wait()
 
 
 class Bash(object):
@@ -119,7 +132,7 @@ class Bash(object):
             temp.write(to_file_map[sys.version_info.major](rendered_script))
         temp.close()
         # make Bash script executable
-        os.chmod(temp.name, 777)  # nosec
+        os.chmod(temp.name, 0o700)
         return temp.name
 
     def render_bash_options(self):
@@ -134,23 +147,24 @@ class Bash(object):
     def process_script(self, filename):
         """Running the Bash code."""
         try:
-            process = subprocess.Popen(shlex.split("bash %s" % filename),
-                                       stdout=self.stdout, stderr=self.stderr,
-                                       shell=self.shell, env=self.env)  # nosec
-            for line in iter(process.stdout.readline, ' '):
-                if not line:
-                    break
-                yield line[0:-1].decode('utf-8')
-            process.wait()
-            self.exit_code = process.returncode
-            self.success = (process.returncode == 0)
-            if not self.config.internal:
-                if process.returncode == 0:
-                    self.logger.info("Exit code has been %d", process.returncode)
-                else:
-                    self.logger.error("Exit code has been %d", process.returncode)
+            with managed_process(subprocess.Popen(shlex.split("bash %s" % filename),
+                                                  stdout=self.stdout, stderr=self.stderr,
+                                                  shell=self.shell, env=self.env)) as process:  # nosec
+                for line in iter(process.stdout.readline, ' '):
+                    if not line:
+                        break
+                    yield line[0:-1].decode('utf-8')
+                process.wait()
+                self.exit_code = process.returncode
+                self.success = (process.returncode == 0)
+                if not self.config.internal:
+                    if process.returncode == 0:
+                        self.logger.info("Exit code has been %d", process.returncode)
+                    else:
+                        self.logger.error("Exit code has been %d", process.returncode)
         except OSError as exception:
             self.exit_code = 1
+            self.success = False
             yield str(exception)
 
     def process_file(self, filename):
@@ -176,10 +190,12 @@ class Bash(object):
                                     item=self.config.item, variables=self.config.variables))
 
         if temp_filename is not None:
-            for line in self.process_file(temp_filename):
-                yield line
-            # removing script
-            os.remove(temp_filename)
+            try:
+                for line in self.process_file(temp_filename):
+                    yield line
+            finally:
+                # removing script
+                os.remove(temp_filename)
 
         if not self.config.internal:
             if self.exit_code == 0:

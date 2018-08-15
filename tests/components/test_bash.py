@@ -97,12 +97,12 @@ class TestBash(unittest.TestCase):
         bash = Bash(ShellConfig(script='''echo "PIPELINE_BASH_FILE=$PIPELINE_BASH_FILE"'''))
         output = [line for line in bash.process() if line.lower().find("script") > 0]
         assert_that(len(output), equal_to(1))
-        assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=/tmp/pipeline-script-.*.sh'))
+        assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=.*/tmp/pipeline-script-.*.sh'))
 
         bash = Bash(ShellConfig(script='''echo "PIPELINE_BASH_FILE={{ env.PIPELINE_BASH_FILE }}"'''))
         output = [line for line in bash.process() if line.lower().find("script") > 0]
         assert_that(len(output), equal_to(1))
-        assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=/tmp/pipeline-script-.*.sh'))
+        assert_that(output[0], matches_regexp('PIPELINE_BASH_FILE=.*/tmp/pipeline-script-.*.sh'))
 
     def test_dry_run(self):
         """Testing simple bash script in dry run mode."""

@@ -15,7 +15,7 @@
 # DAMAGES OR OTHER LIABILITY,
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-# pylint: disable=useless-super-delegation
+# pylint: disable=useless-super-delegation,bad-continuation
 import os
 import tempfile
 
@@ -55,14 +55,17 @@ class Container(Bash):
         with open(template_file) as handle:
             template = handle.read()
             # all fields are re-rendered via the Bash script
-            wrapped_script = render(template, recursive=False, container={
-                'image': 'centos:7' if 'image' not in entry else entry['image'],
-                'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
-                'background': False if 'background' not in entry else str(entry['background']).lower(),
-                'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
-                'network': '' if 'network' not in entry else entry['network'],
-                'script': config.script
-            })
+            wrapped_script = render(template, recursive=False, env=config.env,
+                model=config.model, item=config.item,  # noqa: E128
+                variables=config.variables, container={  # noqa: E128
+                    'image': 'centos:7' if 'image' not in entry else entry['image'],
+                    'remove': True if 'remove' not in entry else str(entry['remove']).lower(),
+                    'background': False if 'background' not in entry else str(entry['background']).lower(),
+                    'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
+                    'network': '' if 'network' not in entry else entry['network'],
+                    'script': config.script
+                }
+            )
 
             config.script = wrapped_script
 

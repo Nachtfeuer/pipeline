@@ -15,12 +15,17 @@
 # DAMAGES OR OTHER LIABILITY,
 # WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+from __future__ import (absolute_import, division, print_function)
+
+import re
+
 from jinja2 import Environment
 from jinja2.exceptions import TemplateSyntaxError, UndefinedError
+from six import string_types
 from spline.tools.logger import Logger
 
 
-def render(value, recursive=True, **kwargs):
+def render(value, **kwargs):  # noqa: C901
     """
     Use Jinja2 rendering for given text an key key/values.
 
@@ -42,19 +47,37 @@ def render(value, recursive=True, **kwargs):
     autoescaping wouldn't help. Usually the pipeline runs in a isolated environment
     and there should not be any injection from outside; that's why: nosec.
     """
+    raw_sentinal = '6db7f9f90d8c7519dcbb6ac0dd828a0f2a8ab18a34ab8b0cae0fb6c0469a1e19'
+    raw_regexp = re.compile(r"\{%\s*raw\s*%\}")
+    environment = None
+
+    def finalize(value):
+        """Our internal Jinja2 finalizer; which recursively renders."""
+        if isinstance(value, string_types) and '{{' in value:
+            if raw_sentinal in value:
+                value = value.replace(raw_sentinal, '')
+                value = raw_regexp.sub(('{%% raw %%}%s' % raw_sentinal), value)
+                return value
+
+            value = raw_regexp.sub(('{%% raw %%}%s' % raw_sentinal), value)
+            value = environment.from_string(value).render(kwargs)
+        return value
+
     try:
-        environment = Environment(autoescape=False)  # nosec
+        environment = Environment(autoescape=False, finalize=finalize)  # nosec
         environment.filters['render'] = render
         environment.filters['docker_environment'] = docker_environment
         environment.filters['find_matrix'] = find_matrix
         environment.filters['find_stages'] = find_stages
-        prev = value
-        while True:
-            curr = environment.from_string(prev).render(**kwargs)
-            if recursive and curr != prev:
-                prev = curr
-            else:
-                return curr
+
+        if isinstance(value, string_types) and 'raw' in value:
+            value = raw_regexp.sub(('{%% raw %%}%s' % raw_sentinal), value)
+
+        rendered_value = environment.from_string(value).render(kwargs)
+        if raw_sentinal in rendered_value:
+            rendered_value = rendered_value.replace(raw_sentinal, '')
+
+        return rendered_value
     except UndefinedError as exception:
         Logger.get_logger(__name__).error("render(undefined): %s", exception)
     except TemplateSyntaxError as exception:

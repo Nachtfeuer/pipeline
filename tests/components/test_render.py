@@ -86,4 +86,3 @@ class TestRender(unittest.TestCase):
         output = [line for line in bash.process() if len(line) > 0]
         assert_that(len(output), equal_to(1))
         assert_that(output[0], equal_to('hello'))
-

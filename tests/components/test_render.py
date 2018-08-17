@@ -4,8 +4,7 @@ import unittest
 from hamcrest import assert_that, equal_to
 
 from spline.components.bash import Bash
-from spline.components.tasks import Tasks, worker
-from spline.components.hooks import Hooks
+from spline.components.tasks import Tasks
 from spline.components.config import ApplicationOptions, ShellConfig
 from spline.pipeline import PipelineData
 

@@ -1,5 +1,6 @@
 """Module version."""
 import sys
+import re
 import json
 from spline.version import VERSION
 from spline.components.config import ShellConfig
@@ -50,16 +51,16 @@ class VersionsCheck(object):
     LOGGER = Logger.get_logger(__name__)
     """Logger instance for this class."""
 
-    BASH_VERSION = r'''bash --version|head -1|grep -Po "\d+(\.\d+)+"'''
+    BASH_VERSION = r'''bash --version|head -1'''
     """Find Bash version."""
 
-    DOCKER_VERSION = r'''docker version|grep "Version:"|head -1|grep -Po "\d+(\.\d+)+"'''
+    DOCKER_VERSION = r'''docker version|grep "Version:"|head -1'''
     """Find Docker version."""
 
     PACKER_VERSION = r'''packer -version'''
     """Find Packer version."""
 
-    ANSIBLE_VERSION = r'''ansible --version|grep -Po "\d+(\.\d+)+"'''
+    ANSIBLE_VERSION = r'''ansible --version'''
     """Find Ansible version."""
 
     def __init__(self):
@@ -100,7 +101,9 @@ class VersionsCheck(object):
             if line.find("command not found") >= 0:
                 VersionsCheck.LOGGER.error("Required tool '%s' not found (stopping pipeline)!", tool_name)
                 sys.exit(1)
-            result = {tool_name: Version(line)}
+            else:
+                version = list(re.findall(r'(\d+(\.\d+)+)+', line))[0][0]
+                result = {tool_name: Version(str(version))}
             break
         return result
 

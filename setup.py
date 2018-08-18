@@ -42,7 +42,7 @@ setup(name='spline',
       author='Thomas Lehmann',
       author_email='thomas.lehmann.private@gmail.com',
       license="MIT",
-      install_requires=["click", "pyaml", "jinja2", "schema"],
+      install_requires=["click", "pyaml", "jinja2", "schema", "six"],
       packages=find_packages(exclude=['tests', 'tests.*']),
       scripts=['scripts/spline'],
       package_data={'spline': [

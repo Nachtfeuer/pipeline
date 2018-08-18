@@ -190,10 +190,12 @@ class Bash(object):
                                     item=self.config.item, variables=self.config.variables))
 
         if temp_filename is not None:
-            for line in self.process_file(temp_filename):
-                yield line
-            # removing script
-            os.remove(temp_filename)
+            try:
+                for line in self.process_file(temp_filename):
+                    yield line
+            finally:
+                # removing script
+                os.remove(temp_filename)
 
         if not self.config.internal:
             if self.exit_code == 0:

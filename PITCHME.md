@@ -102,7 +102,6 @@ pipeline:
 ```
 (on my machine: `thomas: "hello world!"`)
 
- * support for automatic nested rendering
 
 ---
 @title[The With Field]

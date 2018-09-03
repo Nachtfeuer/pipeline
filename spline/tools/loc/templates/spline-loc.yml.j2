@@ -1,0 +1,29 @@
+---
+configuration:
+    - extension: .py
+      type: Python
+      regex: ([ ]*#[^\n]*|""".*?""")
+
+    - extension: .sh
+      type: Bash
+      regex: ([ ]*#[^\n]*)
+
+    - extension: .cxx .cpp .h .hpp
+      type: C++
+      regex: ([ ]*//[^\n]*|/\*.*?\*/)
+
+    - extension: .java
+      type: Java
+      regex: ([ ]*//[^\n]*|/\*.*?\*/)
+
+    - extension: .js
+      type: Javascript
+      regex: ([ ]*//[^\n]*|/\*.*?\*/)
+
+    - extension: .ts
+      type: Typescript
+      regex: ([ ]*//[^\n]*|/\*.*?\*/)
+
+    - extension: .groovy
+      type: Groovy
+      regex: ([ ]*//[^\n]*|/\*.*?\*/)

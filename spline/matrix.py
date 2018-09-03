@@ -30,7 +30,14 @@ from spline.tools.event import Event
 
 
 def matrix_worker(data):
-    """Run pipelines in parallel."""
+    """
+    Run pipelines in parallel.
+
+    Args:
+        data(dict): parameters for the pipeline (model, options, ...).
+    Returns:
+        dict: with two fields: success True/False and captured output (list of str).
+    """
     matrix = data['matrix']
     Logger.get_logger(__name__ + '.worker').info(
         "Processing pipeline for matrix entry '%s'", matrix['name'])
@@ -98,7 +105,7 @@ class Matrix(object):
     """Matrix handles multiple pipelines (ordered or in parallel)."""
 
     def __init__(self, matrix, parallel=False):
-        """Initialize pipeline with matrix data, a model and the pipeline."""
+        """Initialize pipeline with matrix data."""
         self.event = Event.create(__name__)
         self.logger = Logger.get_logger(__name__)
         self.matrix = matrix
@@ -106,7 +113,15 @@ class Matrix(object):
 
     @staticmethod
     def can_process_matrix(entry, matrix_tags):
-        """:return: True when matrix entry can be processed."""
+        """
+        Check given matrix tags to be in the given list of matric tags.
+
+        Args:
+            entry (dict): matrix item (in yaml).
+            matrix_tags (list): represents --matrix-tags defined by user in command line.
+        Returns:
+            bool: True when matrix entry can be processed.
+        """
         if len(matrix_tags) == 0:
             return True
 
@@ -119,7 +134,12 @@ class Matrix(object):
         return count > 0
 
     def run_matrix_ordered(self, process_data):
-        """Running pipelines one after the other."""
+        """
+        Running pipelines one after the other.
+
+        Returns
+            dict: with two fields: success True/False and captured output (list of str).
+        """
         output = []
         for entry in self.matrix:
             env = entry['env'].copy()

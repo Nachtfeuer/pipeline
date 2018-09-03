@@ -34,3 +34,4 @@ Welcome to spline's documentation!
    unicode
    report
    development
+   spline_loc.rst

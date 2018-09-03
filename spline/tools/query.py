@@ -31,9 +31,12 @@ class Select(object):
 
         >>> Select(1, 2, 3, 4).where(lambda n: n % 2 == 0).build()
         [2, 4]
+        >>> Select(1, 2, 3, 4).transform(lambda n: n * 2).build()
+        [2, 4, 6, 8]
         """
         self.sequence = Select.flatten(*args)
         self.filter_functions = []
+        self.transform_functions = []
 
     @staticmethod
     def flatten(*sequence):
@@ -53,6 +56,11 @@ class Select(object):
         self.filter_functions.append(filter_function)
         return self
 
+    def transform(self, transform_function):
+        """Register transfrom function."""
+        self.transform_functions.append(transform_function)
+        return self
+
     def build(self):
         """Do the query."""
         result = []
@@ -63,5 +71,8 @@ class Select(object):
                     ignore = True
                     break
             if not ignore:
-                result.append(entry)
+                value = entry
+                for transform_function in self.transform_functions:
+                    value = transform_function(value)
+                result.append(value)
         return result

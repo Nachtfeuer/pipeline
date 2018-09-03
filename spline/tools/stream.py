@@ -24,19 +24,25 @@ import sys
 import tempfile
 from contextlib import contextmanager
 
+if sys.version_info.major == 3:
+    from io import StringIO as Stream
+else:
+    from io import BytesIO as Stream
+
 
 @contextmanager
-def stdout_redirector(stream):
+def stdout_redirector():
     """
     Simplify redirect of stdout.
 
     Taken from here: https://eli.thegreenplace.net/2015/redirecting-all-kinds-of-stdout-in-python/
     """
     old_stdout = sys.stdout
-    sys.stdout = stream
+    sys.stdout = Stream()
     try:
-        yield
+        yield sys.stdout
     finally:
+        sys.stdout.close()
         sys.stdout = old_stdout
 
 

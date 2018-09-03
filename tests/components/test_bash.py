@@ -131,3 +131,16 @@ class TestBash(unittest.TestCase):
         assert_that(bash.render_bash_options(), equal_to('set -x\n'))
         bash = Bash(ShellConfig(script='''echo "hello"''', strict=True))
         assert_that(bash.render_bash_options(), equal_to('set -euo pipefail\n'))
+
+    def test_internal_flag(self):
+        """Testing simple bash script with internal flag."""
+        bash = Bash(ShellConfig(script='''echo "hello"''', internal=True))
+        output = [line for line in bash.process() if len(line) > 0]
+        assert_that(len(output), equal_to(1))
+        assert_that(output[0], equal_to('hello'))
+
+        bash = Bash(ShellConfig(script='''echo "hello"''', internal=True, dry_run=True))
+        output = [line for line in bash.process() if len(line) > 0]
+        assert_that(len(output), equal_to(2))
+        assert_that(output[0], equal_to('#!/bin/bash'))
+        assert_that(output[1], equal_to('echo "hello"'))

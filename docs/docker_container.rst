@@ -63,6 +63,18 @@ Here's an extract of the output:
     2017-10-29 12:46:07,583 - pipeline.components.tasks -  | CentOS Linux release 7.3.1611 (Core)
     2017-10-29 12:46:07,583 - pipeline.components.tasks -  |
 
+
+Using user labels
+-----------------
+The **docker(container)** task also have an optional dictionary attribute **lables**.
+The key has to be upper case and to start with **UL** (user label). All label
+allow Jinja2 rendering.
+
+The idea is to be able to adjust custom values from outside spline (environment variables)
+that can be used to query containers more easily.
+
+
+
 How to find a Docker container
 ------------------------------
  - Each Docker container gets additional labels:

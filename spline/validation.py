@@ -94,6 +94,10 @@ class Validator(object):
                         Optional('remove', default=True): bool,
                         # when set using --network= option (docker run)
                         Optional('network', default=''): And(str, len),
+                        # when set using --labels= option (docker run)
+                        Optional('labels'): And(len, {
+                            Regex(r'(UL[_A-Z]*)'): And(str, len)
+                        }),
                         # when defined used for --tags option (spline --tags=)
                         Optional('tags'): And([And(str, len)], len),
                         Optional('with'): And(len, [object]),

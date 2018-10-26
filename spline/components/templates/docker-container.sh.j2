@@ -20,6 +20,11 @@ if [ $# -eq 0 ]; then
         NETWORK="--network={{ container.network }}"
     fi
 
+    USER_LABELS=
+    {% for key, value in container.labels.items() %}
+        USER_LABELS="${USER_LABELS} --label {{ key }}={{ value }}"
+    {% endfor %}
+
     docker run --rm={{ container.remove }} \
         ${NETWORK} \
         -v $(dirname ${PIPELINE_BASH_FILE_ORIGINAL}):/root/scripts ${MOUNT} \
@@ -28,7 +33,7 @@ if [ $# -eq 0 ]; then
         --label="pipeline=${PIPELINE_PID}" \
         --label="pipeline-stage=${PIPELINE_STAGE}" \
         --label="creator=$$" \
-        --label="context=pipeline" \
+        --label="context=pipeline" ${USER_LABELS} \
         ${BACKGROUND_MODE}  {{ container.image }} \
         ${PIPELINE_BASH_FILE} INIT
 else

@@ -1,0 +1,23 @@
+pipeline:
+  - stage(Example):
+     - tasks(ordered):
+        - docker(container):
+            background: yes
+            labels:
+              UL_CONTEXT: example
+            script: |
+               echo "Hello world"
+               sleep infinity
+            tags:
+              - create
+
+        - shell:
+            title: cleanup docker container
+            script: |
+              {%raw%}
+              ID=$(docker ps --format={{.ID}} --filter "label=UL_CONTEXT=example")
+              {%endraw%}
+              echo "Found container ID=${ID}"
+              docker stop ${ID}
+            tags:
+              - cleanup

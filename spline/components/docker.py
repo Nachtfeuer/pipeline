@@ -61,6 +61,7 @@ class Container(Bash):
                 'background': False if 'background' not in entry else str(entry['background']).lower(),
                 'mount': False if 'mount' not in entry else str(entry['mount']).lower(),
                 'network': '' if 'network' not in entry else entry['network'],
+                'labels': {} if 'labels' not in entry else entry['labels'],
                 'script': config.script
             })
 

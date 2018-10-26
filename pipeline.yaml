@@ -34,16 +34,6 @@ model:
       scl enable python27 "bash -c \"pip install tox\""
       scl enable python27 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
 
-    init_py33: |
-      yum -y install centos-release-scl yum-utils git zlib-devel libjpeg-devel gcc make
-      yum-config-manager --enable rhel-server-rhscl-7-rpms
-      yum -y install python33
-      scl enable python33 "bash -c \"easy_install pip\""
-      scl enable python33 "bash -c \"pip install pip --upgrade\""
-      scl enable python33 "bash -c \"pip install setuptools --upgrade\""
-      scl enable python33 "bash -c \"pip install tox\""
-      scl enable python33 "bash -c \"{{ env.PIPELINE_BASH_FILE }} RUN\""
-
     init_py34: |
       yum -y install centos-release-scl yum-utils git zlib-devel libjpeg-devel gcc make
       yum-config-manager --enable rhel-server-rhscl-7-rpms
@@ -85,10 +75,10 @@ model:
 
     init_py37: |
       yum -y install wget gcc make openssl-devel libffi-devel git zlib-devel libjpeg-devel
-      wget -q https://www.python.org/ftp/python/3.7.0/Python-3.7.0a2.tar.xz
+      wget -q https://www.python.org/ftp/python/3.7.0/Python-3.7.0.tar.xz
       tar -xf $(ls Python*.tar.xz)
       cd Python*
-      ./configure
+      ./configure --enable-optimizations
       make && make altinstall
       ln -s /usr/local/bin/pip3.7 /usr/local/bin/pip
       pip install pip --upgrade

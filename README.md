@@ -12,10 +12,14 @@
 [![GitPitch](https://gitpitch.com/assets/badge.svg)](https://gitpitch.com/Nachtfeuer/pipeline/master)
 
 ---
-**Important note**: since change in my job I didn't had the chance to continue on this project. Also I want to keep this one alive
-  (with small improvements only) my main new project is here https://github.com/thomas-lehmann-private/hyperion which is planned to be
-  a improved task processing tool; step by step those one will be capable to have similar functionality across all platforms
-  (powershell, batch, bash, JShell, Groovy, Kotlin, Docker, ... features depend on platform). It's fully written in Java. Stay tuned.
+
+**Important note**:
+
+Since change in my job I didn't had the chance to continue on this project. Also I want to keep this one alive
+(with small improvements only) my main new project is here https://github.com/thomas-lehmann-private/hyperion which is planned to be
+a improved task processing tool; step by step those one will be capable to have similar functionality across all platforms
+(powershell, batch, bash, JShell, Groovy, Kotlin, Docker, ... features depend on platform). It's fully written in Java. Stay tuned.
+
 ---
 
 **Table Of Content**:  

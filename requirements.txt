@@ -30,3 +30,4 @@ jinja2 == 2.9.6
 click == 6.7
 pyaml == 17.8.0
 schema == 0.6.6
+pillow>=8.1.1 # not directly required, pinned by Snyk to avoid a vulnerability

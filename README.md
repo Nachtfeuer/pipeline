@@ -1,6 +1,5 @@
 # Welcome to spline - the pipeline tool
 
-[![Build Status](https://travis-ci.org/Nachtfeuer/pipeline.svg?branch=master)](https://travis-ci.org/Nachtfeuer/pipeline)
 [![PyPI version](https://img.shields.io/pypi/v/spline.svg)](https://pypi.python.org/pypi/spline)
 [![PyPI format](https://img.shields.io/pypi/format/spline.svg)](https://pypi.python.org/pypi/spline)
 [![PyPI versions](https://img.shields.io/pypi/pyversions/spline.svg)](https://pypi.python.org/pypi/spline)
@@ -9,15 +8,14 @@
 [![Coverage Status](https://coveralls.io/repos/github/Nachtfeuer/pipeline/badge.svg?branch=master&service=github)](https://coveralls.io/github/Nachtfeuer/pipeline?branch=master)
 [![BCH compliance](https://bettercodehub.com/edge/badge/Nachtfeuer/pipeline?branch=master)](https://bettercodehub.com/)
 [![Known Vulnerabilities](https://snyk.io/test/github/nachtfeuer/pipeline/badge.svg)](https://snyk.io/test/github/nachtfeuer/pipeline)
-[![GitPitch](https://gitpitch.com/assets/badge.svg)](https://gitpitch.com/Nachtfeuer/pipeline/master)
 
 ---
 
 **Important note**:
 
-Since change in my job I didn't had the chance to continue on this project. Also I want to keep this one alive
-(with small improvements only) my main new project is here https://github.com/thomas-lehmann-private/hyperion which is planned to be
-a improved task processing tool; step by step those one will be capable to have similar functionality across all platforms
+Since change in my job I didn't had the chance to continue on this project. My main new project is
+here https://github.com/thomas-lehmann-private/hyperion-task-processor which is planned to be
+a improved task processing tool; step by step those one will be capable to have more functionality across all platforms
 (powershell, batch, bash, JShell, Groovy, Kotlin, Docker, ... features depend on platform). It's fully written in Java. Stay tuned.
 
 ---

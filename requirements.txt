@@ -31,3 +31,4 @@ click == 6.7
 pyaml == 17.8.0
 schema == 0.6.6
 pillow>=8.3.0 # not directly required, pinned by Snyk to avoid a vulnerability
+setuptools>=65.5.1 # not directly required, pinned by Snyk to avoid a vulnerability

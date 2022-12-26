@@ -23,7 +23,7 @@ sphinx_rtd_theme == 0.2.4
 epydoc
 
 # package dependencies
-wheel == 0.29.0
+wheel == 0.38.1
 
 # runtime dependencies
 jinja2 == 2.9.6
